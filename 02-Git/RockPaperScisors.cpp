@@ -27,6 +27,21 @@ int main(int argc, char **argv)
     int pcPick = random() % 3;
     cout << "PC choose " << pick[pcPick] << endl;
 
+    if (userPick == pcPick)
+    {
+
+    }
+    else if (((userPick + 1) % 3) == pcPick)
+    {
+        /**pc win*/
+        cout << "PC win" << endl;
+    }
+    else
+    {
+        /**user win*/
+        cout << "You win" << endl;
+    }
+
     return 0;
 }
 
