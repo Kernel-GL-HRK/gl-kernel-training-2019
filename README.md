@@ -1,7 +1,13 @@
-# Linux kernel general course
-GlobalLogic Kharkiv, 2019
-* Mail group: _globallogic-kernel-training-hrk-2019@googlegroups.com_
+# Homework:
 
-This repository is aimed for sharing our exercises and your solutions in scope of the course.
+Create a rock-paper-scissors console game
+(rules https://en.wikipedia.org/wiki/Rock%E2%80%93paper%E2%80%93scissors)
 
-Please refer to [wiki](https://github.com/Kernel-GL-HRK/gl-kernel-training-2019/wiki) for details.
+The game should be simple, the goal is to create a git project with proper commit order and structure. E.g.:
+
+```
+> Please choose: rock (r) - paper (p) - scissors (s)
+> r
+> You choose rock, I choose paper
+> I win: paper beats rock
+```
