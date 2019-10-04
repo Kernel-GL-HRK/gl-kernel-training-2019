@@ -21,6 +21,22 @@ int main(int argc, char **argv)
     cout << "Please choose: rock (r) - paper (p) - scissors (s)" << endl;
     cin >> symb;
 
+    bool symbOk = false;
+    for (int i = 0; i < 3; i++)
+    {
+        if (pick[i] == symb)
+        {
+            symbOk = true;
+            userPick = i;
+            break;
+        }
+    }
+
+    if (symbOk == false)
+    {
+        return 1;
+    }
+
     cout << "You choose " << pick[userPick] << endl;
 
     srand(time(0));
