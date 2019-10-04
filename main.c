@@ -2,12 +2,12 @@
 #include <time.h>
 #include <stdlib.h>
 
-char get_my_choise()
+char get_my_choice()
 {
         return (char)(rand() % 3);
 }
 
-char get_user_choise()
+char get_user_choice()
 {
         char input = 0;
 
@@ -33,42 +33,42 @@ char get_user_choise()
         }
 }
 
-void print_result(char my_choise, char opponent_choise)
+void print_result(char my_choice, char opponent_choice)
 {
         const char *variants[] = {"paper", "rock", "scissors"};
 
-        printf("You chose %s, I chose %s.\n", variants[opponent_choise],
-                variants[my_choise]);
+        printf("You chose %s, I chose %s.\n", variants[opponent_choice],
+                variants[my_choice]);
 
-        if (my_choise == opponent_choise) {
-                printf("Draw: we both chose %s.\n\n", variants[my_choise]);
+        if (my_choice == opponent_choice) {
+                printf("Draw: we both chose %s.\n\n", variants[my_choice]);
         } else {
-                if ((my_choise == 0 && opponent_choise == 1) ||
-                        (my_choise == 1 && opponent_choise == 2) ||
-                        (my_choise == 2 && opponent_choise == 0))
+                if ((my_choice == 0 && opponent_choice == 1) ||
+                        (my_choice == 1 && opponent_choice == 2) ||
+                        (my_choice == 2 && opponent_choice == 0))
                         printf("I win: %s beats %s.\n\n",
-                                variants[my_choise],
-                                variants[opponent_choise]);
+                                variants[my_choice],
+                                variants[opponent_choice]);
                 else
                         printf("You win: %s beats %s.\n\n",
-                                variants[opponent_choise],
-                                variants[my_choise]);
+                                variants[opponent_choice],
+                                variants[my_choice]);
         }
 }
 
 int main()
 {
-        char user_choise;
-        char my_choise;
+        char user_choice;
+        char my_choice;
 
         srand(time(NULL));
 
         while (1) {
-                my_choise = get_my_choise();
-                user_choise = get_user_choise();
-                if (user_choise == 3)
+                my_choice = get_my_choice();
+                user_choice = get_user_choice();
+                if (user_choice == 3)
                         break;
-                print_result(my_choise, user_choise);
+                print_result(my_choice, user_choice);
         }
 
         return 0;
