@@ -37,22 +37,22 @@ void print_result(char my_choice, char opponent_choice)
 {
         const char *variants[] = {"paper", "rock", "scissors"};
 
-        printf("You chose %s, I chose %s.\n", variants[opponent_choice],
-                variants[my_choice]);
+        printf("You chose %s, I chose %s.\n", variants[(int)opponent_choice],
+                variants[(int)my_choice]);
 
         if (my_choice == opponent_choice) {
-                printf("Draw: we both chose %s.\n\n", variants[my_choice]);
+                printf("Draw: we both chose %s.\n\n", variants[(int)my_choice]);
         } else {
                 if ((my_choice == 0 && opponent_choice == 1) ||
                         (my_choice == 1 && opponent_choice == 2) ||
                         (my_choice == 2 && opponent_choice == 0))
                         printf("I win: %s beats %s.\n\n",
-                                variants[my_choice],
-                                variants[opponent_choice]);
+                                variants[(int)my_choice],
+                                variants[(int)opponent_choice]);
                 else
                         printf("You win: %s beats %s.\n\n",
-                                variants[opponent_choice],
-                                variants[my_choice]);
+                                variants[(int)opponent_choice],
+                                variants[(int)my_choice]);
         }
 }
 
