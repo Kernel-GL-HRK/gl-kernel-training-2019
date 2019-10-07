@@ -1,4 +1,6 @@
 #include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
 
 
 enum elements_of_game {
@@ -38,6 +40,14 @@ enum elements_of_game char_convert_to_element(char c_t_e)
 	}
 }
 
+enum elements_of_game generate_random_element(void)
+{
+	srand((unsigned int) time(NULL));
+	const int upper_bound = INCOR_VAL;
+	return (rand() % upper_bound);
+}
+
+
 
 int main(void)
 {
@@ -47,7 +57,11 @@ int main(void)
 	if (user_select == INCOR_VAL)
 		printf("Invalid user input\n");
 	else
-		printf("User choose %s\n", element_to_str(user_select));
+		printf("Man choose %s\n", element_to_str(user_select));
+
+		enum elements_of_game pc_choice = generate_random_element();
+
+		printf("Computer chose %s\n", element_to_str(pc_choice));
 	return 0;
 
 }
