@@ -5,6 +5,7 @@
 #include <time.h>
 
 #define NUM_STATE 3
+#define NUM_RULES 3
 
 typedef enum {
     G_ROCK,
@@ -13,6 +14,12 @@ typedef enum {
     G_GARBAGE
 } G_STATES;
 
+typedef enum {
+    G_LOSE,
+    G_WIN,
+    G_DRAW
+} G_STATUS;
+
 typedef struct {
     G_STATES state;
     char *long_name;
@@ -20,12 +27,24 @@ typedef struct {
     char *descriptions;
 } Options;
 
+typedef struct {
+    G_STATES player;
+    G_STATES computer;
+} SimpleWinRule;
+
 const Options parse_args[NUM_STATE] = {
     {G_ROCK, "rock", 'r', "Rock beats scissors"},
     {G_PAPER, "paper", 'p', "Paper beats rock"},
     {G_SCISSORS, "scissors", 's', "Scissors beats paper"},
 };
 
+const SimpleWinRule rules[] = {
+    {G_ROCK, G_SCISSORS},
+    {G_PAPER, G_ROCK},
+    {G_SCISSORS, G_PAPER}
+};
+
+G_STATUS Check(const Options *player, const Options *computer);
 Options *GetPlayerChoice();
 void Print_Help();
 void RunGame();
@@ -35,6 +54,23 @@ bool isGameRun = true;
 int main(int argc, char *argv[]) {
     RunGame();
     return 0;
+}
+
+G_STATUS Check(const Options *player, const Options *computer) {
+
+    if (player == NULL || computer == NULL) return G_DRAW;
+    if (player->state != computer->state) {
+        for (int rul = 0; rul < NUM_RULES; ++rul) {
+            if (player->state == rules[rul].player && computer->state == rules[rul].computer) {
+                return G_WIN;
+            }
+        }
+        return G_LOSE;
+    } else {
+        return G_DRAW;
+    }
+
+    return G_DRAW;
 }
 
 Options *GetComputerChoice() {
@@ -99,5 +135,6 @@ void RunGame() {
     while (isGameRun) {
         const Options *player = GetPlayerChoice();
         const Options *computer = GetComputerChoice();
+        const G_STATUS result = Check(player, computer);
     }
 }
