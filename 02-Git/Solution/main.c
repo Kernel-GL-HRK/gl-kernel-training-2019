@@ -15,12 +15,24 @@ int main(){
         switch (symbol[0]){
             case 'r':
                 printf("You choose 'r', I choose %s \n",(char*)&choose_pc);
+                if('p' == choose_pc[0])
+                    printf("===========You lose===========\n");
+                else
+                    printf("===========You win===========\n");
                 break;
             case 'p':
                 printf("You choose 'p', I choose %s \n",(char*)&choose_pc);
+                if('s' == choose_pc[0])
+                    printf("===========You lose===========\n");
+                else
+                    printf("===========You win===========\n");
                 break;
             case 's':
                 printf("You choose 's', I choose %s \n",(char*)&choose_pc);
+                if('r' == choose_pc[0])
+                    printf("===========You lose===========\n");
+                else
+                    printf("===========You win===========\n");
                 break;
             default:
                 printf("Error\n");
