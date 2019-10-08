@@ -44,9 +44,16 @@ const SimpleWinRule rules[] = {
     {G_SCISSORS, G_PAPER}
 };
 
+const char *status_name[] = {
+    "lose",
+    "wine",
+    "draw"
+};
+
 G_STATUS Check(const Options *player, const Options *computer);
 Options *GetPlayerChoice();
 void Print_Help();
+void PrintResult(const Options *player, const Options *computer, const G_STATUS result);
 void RunGame();
 
 bool isGameRun = true;
@@ -128,6 +135,16 @@ void Print_Help() {
     printf("Please choose: rock (r) - paper (p) - scissors (s)\n");
 }
 
+void PrintResult(const Options *player, const Options *computer, const G_STATUS result) {
+    if (player == NULL || computer == NULL) {
+        printf("Exit!\n");
+        return;
+    }
+
+    printf("You choose %s, choose %s\n", player->long_name, computer->long_name);
+    printf("I %s: %s beats %s\n", status_name[result], player->long_name, computer->long_name);
+}
+
 void RunGame() {
     Print_Help();
     isGameRun = true;
@@ -136,5 +153,6 @@ void RunGame() {
         const Options *player = GetPlayerChoice();
         const Options *computer = GetComputerChoice();
         const G_STATUS result = Check(player, computer);
+        PrintResult(player, computer, result);
     }
 }
