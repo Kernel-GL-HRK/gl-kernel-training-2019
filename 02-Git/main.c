@@ -1,5 +1,8 @@
 #include <stdio.h>
+#include <unistd.h>
+#include <stdlib.h>
 #include <stdbool.h>
+#include <time.h>
 
 #define NUM_STATE 3
 
@@ -32,6 +35,25 @@ bool isGameRun = true;
 int main(int argc, char *argv[]) {
     RunGame();
     return 0;
+}
+
+Options *GetComputerChoice() {
+    Options *ret = NULL;
+    const char computer_choice = rand() % (NUM_STATE);
+
+    for (int s = 0; s < NUM_STATE; ++s) {
+        if (computer_choice == parse_args[s].state) {
+            ret = (Options *) & parse_args[s];
+            break;
+        }
+    }
+
+    if (ret == NULL) {
+        Print_Help();
+        isGameRun = false;
+    }
+
+    return ret;
 }
 
 Options *ParseChoice(const char choice) {
@@ -73,7 +95,9 @@ void Print_Help() {
 void RunGame() {
     Print_Help();
     isGameRun = true;
+    srand(time(NULL));
     while (isGameRun) {
         const Options *player = GetPlayerChoice();
+        const Options *computer = GetComputerChoice();
     }
 }
