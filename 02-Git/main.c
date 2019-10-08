@@ -25,6 +25,19 @@ int main() {
 
     printf("Computer: %s", str[index]);
 
+    // comaring values and detection of winer
+    if (computer_val == human_val) {
+        printf("Nobody wins\n");
+    }
+    else if (((computer_val == 'r') && (human_val == 'p')) ||
+             ((computer_val == 'p') && (human_val == 's')) ||
+             ((computer_val == 's') && (human_val == 'r'))) {
+        printf("Human wins\n");
+    }
+    else {
+        printf("Computer wins\n");
+    }
+
     return 0;
 
 }
