@@ -13,12 +13,14 @@ enum PRS
 // function prototypes
 int getUserChoice();
 int getCompChoise();
+void calculateResult(int userChoice, int compChoise);
 
 // main function
 int main()
 {
 	int userChoise = getUserChoice();
 	int compChoise = getCompChoise();
+	calculateResult(userChoise, compChoise);
 
 	//
 	return 0;
@@ -50,5 +52,18 @@ int getCompChoise()
 
 	// result
 	return choise;
+}
+
+// get result function
+void calculateResult(int userChoice, int compChoise)
+{
+	if(userChoice == compChoise)
+		printf("Equal\n");
+	else if((userChoice == PRS_PAPER && compChoise == PRS_ROCK) || 
+		(userChoice == PRS_ROCK && compChoise == PRS_SCISSORS) || 
+		(userChoice == PRS_SCISSORS && compChoise == PRS_PAPER)) 
+		printf("You win!!!\n");
+	else
+		printf("You lose\n");
 }
 
