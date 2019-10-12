@@ -46,9 +46,20 @@ user_validation(){
 	return 1
  }
 
+ get_file_id(){
+	echo $(ls -nd "$1" | cut --delimiter=" " -f 3)
+}
+
+get_file_grup(){
+	echo $(ls -nd "$1" | cut --delimiter=" " -f 4)
+}
+
 ##########_MAIN_#########
 
 parse_args $@
+
+echo "Use help is $_help"
+echo "Use forse is $_forse"
 
 if [ "$_help" = true ]; then
 	help
@@ -63,5 +74,11 @@ while read -r line;do
 
 	user_validation $ID
 	if [  $? -eq 0 ]; then
+		FILE_ID_USER=$(get_file_id $HOME_DIR)
+
+		if [ $FILE_ID_USER -ne $ID ]; then
+			echo "The directory $HOME_DIR doesn't belong to the user $USER with id $ID !"
+		fi
+
 	fi
 done < /etc/passwd
