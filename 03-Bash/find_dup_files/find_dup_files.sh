@@ -4,8 +4,15 @@
 sourceDir=$(pwd)
 
 # set new source dir if available
-if [ $# -ne 0 ]; then 
-    sourceDir=$1
+if [ $# -ne 0 ]; then
+    if [ $1 = "-h" -o $1 = "--help" ]; then
+        echo "$0 [-h | --help | DIRECTORY] "
+        echo "$0 - srcipt check files in DIRECTORY with same md5 sum"
+        echo "      -h | --help - print this help"
+        exit 0
+    else
+        sourceDir=$1
+    fi
 fi
 
 cd $sourceDir
