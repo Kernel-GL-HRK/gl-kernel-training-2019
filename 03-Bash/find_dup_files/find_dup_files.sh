@@ -2,6 +2,8 @@
 
 _DIR=""
 _list_file="list.txt"
+_list_all_file="list_all.txt"
+_list_md5sum_file="md5sum.txt"
 
 help(){
 cat <<EOF
@@ -31,6 +33,20 @@ get_md4sum(){
 	md5sum "$1" | cut --delimiter=" " -f 1
 }
 
+#1-input_list_file 2-md5sum_file 3-all_info
+creat_list_md5sum(){
+	echo -n > $3
+	echo -n > $2
+	while read -r _line;do
+		_md5sum=$(get_md4sum "$_line" | tr -d '\n')
+		echo -n $_md5sum >> $3
+		echo $_md5sum >> $2
+
+		echo -n "\t$(du -b "$_line" | cut -f1)" >> $3
+		echo "\t\"$_line\"" >> $3
+	done < $1
+}
+
 ##########_MAIN_#########
 
 parse_args $@
@@ -45,4 +61,5 @@ if [ ! -d "$_DIR" ] || [ -z "$_DIR" ]; then
 fi
 
 creat_list_for_check $_DIR $_list_file
+creat_list_md5sum $_list_file $_list_md5sum_file $_list_all_file
 
