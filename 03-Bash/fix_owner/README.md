@@ -7,7 +7,7 @@ In case of inequality of user's id and file/dir/link owner's id
 ask for fixing it.
 Do the same for default user's group file/dir/link group id.
 Script should support command-line options:
-  -f, --force - fix without asknowledgement,
+  -f, --force - fix without acknowledgement,
   -h, --help - print these options.
 
 Tips:
