@@ -47,6 +47,17 @@ creat_list_md5sum(){
 	done < $1
 }
 
+#1-md5sum_file 2-all_info
+compare_and_show_results(){
+	local old_md5sum=""
+	while read -r _line;do
+		if [ "$old_md5sum" = "$_line" ]; then
+			echo "$(cat $2 | grep $_line)"
+		fi
+		old_md5sum=$_line
+	done < $1
+}
+
 ##########_MAIN_#########
 
 parse_args $@
@@ -63,4 +74,5 @@ fi
 creat_list_for_check $_DIR $_list_file
 creat_list_md5sum $_list_file $_list_md5sum_file $_list_all_file
 sort $_list_md5sum_file -o $_list_md5sum_file
+compare_and_show_results $_list_md5sum_file $_list_all_file
 
