@@ -62,4 +62,5 @@ fi
 
 creat_list_for_check $_DIR $_list_file
 creat_list_md5sum $_list_file $_list_md5sum_file $_list_all_file
+sort $_list_md5sum_file -o $_list_md5sum_file
 
