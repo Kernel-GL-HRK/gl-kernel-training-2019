@@ -1,6 +1,7 @@
 #!/bin/sh
 
 _DIR=""
+_list_file="list.txt"
 
 help(){
 cat <<EOF
@@ -20,6 +21,16 @@ parse_args(){
 	done
 }
 
+#1-dir 2-file_check_list
+creat_list_for_check(){
+	echo -n "" > $2
+	find $1 -type f -name "*" | sed 's/ /\\ /g' >> $2
+}
+
+get_md4sum(){
+	md5sum "$1" | cut --delimiter=" " -f 1
+}
+
 ##########_MAIN_#########
 
 parse_args $@
@@ -29,11 +40,9 @@ if [ "$_help" = true ]; then
 	exit 0
 fi
 
-echo "DIR: $_DIR";
-
-if [ ! -d $_DIR ] || [ -z $_DIR ]; then
+if [ ! -d "$_DIR" ] || [ -z "$_DIR" ]; then
 	_DIR=$(pwd)
 fi
 
-echo "DIR: $_DIR";
+creat_list_for_check $_DIR $_list_file
 
