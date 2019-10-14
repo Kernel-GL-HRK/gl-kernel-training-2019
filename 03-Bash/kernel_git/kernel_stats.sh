@@ -1,6 +1,7 @@
 #!/bin/sh
 
 _DIR=""
+_file_stat=$(mktemp)
 
 help(){
 cat <<EOF
@@ -31,6 +32,32 @@ count_comits(){
 	cd $tmp_dir
 }
 
+save_statistic(){
+	local tmp_dir="$(pwd)"
+	local _py_files=$(mktemp)
+	local _py_authors=$(mktemp)
+	local _tmp_file=$(mktemp)
+
+	cd $1
+	echo $_py_files
+	find . -type f -name "*.py"  > $_py_files
+	echo -n > $2
+
+	while read -r _line;do
+		echo "file: $_line"
+		git blame -e "$_line" > $_tmp_file
+		sync
+		cat $_tmp_file | grep -i -o '[A-Z0-9._%+-]\+@[A-Z0-9.-]\+\.[A-Z]\{2,4\}' | sort | uniq > $_py_authors
+		while read -r _author;do
+			info="$_author\t$(cat $_tmp_file | grep "$_author" | wc -l)\t$_line"
+			echo "$info" >> $2
+			echo "$info"
+		done < $_py_authors
+	done < $_py_files
+	rm $_py_files $_tmp_file $_py_authors
+	cd $tmp_dir
+}
+
 ##########_MAIN_#########
 
 parse_args $@
@@ -46,4 +73,7 @@ fi
 
 count_files_in_dir $_DIR
 count_comits $_DIR
+save_statistic $_DIR $_file_stat
+
+rm $_file_stat
 
