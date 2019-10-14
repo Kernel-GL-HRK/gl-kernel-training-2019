@@ -24,6 +24,13 @@ count_files_in_dir(){
 	echo "count *.py :\t $(find "$1" -type f -name "*.py" | wc -l)"
 }
 
+count_comits(){
+	local tmp_dir="$(pwd)"
+	cd $1
+	echo "count word \"revert\" in commits:\t $(git log --oneline | grep revert | wc -l)"
+	cd $tmp_dir
+}
+
 ##########_MAIN_#########
 
 parse_args $@
@@ -38,4 +45,5 @@ if [ ! -d "$_DIR" ] || [ -z "$_DIR" ]; then
 fi
 
 count_files_in_dir $_DIR
+count_comits $_DIR
 
