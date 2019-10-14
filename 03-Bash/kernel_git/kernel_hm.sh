@@ -24,5 +24,9 @@ echo Quantity of files with extention .py in target diretory:
 ls -lR | grep --count \.py$
 
 echo
+echo Quantity of commits with word \'revert\'
+git rev-list HEAD --count --grep='revert'
+
+echo
 echo name of executed script:
 echo $0
