@@ -2,6 +2,7 @@
 
 _DIR=""
 _file_stat=$(mktemp)
+_file_count_stat=$(mktemp)
 
 help(){
 cat <<EOF
@@ -58,6 +59,25 @@ save_statistic(){
 	cd $tmp_dir
 }
 
+#1(in)-file with statistic, 2(out)-file with count all lines of the author in all files
+count_all_statistic(){
+	local count_line=""
+	local old_line=""
+	echo -n > $2
+	while read column1 column2 column3 ; do
+
+		if [ "$old_line" = "$column1" ]; then
+			count_line=$(expr $count_line + ${column2})
+		else
+			echo "$old_line $count_line" >> $2
+			echo "$old_line $count_line"
+			count_line=$(expr $column2)
+		fi
+
+		old_line=$column1
+	done < $1
+}
+
 ##########_MAIN_#########
 
 parse_args $@
@@ -75,5 +95,11 @@ count_files_in_dir $_DIR
 count_comits $_DIR
 save_statistic $_DIR $_file_stat
 
-rm $_file_stat
+sort $_file_stat -o $_file_stat
+
+echo ""
+echo "Statistics for all files."
+
+count_all_statistic $_file_stat $_file_count_stat
+rm $_file_stat $_file_count_stat
 
