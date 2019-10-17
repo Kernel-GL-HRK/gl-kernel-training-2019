@@ -6,12 +6,18 @@ if [ -n "$1" ]; then
 			FORCE_FLAG="1"
 			;;
 		-h | --help)
-			echo "Usage: fix_owner.sh [OPTION]"
-			echo -e "...\n"
-			echo "Options (no more than one argument):"
-			echo -e "\t-h, --help     display this help and exit"
-			echo -e "\t-f, --force    fix without asknowledgement\n"
-			exit
+		echo "Usage: fix_owner.sh [OPTION]"
+		echo "Search for files / folders with ID and GROUP_ID in"
+		echo "the user's home directory that do not match the"
+		echo "FILE_ID and FILE_GROUP_ID of this user."
+		echo "Options (no more than one argument):"
+		echo -e "\t-h, --help     display this help and exit"
+		echo -e "\t-f, --force    fix without asknowledgement\n"
+		exit
+		;;
+		*)
+		echo "Parameter is fault"
+		exit
 		;;
 	esac
 fi
