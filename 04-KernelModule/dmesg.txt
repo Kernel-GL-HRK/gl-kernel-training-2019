@@ -1,0 +1,10 @@
+the4th@the4th-Aspire-A715-72G:~/Projects/GL/myFork/gl-kernel-training-2019.git/04-KernelModule$ sudo insmod mymodule.ko par=-1
+insmod: ERROR: could not insert module mymodule.ko: Operation not permitted
+the4th@the4th-Aspire-A715-72G:~/Projects/GL/myFork/gl-kernel-training-2019.git/04-KernelModule$ dmesg
+[181370.900776] Init module
+[181370.900777] Input parameter = -1
+the4th@the4th-Aspire-A715-72G:~/Projects/GL/myFork/gl-kernel-training-2019.git/04-KernelModule$ sudo insmod mymodule.ko par=0
+the4th@the4th-Aspire-A715-72G:~/Projects/GL/myFork/gl-kernel-training-2019.git/04-KernelModule$ dmesg
+[181432.361673] Init module
+the4th@the4th-Aspire-A715-72G:~/Projects/GL/myFork/gl-kernel-training-2019.git/04-KernelModule$ sudo rmmod mymodule
+the4th@the4th-Aspire-A715-72G:~/Projects/GL/myFork/gl-kernel-training-2019.git/04-KernelModule$ lsmod | grep mymodule
