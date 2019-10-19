@@ -4,6 +4,8 @@ _help=false
 _force=false
 _check_list_file=$(mktemp)
 
+exec 3<&0
+
 help(){
 cat <<EOF
 For use:
@@ -48,11 +50,11 @@ user_validation(){
  }
 
  get_file_id(){
-	echo $(ls -nd "$1" | cut --delimiter=" " -f 3)
+	echo $(stat -c "%u" "$1")
 }
 
 get_file_grup(){
-	echo $(ls -nd "$1" | cut --delimiter=" " -f 4)
+	echo $(stat -c "%g" "$1")
 }
 
 #1-dir 2-file_check_list
@@ -65,24 +67,27 @@ creat_list_for_check(){
 check_item(){
 	if [ -d $1 ]; then
 		local FILE_ID_USER=$(get_file_id $1)
-		local FILE_GRUP_USER=$(get_file_grup $1)
 
-		if [ $FILE_ID_USER -ne $3 ] || [ $FILE_GRUP_USER -ne $4 ]; then
+		if [ $FILE_ID_USER -ne $3 ] ; then
 			if [ "$_force" = true ]; then
-				echo chown $3:$4 $1
+				echo chown $3 $1
 			else
 				if [ $FILE_ID_USER -ne $3 ]; then
 					echo "The directory $1 doesn't belong to the user $2 with id $3 !"
-				fi
-				if [ $FILE_GRUP_USER -ne $4 ]; then
-					echo "The directory $1 doesn't belong to the user $2 with grup $4 !"
-				fi
 
-				read -p "To fix? [y/n]" _key < /dev/tty
+					read -p "To fix? [y/n]" _key <&3
 
-				case "${_key}" in
-				    [yY]) echo chown $3:$4 $1 ;echo "Fix!"  ;;
-				esac
+					case "${_key}" in
+					    [yY])
+							chown $3 $1
+							if [ $(get_file_id $1) -eq $3 ]; then
+								echo "Fix!"
+							else
+								echo "Not fix!"
+							fi  ;;
+					esac
+
+				fi
 			fi
 		fi
 		if [ $? -ne 0 ]; then
@@ -122,3 +127,4 @@ while read -r line;do
 done < /etc/passwd
 
 rm $_check_list_file
+exec 3<&-
