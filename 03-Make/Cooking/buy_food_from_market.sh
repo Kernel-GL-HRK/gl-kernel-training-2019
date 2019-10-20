@@ -10,7 +10,7 @@ CARROT=$(cat food-market/carrot.txt)
 OIL=$(cat food-market/oil.txt)
 GREENPEAS=$(cat food-market/greenpeas.txt)
 
-echo -e "Buy $CHIKEN, $POTATO, $CARROT, $SALT, $ONION, $OIL, $GREENPEAS in the food market"
+echo "Buy $CHIKEN, $POTATO, $CARROT, $SALT, $ONION, $OIL, $GREENPEAS in the food market" > $1
 
 cp food-market/chicken.txt kitchen/table/
 cp food-market/potato.txt kitchen/table/
