@@ -1,0 +1,14 @@
+vadim@vadim-l1:~/work/ssd_250/gl-kernel-training-2019/gl-kernel-training-2019/04-kernel$ sudo insmod mymodule.ko
+insmod: ERROR: could not insert module mymodule.ko: Operation not permitted
+vadim@vadim-l1:~/work/ssd_250/gl-kernel-training-2019/gl-kernel-training-2019/04-kernel$ lsmod | grep mymo
+vadim@vadim-l1:~/work/ssd_250/gl-kernel-training-2019/gl-kernel-training-2019/04-kernel$ sudo insmod mymodule.ko myparam=0
+vadim@vadim-l1:~/work/ssd_250/gl-kernel-training-2019/gl-kernel-training-2019/04-kernel$ lsmod | grep mymo
+mymodule               16384  0
+vadim@vadim-l1:~/work/ssd_250/gl-kernel-training-2019/gl-kernel-training-2019/04-kernel$ sudo rmmod mymodule 
+vadim@vadim-l1:~/work/ssd_250/gl-kernel-training-2019/gl-kernel-training-2019/04-kernel$ lsmod | grep mymo
+vadim@vadim-l1:~/work/ssd_250/gl-kernel-training-2019/gl-kernel-training-2019/04-kernel$ dmesg 
+[ 1925.208269] mymodule: myparam = -1
+[ 1962.964764] mymodule: myparam = 0
+[ 1962.964765] mymodule: module loaded
+[ 1977.960142] mymodule: module exited
+vadim@vadim-l1:~/work/ssd_250/gl-kernel-training-2019/gl-kernel-training-2019/04-kernel$ 
