@@ -59,6 +59,6 @@ clean:
 	rm -Rf ./kitchen
 else
 soup_nomake: script_nomake.sh
-	./$<
+	./$< $(MEAT) $(POTATOES) $(ONIONS) $(CARROT) $(SALT) $(WATER)
 endif
 
