@@ -5,10 +5,15 @@
 #include <linux/device.h>
 #include <linux/err.h>
 
+static int vp_param = -1;
+
+module_param(vp_param, int, 0);
+
 static int vp_module_init(void)
 {
+	pr_info("vp_module: vp_param = %d\n", vp_param);
 	pr_info("vp_module loaded\n");
-	return 0;
+	return vp_param;
 }
 
 static void vp_module_exit(void)
