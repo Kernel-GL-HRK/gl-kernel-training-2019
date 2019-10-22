@@ -1,0 +1,36 @@
+[ 1616.704392] Init module
+[ 1616.704396] Input parameter = -5
+[ 1638.721138] Init module
+[ 1651.247296] Remove module
+[ 2431.819096] Init module
+[ 2431.819099] Input parameter = -27
+[ 2443.004786] Init module
+[ 2443.004790] Input parameter = -8
+[ 2456.403865] Init module
+[ 2456.403869] Input parameter = 4
+[ 2456.403872] do_init_module: 'mymodule'->init suspiciously returned 4, it should follow 0/-E convention
+               do_init_module: loading module anyway...
+[ 2456.403877] CPU: 3 PID: 5887 Comm: insmod Tainted: G           OE    4.15.0-65-generic #74-Ubuntu
+[ 2456.403878] Hardware name: LENOVO 23539LU/23539LU, BIOS G7ETA4WW (2.64 ) 10/08/2015
+[ 2456.403880] Call Trace:
+[ 2456.403896]  dump_stack+0x63/0x8e
+[ 2456.403906]  do_init_module+0x8d/0x213
+[ 2456.403912]  load_module+0x1939/0x1f30
+[ 2456.403921]  ? ima_post_read_file+0x96/0xa0
+[ 2456.403928]  SYSC_finit_module+0xfc/0x120
+[ 2456.403932]  ? SYSC_finit_module+0xfc/0x120
+[ 2456.403939]  SyS_finit_module+0xe/0x10
+[ 2456.403946]  do_syscall_64+0x73/0x130
+[ 2456.403954]  entry_SYSCALL_64_after_hwframe+0x3d/0xa2
+[ 2456.403958] RIP: 0033:0x7efc3537e839
+[ 2456.403961] RSP: 002b:00007ffc72c706e8 EFLAGS: 00000246 ORIG_RAX: 0000000000000139
+[ 2456.403965] RAX: ffffffffffffffda RBX: 0000564944d5b7a0 RCX: 00007efc3537e839
+[ 2456.403967] RDX: 0000000000000000 RSI: 0000564944d5b260 RDI: 0000000000000003
+[ 2456.403970] RBP: 0000564944d5b260 R08: 0000000000000000 R09: 0000000000000000
+[ 2456.403972] R10: 0000000000000003 R11: 0000000000000246 R12: 0000000000000000
+[ 2456.403974] R13: 0000564944d5deb0 R14: 0000000000000000 R15: 0000564944d5b260
+[ 2542.250410] Remove module
+[ 2564.093289] Init module
+[ 2564.093293] Input parameter = -1
+[ 2576.110626] Init module
+[ 2582.872060] Remove module
