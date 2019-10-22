@@ -1,0 +1,23 @@
+dmytro@dmytro-HP-EliteBook-840-G2:~/gl/gl-kernel-training-2019/04-KernelModule$ sudo dmesg --clear 
+dmytro@dmytro-HP-EliteBook-840-G2:~/gl/gl-kernel-training-2019/04-KernelModule$ sudo rmmod mymodule 
+dmytro@dmytro-HP-EliteBook-840-G2:~/gl/gl-kernel-training-2019/04-KernelModule$ sudo insmod mymodule.ko
+dmytro@dmytro-HP-EliteBook-840-G2:~/gl/gl-kernel-training-2019/04-KernelModule$ dmesg 
+[62355.858460] OK, the module is running
+[62384.711559] Goodbye, world!
+[62389.771949] Hello, world!
+dmytro@dmytro-HP-EliteBook-840-G2:~/gl/gl-kernel-training-2019/04-KernelModule$ sudo rmmod mymodule 
+dmytro@dmytro-HP-EliteBook-840-G2:~/gl/gl-kernel-training-2019/04-KernelModule$ sudo insmod mymodule.ko myparam=-1
+insmod: ERROR: could not insert module mymodule.ko: Operation not permitted
+dmytro@dmytro-HP-EliteBook-840-G2:~/gl/gl-kernel-training-2019/04-KernelModule$ dmesg 
+[62355.858460] OK, the module is running
+[62384.711559] Goodbye, world!
+[62389.771949] Hello, world!
+[62389.771950] OK, the module is running
+[62408.213895] Goodbye, world!
+[62412.070988] Hello, world!
+[62412.070990] Error,the module is not running
+dmytro@dmytro-HP-EliteBook-840-G2:~/gl/gl-kernel-training-2019/04-KernelModule$ sudo rmmod mymodule 
+rmmod: ERROR: Module mymodule is not currently loaded
+dmytro@dmytro-HP-EliteBook-840-G2:~/gl/gl-kernel-training-2019/04-KernelModule$ lsmod | grep mymod
+dmytro@dmytro-HP-EliteBook-840-G2:~/gl/gl-kernel-training-2019/04-KernelModule$ 
+ 
