@@ -1,0 +1,12 @@
+[161925.754996] Test_module_info: function - test_module_init:20 - Test module is loaded!
+[161925.754998] Test_module_info: function - test_module_init:21 - Parameter is 0
+[161931.311630] Test_module_info: function - test_module_stop:31 - Test module is removed!
+[161935.426110] Test_module_error: function - test_module_init:23 - Test module isn't loaded!
+[161935.426113] Test_module_error: function - test_module_init:24 - Parameter is -1
+[161941.074586] Test_module_error: function - test_module_init:23 - Test module isn't loaded!
+[161941.074590] Test_module_error: function - test_module_init:24 - Parameter is -2
+[161943.620199] Test_module_error: function - test_module_init:23 - Test module isn't loaded!
+[161943.620201] Test_module_error: function - test_module_init:24 - Parameter is -3
+[161948.690309] Test_module_info: function - test_module_init:20 - Test module is loaded!
+[161948.690310] Test_module_info: function - test_module_init:21 - Parameter is 0
+[161952.794361] Test_module_info: function - test_module_stop:31 - Test module is removed!
