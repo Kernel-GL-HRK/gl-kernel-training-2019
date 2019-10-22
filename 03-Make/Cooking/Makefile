@@ -1,7 +1,8 @@
-#!/usr/bin/make -f 
+#!/usr/bin/make -f
 
-DIRMARKET=food-market
+PATHMARKET=food-market
 PATHPOT=kitchen/table/pot/
+PATHFPAN=kitchen/table/fpan/
 
 SOURCE += salt.txt
 SOURCE += chicken.txt
@@ -11,46 +12,61 @@ SOURCE += oil.txt
 SOURCE += greenpeas.txt
 SOURCE += carrot.txt
 
-FOOD = $(addprefix $(DIRMARKET)/, $(SOURCE))
+FOOD = $(addprefix $(PATHMARKET)/, $(SOURCE))
 
 receipt_ready.txt: buy_food add_frying
 	./ready.sh
 
-add_frying: kitchen/table/pot add_greenpeas frying
-	./put_frying_to_pot.sh kitchen/table/pot/add_frying.txt
+add_frying: add_greenpeas frying ${PATHPOT}
+	echo "Put the frying to the pot and boil 3 min" \
+	> ${PATHPOT}add_frying.txt
 
-add_greenpeas: kitchen/table/pot add_potato frying
-	./put_greenpeas_to_pot.sh 200 kitchen/table/pot/add_greenpeas.txt
+add_greenpeas: add_potato ${PATHPOT}
+	echo "Put 100 g of the $$(cat kitchen/table/greenpeas.txt)" \
+	" to the pot and boil 3 min" > ${PATHPOT}add_greenpeas.txt
 
-add_potato: kitchen/table/pot add_salt
-	./put_potate_to_pot.sh 500 kitchen/table/pot/add_potato.txt
+add_potato: add_salt ${PATHPOT}
+	echo "Peel 50 g of the $$(cat kitchen/table/potato.txt),"\
+	" cut it, put to the pot"\
+	" and boil 20-30 min" > ${PATHPOT}add_potato.txt
 
-frying: kitchen/table/fpan/ add_carrot add_onion add_oil
-	./frying.sh kitchen/table/fpan/frying.txt
+frying: add_carrot add_onion add_oil ${PATHFPAN}
+	cat ${PATHFPAN}add_oil.txt > ${PATHFPAN}frying.txt
+	cat ${PATHFPAN}add_onion.txt >> ${PATHFPAN}frying.txt
+	cat ${PATHFPAN}add_carrot.txt >> ${PATHFPAN}frying.txt
 
-add_carrot: kitchen/table/fpan/ add_onion
-	./put_carrot_to_fpan.sh 1 kitchen/table/fpan/add_carrot.txt
+add_carrot: add_onion ${PATHFPAN}
+	echo "Chop one $$(cat kitchen/table/carrot.txt),"\
+	" put it to the frying pan and fry it" > \
+	${PATHFPAN}add_carrot.txt
 
-add_onion: kitchen/table/fpan add_oil
-	./put_onion_to_fpan.sh 2 kitchen/table/fpan/add_onion.txt
+add_onion: add_oil ${PATHFPAN}
+	echo "Cut 1-2 st. of the $$(cat kitchen/table/onion.txt),"\
+	" put it to the frying pan and fry it" \
+	> ${PATHFPAN}add_onion.txt
 
-add_oil: kitchen/table/fpan buy_food
-	./put_oil_to_fpan.sh 50 kitchen/table/fpan/add_oil.txt
+add_oil: buy_food ${PATHFPAN}
+	echo "Put 50 g of the $$(cat kitchen/table/oil.txt)" \
+	" to the hot frying pan" > ${PATHFPAN}add_oil.txt
 
-add_salt: kitchen/table/pot add_chicken
-	./put_salt_to_pot.sh kitchen/table/pot/add_salt.txt
+add_salt: add_chicken ${PATHPOT}
+	echo "Put the $$(cat kitchen/table/salt.txt) to the pot and mix it" > \
+	${PATHPOT}add_salt.txt
 
-add_chicken: kitchen/table/pot add_water
-	./put_chicken_to_pot.sh 500 kitchen/table/pot/add_chicken.txt
+add_chicken: add_water ${PATHPOT}
+	echo "Put 500 g of the $$(cat kitchen/table/chicken.txt) to the pot" \
+	" and boil 60 min" > ${PATHPOT}add_chicken.txt
 
-add_water: kitchen/table/pot buy_food
+add_water: buy_food ${PATHPOT}
 	./get_water_from_faucet.sh 2000 kitchen/table/pot/add_water.txt
 
-buy_food: $(FOOD)
+buy_food: create_res $(FOOD)
 	./buy_food_from_market.sh kitchen/table/receipt.txt
 
+create_res:
+	./create_res.sh ${PATHMARKET} kitchen/faucet/
 
 .PHONY: clean
 
 clean:
-	find "kitchen/table/" -type f -name "*.txt" -delete 
+	find -type f -name "*.txt" -delete
