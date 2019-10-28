@@ -1,0 +1,25 @@
+anton@anton-pc:~/Desktop/testerLesson4$ sudo dmesg --clear
+anton@anton-pc:~/Desktop/testerLesson4$ sudo insmod mymodule.ko myparam=-1
+insmod: ERROR: could not insert module mymodule.ko: Operation not permitted
+anton@anton-pc:~/Desktop/testerLesson4$ dmesg
+[ 9375.067104] mymodule: module is loading...
+[ 9375.067105] mymodule: loading error
+[ 9375.067106] mymodule: myparam = -1
+anton@anton-pc:~/Desktop/testerLesson4$ lsmod | grep mymodule
+anton@anton-pc:~/Desktop/testerLesson4$ sudo dmesg --clear
+anton@anton-pc:~/Desktop/testerLesson4$ sudo insmod mymodule.ko myparam=0
+anton@anton-pc:~/Desktop/testerLesson4$ dmesg
+[ 9578.161339] mymodule: module is loading...
+[ 9578.161339] mymodule: module is loaded
+[ 9578.161340] mymodule: myparam = 0
+anton@anton-pc:~/Desktop/testerLesson4$ lsmod | grep mymodule
+mymodule               16384  0
+anton@anton-pc:~/Desktop/testerLesson4$ sudo rmmod mymodule 
+anton@anton-pc:~/Desktop/testerLesson4$ dmesg
+[ 9578.161339] mymodule: module is loading...
+[ 9578.161339] mymodule: module is loaded
+[ 9578.161340] mymodule: myparam = 0
+[ 9670.729256] mymodule: module removed
+anton@anton-pc:~/Desktop/testerLesson4$ lsmod | grep mymodule
+anton@anton-pc:~/Desktop/testerLesson4$ 
+
