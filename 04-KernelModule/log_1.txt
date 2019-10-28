@@ -1,0 +1,90 @@
+ghost@ghost-TravelMate-5760G:
+~/Documents/global_logic/gl-kernel-training-2019/repository/vlad_fork/gl-kernel-training-2019/04-KernelModule
+$ sudo insmod simple_module.ko myparam=-1
+insmod: ERROR: could not insert module simple_module.ko: Operation not permitted
+ghost@ghost-TravelMate-5760G:
+~/Documents/global_logic/gl-kernel-training-2019/repository/vlad_fork/gl-kernel-training-2019/04-KernelModule
+$ ls
+Makefile        README.md         simple_module.mod.c
+modules.order   simple_module.c   simple_module.mod.o
+Module.symvers  simple_module.ko  simple_module.o
+ghost@ghost-TravelMate-5760G:
+~/Documents/global_logic/gl-kernel-training-2019/repository/vlad_fork/gl-kernel-training-2019/04-KernelModule
+$ lsmod | grep simple_module
+ghost@ghost-TravelMate-5760G:
+~/Documents/global_logic/gl-kernel-training-2019/repository/vlad_fork/gl-kernel-training-2019/04-KernelModule
+$ dmesg
+[31124.483906] simple_module: start module for loading...
+[31124.483908] simple_module: wait for loaded module ...
+[31124.483909] simple_module: loading error
+[31124.483910] simple_module: myparam = -1
+ghost@ghost-TravelMate-5760G:
+~/Documents/global_logic/gl-kernel-training-2019/repository/vlad_fork/gl-kernel-training-2019/04-KernelModule
+$ sudo dmesg --clear
+ghost@ghost-TravelMate-5760G:
+~/Documents/global_logic/gl-kernel-training-2019/repository/vlad_fork/gl-kernel-training-2019/04-KernelModule
+$ sudo insmod simple_module myparam=0
+insmod: ERROR: could not load module simple_module: No such file or directory
+ghost@ghost-TravelMate-5760G:
+~/Documents/global_logic/gl-kernel-training-2019/repository/vlad_fork/gl-kernel-training-2019/04-KernelModule
+$ lsmod | grep simple_module
+ghost@ghost-TravelMate-5760G:
+~/Documents/global_logic/gl-kernel-training-2019/repository/vlad_fork/gl-kernel-training-2019/04-KernelModule
+$ sudo insmod simple_module.ko myparam=0
+ghost@ghost-TravelMate-5760G:
+~/Documents/global_logic/gl-kernel-training-2019/repository/vlad_fork/gl-kernel-training-2019/04-KernelModule
+$ lsmod | grep simple_module
+simple_module          16384  0
+ghost@ghost-TravelMate-5760G:
+~/Documents/global_logic/gl-kernel-training-2019/repository/vlad_fork/gl-kernel-training-2019/04-KernelModule
+$ dmesg
+[31195.539525] simple_module: start module for loading...
+[31195.539526] simple_module: wait for loaded module ...
+[31195.539526] simple_module: module is loaded
+[31195.539527] simple_module: myparam = 0
+[31200.144983] ata1: log page 10h reported inactive tag 16
+[31200.144995] ata1.00: exception Emask 0x1 SAct 0x20000 SErr 0x0 action 0x0
+[31200.145000] ata1.00: irq_stat 0x40000008
+[31200.145006] ata1.00: failed command: WRITE FPDMA QUEUED
+[31200.145016] ata1.00: cmd 61/08:88:18:3f:a0/00:00:00:00:00/40 tag 17 ncq dma 4096 out
+                        res 40/00:88:18:3f:a0/00:00:00:00:00/40 Emask 0x1 (device error)
+[31200.145021] ata1.00: status: { DRDY }
+[31200.145352] ata1.00: supports DRM functions and may not be fully accessible
+[31200.148741] ata1.00: supports DRM functions and may not be fully accessible
+[31200.151764] ata1.00: configured for UDMA/133
+[31200.151776] ata1: EH complete
+[31200.151898] ata1.00: Enabling discard_zeroes_data
+ghost@ghost-TravelMate-5760G:
+~/Documents/global_logic/gl-kernel-training-2019/repository/vlad_fork/gl-kernel-training-2019/04-KernelModule
+$ lsmod | grep simple_module
+simple_module          16384  0
+ghost@ghost-TravelMate-5760G:
+~/Documents/global_logic/gl-kernel-training-2019/repository/vlad_fork/gl-kernel-training-2019/04-KernelModule
+$ sudo rmmod simple_module
+ghost@ghost-TravelMate-5760G:
+~/Documents/global_logic/gl-kernel-training-2019/repository/vlad_fork/gl-kernel-training-2019/04-KernelModule
+$ dmesg
+[31195.539525] simple_module: start module for loading...
+[31195.539526] simple_module: wait for loaded module ...
+[31195.539526] simple_module: module is loaded
+[31195.539527] simple_module: myparam = 0
+[31200.144983] ata1: log page 10h reported inactive tag 16
+[31200.144995] ata1.00: exception Emask 0x1 SAct 0x20000 SErr 0x0 action 0x0
+[31200.145000] ata1.00: irq_stat 0x40000008
+[31200.145006] ata1.00: failed command: WRITE FPDMA QUEUED
+[31200.145016] ata1.00: cmd 61/08:88:18:3f:a0/00:00:00:00:00/40 tag 17 ncq dma 4096 out
+                        res 40/00:88:18:3f:a0/00:00:00:00:00/40 Emask 0x1 (device error)
+[31200.145021] ata1.00: status: { DRDY }
+[31200.145352] ata1.00: supports DRM functions and may not be fully accessible
+[31200.148741] ata1.00: supports DRM functions and may not be fully accessible
+[31200.151764] ata1.00: configured for UDMA/133
+[31200.151776] ata1: EH complete
+[31200.151898] ata1.00: Enabling discard_zeroes_data
+[31266.788425] simple_module: module removed
+ghost@ghost-TravelMate-5760G:
+~/Documents/global_logic/gl-kernel-training-2019/repository/vlad_fork/gl-kernel-training-2019/04-KernelModule
+$ lsmod | grep simple_module
+ghost@ghost-TravelMate-5760G:
+~/Documents/global_logic/gl-kernel-training-2019/repository/vlad_fork/gl-kernel-training-2019/04-KernelModule
+$ 
+
