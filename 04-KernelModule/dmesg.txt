@@ -1,0 +1,57 @@
+[13:42:14][baldman@bcs-dm][~/projects/c/gl-kernel-training-2019/04-KernelModule]$ dmesg
+[13:42:18][baldman@bcs-dm][~/projects/c/gl-kernel-training-2019/04-KernelModule]$ sudo insmod mymodule.ko
+[13:42:22][baldman@bcs-dm][~/projects/c/gl-kernel-training-2019/04-KernelModule]$ dmesg
+[50969.443433] Init simple Linux module
+[13:42:23][baldman@bcs-dm][~/projects/c/gl-kernel-training-2019/04-KernelModule]$ sudo rmmod mymodule
+[13:42:27][baldman@bcs-dm][~/projects/c/gl-kernel-training-2019/04-KernelModule]$ dmesg
+[50969.443433] Init simple Linux module
+[50974.900355] Remove simple Linux module
+[13:42:30][baldman@bcs-dm][~/projects/c/gl-kernel-training-2019/04-KernelModule]$ sudo insmod mymodule.ko myparam=1
+[13:43:07][baldman@bcs-dm][~/projects/c/gl-kernel-training-2019/04-KernelModule]$ dmesg
+[50969.443433] Init simple Linux module
+[50974.900355] Remove simple Linux module
+[51014.027753] Init simple Linux module
+[51014.027754] Input parameter = 1
+[13:43:08][baldman@bcs-dm][~/projects/c/gl-kernel-training-2019/04-KernelModule]$ sudo rmmod mymodule
+[13:43:12][baldman@bcs-dm][~/projects/c/gl-kernel-training-2019/04-KernelModule]$ dmesg
+[50969.443433] Init simple Linux module
+[50974.900355] Remove simple Linux module
+[51014.027753] Init simple Linux module
+[51014.027754] Input parameter = 1
+[51019.271182] Remove simple Linux module
+[13:43:14][baldman@bcs-dm][~/projects/c/gl-kernel-training-2019/04-KernelModule]$ sudo insmod mymodule.ko myparam=666
+insmod: ERROR: could not insert module mymodule.ko: Operation not permitted
+[13:43:19][baldman@bcs-dm][~/projects/c/gl-kernel-training-2019/04-KernelModule]$ dmesg
+[50969.443433] Init simple Linux module
+[50974.900355] Remove simple Linux module
+[51014.027753] Init simple Linux module
+[51014.027754] Input parameter = 1
+[51019.271182] Remove simple Linux module
+[51026.603606] Init simple Linux module
+[51026.603608] Input parameter = 666
+[13:43:42][baldman@bcs-dm][~/projects/c/gl-kernel-training-2019/04-KernelModule]$ sudo insmod mymodule.ko myparam=5
+[13:43:56][baldman@bcs-dm][~/projects/c/gl-kernel-training-2019/04-KernelModule]$ dmesg
+[50969.443433] Init simple Linux module
+[50974.900355] Remove simple Linux module
+[51014.027753] Init simple Linux module
+[51014.027754] Input parameter = 1
+[51019.271182] Remove simple Linux module
+[51026.603606] Init simple Linux module
+[51026.603608] Input parameter = 666
+[51026.603608] Something went wrong ...
+[51063.284879] Init simple Linux module
+[51063.284881] Input parameter = 5
+[13:45:44][baldman@bcs-dm][~/projects/c/gl-kernel-training-2019/04-KernelModule]$ sudo rmmod mymodule
+[13:45:49][baldman@bcs-dm][~/projects/c/gl-kernel-training-2019/04-KernelModule]$ dmesg
+[50969.443433] Init simple Linux module
+[50974.900355] Remove simple Linux module
+[51014.027753] Init simple Linux module
+[51014.027754] Input parameter = 1
+[51019.271182] Remove simple Linux module
+[51026.603606] Init simple Linux module
+[51026.603608] Input parameter = 666
+[51026.603608] Something went wrong ...
+[51063.284879] Init simple Linux module
+[51063.284881] Input parameter = 5
+[51176.611335] Remove simple Linux module
+[13:45:52][baldman@bcs-dm][~/projects/c/gl-kernel-training-2019/04-KernelModule]$
