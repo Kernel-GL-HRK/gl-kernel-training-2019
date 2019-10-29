@@ -1,0 +1,5 @@
+[ 2243.924188] vp_module: loading out-of-tree module taints kernel.
+[ 2243.924266] vp_module: module verification failed: signature and/or required key missing - tainting kernel
+[ 2243.924500] vp_module: vp_param = -1
+[ 2243.924500] vp_module loaded
+
