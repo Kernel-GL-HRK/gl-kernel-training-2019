@@ -26,16 +26,31 @@ POT = pot
 SLICED_PRODUCTS = sliced_products
 DINNING_ROOM = dinning_room
 PRODUCTS = products
+WATER = water
 
+
+define CREATE_DIRECTORIES_VAL 
+#!/bin/bash
+mkdir -vp ./$(FOOD_MARKET)/
+mkdir -vp ./$(KITCHEN)/$(TABLE)/$(SPOON)
+mkdir -vp ./$(KITCHEN)/$(TABLE)/$(KNIFE)
+mkdir -vp ./$(KITCHEN)/$(TABLE)/$(POT)
+mkdir -vp ./$(KITCHEN)/$(PRODUCTS)
+mkdir -vp ./$(KITCHEN)/$(SLICED_PRODUCTS)
+mkdir -vp ./$(DINNING_ROOM)
+endef
+export CREATE_DIRECTORIES_VAL
 
 TOTAL_GOAL_PRODUCTS = $(POTATOES).txt $(CABBAGE).txt \
 			$(ONIONS).txt $(MEAT).txt \
 			$(CARROT).txt $(SALT).txt
+			
+
 
 CREATE_WITHOUT_MAKE = "create_without_make.sh"
 
-$(GOAL): create_directories $(TOTAL_GOAL_PRODUCTS) buy_products cut_products \
-	 move_sliced_products_to_pot bouling
+$(GOAL): create_directories $(TOTAL_GOAL_PRODUCTS) $(WATER).txt buy_products \
+	 cut_products move_sliced_products_to_pot bouling
 ifneq ($(ARG),-k)
 	@cat ./$(KITCHEN)/$(TABLE)/$(POT)/*.txt
 	@echo "$(GOAL) is cooked!"
@@ -53,19 +68,9 @@ ifneq ($(ARG),-k)
 	mkdir -vp ./$(KITCHEN)/$(PRODUCTS)
 	mkdir -vp ./$(KITCHEN)/$(SLICED_PRODUCTS)
 	mkdir -vp ./$(DINNING_ROOM)
-	touch ./$(KITCHEN)/water.txt
 else
-	touch ./$(CREATE_WITHOUT_MAKE)
-	chmod a+x ./$(CREATE_WITHOUT_MAKE)
-	@echo "#!/bin/bash" >> $(CREATE_WITHOUT_MAKE)
-	@echo "mkdir -vp ./$(FOOD_MARKET)/" >> $(CREATE_WITHOUT_MAKE)
-	@echo "mkdir -vp ./$(KITCHEN)/$(TABLE)/$(SPOON)" >> $(CREATE_WITHOUT_MAKE)
-	@echo "mkdir -vp ./$(KITCHEN)/$(TABLE)/$(KNIFE)" >> $(CREATE_WITHOUT_MAKE)
-	@echo "mkdir -vp ./$(KITCHEN)/$(TABLE)/$(POT)" >> $(CREATE_WITHOUT_MAKE)
-	@echo "mkdir -vp ./$(KITCHEN)/$(PRODUCTS)" >> $(CREATE_WITHOUT_MAKE)
-	@echo "mkdir -vp ./$(KITCHEN)/$(SLICED_PRODUCTS)" >> $(CREATE_WITHOUT_MAKE)
-	@echo "mkdir -vp ./$(DINNING_ROOM)" >> $(CREATE_WITHOUT_MAKE)
-	@echo "touch ./$(KITCHEN)/water.txt" >> $(CREATE_WITHOUT_MAKE)
+	@echo "$$CREATE_DIRECTORIES_VAL" > ./$(CREATE_WITHOUT_MAKE)
+	@chmod a+x ./$(CREATE_WITHOUT_MAKE)
 endif
 
 potatoes.txt:
@@ -137,6 +142,7 @@ endif
 move_sliced_products_to_pot:
 ifneq ($(ARG),-k)
 	@cp $(KITCHEN)/$(SLICED_PRODUCTS)/* ./$(KITCHEN)/$(TABLE)/$(POT)
+	@cp $(KITCHEN)/$(WATER).txt ./$(KITCHEN)/$(TABLE)/$(POT)
 else
 	@echo "cp $(KITCHEN)/$(SLICED_PRODUCTS)/* ./$(KITCHEN)/$(TABLE)/$(POT)" >> $(CREATE_WITHOUT_MAKE)
 endif
@@ -144,7 +150,7 @@ endif
 
 bouling: bouling.sh
 ifneq ($(ARG),-k)
-	./$< $(TOTAL_GOAL_PRODUCTS)
+	./$< $(TOTAL_GOAL_PRODUCTS) $(WATER).txt
 else
 	@echo "./$< $(TOTAL_GOAL_PRODUCTS)" >> $(CREATE_WITHOUT_MAKE)
 endif
