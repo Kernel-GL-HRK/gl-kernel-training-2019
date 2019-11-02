@@ -9,9 +9,12 @@
 #include <linux/kernel.h>
 #include <linux/proc_fs.h>
 #include <linux/uaccess.h>
+#include <linux/device.h>
 
 #define DIR_NAME_PROCFS "module_05"
 #define ENT_NAME_PROCFS "uppercase"
+#define CLASS_ENT_NAME_SYSFS "lowercase"
+#define CLASS_NAME_SYSFS DIR_NAME_PROCFS
 
 static struct proc_dir_entry *dir;
 static struct proc_dir_entry *ent_uppercase;
@@ -21,6 +24,68 @@ static ssize_t str_size;
 
 static char str_show[PAGE_SIZE];
 
+static struct class *attr_class;
+
+void lowercase(void)
+{
+	int i;
+
+	for (i = 0; i < str_size; ++i) {
+		str_show[i] = str[i];
+		if (str_show[i] >= 'a' && str_show[i] <= 'z')
+			str_show[i] -= 'a' - 'A';
+	}
+}
+
+static ssize_t rw_show(struct class *class,
+	struct class_attribute *attr, char *buf)
+{
+	lowercase();
+	pr_info("%s: str_show = %s\n", __func__, str_show);
+
+	sprintf(buf, "%s", str_show);
+	return strlen(buf);
+}
+
+static ssize_t rw_store(struct class *class,
+	struct class_attribute *attr, const char *buf, size_t count)
+{
+	memcpy(str, buf, count);
+
+	str_size = count;
+
+	pr_info("%s: str = %s\n", __func__, str);
+	return count;
+}
+
+/*CLASS_ATTR_RW(rw);*/
+struct class_attribute class_attr_rw = {
+	.attr = { .name = CLASS_ENT_NAME_SYSFS, .mode = 0666 },
+	.show	= rw_show,
+	.store	= rw_store
+};
+
+int init_sysfs(void)
+{
+	int ret;
+
+	attr_class = class_create(THIS_MODULE, CLASS_NAME_SYSFS);
+	if (attr_class == NULL) {
+		pr_err("%s: error creating sysfs class\n", __func__);
+		return -ENOMEM;
+	}
+
+	ret = class_create_file(attr_class, &class_attr_rw);
+	if (ret) {
+		pr_err("%s: error creating sysfs class attribute\n", __func__);
+		class_destroy(attr_class);
+		return ret;
+	}
+
+	pr_info("%s: module loaded\n", __func__);
+
+	return 0;
+}
 
 void uppercase(void)
 {
@@ -113,6 +178,11 @@ static int module_05(void)
 	pr_info("%s: module starting\n",  __func__);
 	ret = init_procfs();
 
+	if (ret < 0)
+		return ret;
+
+	ret = init_sysfs();
+
 	return ret;
 }
 
@@ -120,6 +190,8 @@ static void module_05_exit(void)
 {
 	pr_info("%s: module exit\n",  __func__);
 	proc_remove(dir);
+
+	class_destroy(attr_class);
 }
 
 
