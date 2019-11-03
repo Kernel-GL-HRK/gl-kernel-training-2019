@@ -14,7 +14,8 @@
 
 static char msg[PAGE_SIZE];
 static char buffer[PAGE_SIZE] = "0";
-static ssize_t msg_size, buf_size;
+static char proc_buffer[PAGE_SIZE] = "0";
+static ssize_t msg_size, buf_size, proc_buffer_size;
 static struct proc_dir_entry *uc_dir;
 static struct proc_dir_entry *ent_conv, *ent_stat_calls,
 			*ent_stat_proc, *ent_stat_conv;
@@ -65,6 +66,24 @@ static ssize_t uc_stat_calls_read(struct file *file, char __user *pbuf,
 	return num;
 }
 
+static ssize_t uc_stat_proc_read(struct file *file, char __user *pbuf,
+					size_t count, loff_t *ppos)
+{
+
+	ssize_t num, not_copied;
+
+	pr_info("uppercase_conv_module: Number of processed charaters: %d\n", total_procedded_ch);
+	num = min_t(ssize_t, proc_buffer_size, count);
+	if (num) {
+		not_copied = copy_to_user(pbuf, proc_buffer, num);
+		num -= not_copied;
+	}
+
+	proc_buffer_size = 0; /* Indicate EOF on next read */
+
+	return num;
+}
+
 static ssize_t uc_conv_write(struct file *file, const char __user *pbuf,
 						size_t count, loff_t *ppos)
 {
@@ -108,6 +127,11 @@ static struct file_operations uc_stat_calls = {
 	.read = uc_stat_calls_read,
 };
 
+static struct file_operations uc_stat_proc = {
+	.owner = THIS_MODULE,
+	.read = uc_stat_proc_read,
+};
+
 static struct file_operations uc_ops = {
 	.owner = THIS_MODULE,
 	.read = uc_conv_read,
@@ -133,6 +157,14 @@ static int uppercase_converter_module_init(void)
 
 	ent_stat_calls = proc_create(NCALLS_NAME, 0444, uc_dir, &uc_stat_calls);
 	if (ent_stat_calls == NULL) {
+		pr_err("uppercase_conv_module: error creating procfs entry 1\n");
+		proc_remove(uc_dir);
+		return -ENOMEM;
+	}
+
+	ent_stat_proc = proc_create(NPROCESSED_CH_NAME, 0444,
+					uc_dir, &uc_stat_proc);
+	if (ent_stat_proc == NULL) {
 		pr_err("uppercase_conv_module: error creating procfs entry 1\n");
 		proc_remove(uc_dir);
 		return -ENOMEM;
