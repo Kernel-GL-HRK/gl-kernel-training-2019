@@ -16,6 +16,8 @@
 #define CLASS_ENT_NAME_SYSFS "lowercase"
 #define CLASS_NAME_SYSFS DIR_NAME_PROCFS
 
+#define STATISTICS_NAME "statistics"
+
 static struct proc_dir_entry *dir;
 static struct proc_dir_entry *ent_uppercase;
 
@@ -26,21 +28,47 @@ static char str_show[PAGE_SIZE];
 
 static struct class *attr_class;
 
+static int count_convert_char_to_up;
+static int count_convert_char_to_down;
+
+
+void make_stat(char *buf)
+{
+	sprintf(buf,
+		"converted lowercase characters:\t%d\n"
+		"converted uppercase characters:\t%d\n"
+		"converted characters:\t%d\n",
+		count_convert_char_to_up,
+		count_convert_char_to_down,
+		count_convert_char_to_up + count_convert_char_to_down);
+}
+
 void lowercase(void)
 {
 	int i;
 
 	for (i = 0; i < str_size; ++i) {
 		str_show[i] = str[i];
-		if (str_show[i] >= 'a' && str_show[i] <= 'z')
+		if (str_show[i] >= 'a' && str_show[i] <= 'z') {
 			str_show[i] -= 'a' - 'A';
+			count_convert_char_to_up++;
+		}
 	}
 }
+
+static ssize_t stat_show(struct class *class,
+	struct class_attribute *attr, char *buf)
+{
+	pr_info("%s: str_show = %s\n", __func__, str_show);
+
+	make_stat(buf);
+	return strlen(buf);
+}
+
 
 static ssize_t rw_show(struct class *class,
 	struct class_attribute *attr, char *buf)
 {
-	lowercase();
 	pr_info("%s: str_show = %s\n", __func__, str_show);
 
 	sprintf(buf, "%s", str_show);
@@ -54,6 +82,8 @@ static ssize_t rw_store(struct class *class,
 
 	str_size = count;
 
+	lowercase();
+
 	pr_info("%s: str = %s\n", __func__, str);
 	return count;
 }
@@ -63,6 +93,11 @@ struct class_attribute class_attr_rw = {
 	.attr = { .name = CLASS_ENT_NAME_SYSFS, .mode = 0666 },
 	.show	= rw_show,
 	.store	= rw_store
+};
+
+struct class_attribute class_attr_statistics = {
+	.attr = { .name = STATISTICS_NAME, .mode = 0444 },
+	.show	= stat_show
 };
 
 int init_sysfs(void)
@@ -82,6 +117,13 @@ int init_sysfs(void)
 		return ret;
 	}
 
+	ret = class_create_file(attr_class, &class_attr_statistics);
+	if (ret) {
+		pr_err("%s: error creating sysfs class attribute\n", __func__);
+		class_destroy(attr_class);
+		return ret;
+	}
+
 	pr_info("%s: module loaded\n", __func__);
 
 	return 0;
@@ -93,8 +135,10 @@ void uppercase(void)
 
 	for (i = 0; i < str_size; ++i) {
 		str_show[i] = str[i];
-		if (str_show[i] >= 'A' && str_show[i] <= 'Z')
+		if (str_show[i] >= 'A' && str_show[i] <= 'Z') {
 			str_show[i] += 'a' - 'A';
+			count_convert_char_to_down++;
+		}
 	}
 }
 
@@ -118,6 +162,8 @@ static ssize_t uppercase_write(struct file *file,
 
 	str_size = count - not_copied;
 
+	uppercase();
+
 	pr_info("%s: msg_size=%d\n", __func__, str_size);
 
 	return str_size;
@@ -129,8 +175,6 @@ static ssize_t uppercase_read(struct file *file,
 	ssize_t num, not_copied;
 
 	pr_info("%s: count=%d\n", __func__, count);
-
-	uppercase();
 
 	num = min_t(ssize_t, str_size, count);
 	if (num) {
@@ -144,7 +188,30 @@ static ssize_t uppercase_read(struct file *file,
 	return num;
 }
 
+static ssize_t stat_read(struct file *file,
+	char __user *pbuf, size_t count, loff_t *ppos)
+{
+	static char buf[PAGE_SIZE];
+	static ssize_t count_read;
+	ssize_t not_copied;
 
+	make_stat(buf);
+	count_read++;
+	if (count_read <= 1) {
+		not_copied =  copy_to_user(pbuf, buf, strlen(buf));
+		count_read++;
+		return strlen(buf) - not_copied;
+	} else if (count_read >= 4) { // for utils cat
+		count_read = 0;
+	}
+
+	return 0;
+}
+
+static const struct file_operations stat_ops = {
+	.owner = THIS_MODULE,
+	.read = stat_read
+};
 
 static const struct file_operations myops = {
 	.owner = THIS_MODULE,
@@ -166,6 +233,14 @@ int init_procfs(void)
 		remove_proc_entry(DIR_NAME_PROCFS, NULL);
 		return -ENOMEM;
 	}
+
+	ent_uppercase = proc_create(STATISTICS_NAME, 0444, dir, &stat_ops);
+	if (ent_uppercase == NULL) {
+		pr_err("%s: error creating procfs entry\n", __func__);
+		remove_proc_entry(DIR_NAME_PROCFS, NULL);
+		return -ENOMEM;
+	}
+
 	return 0;
 }
 
@@ -182,6 +257,9 @@ static int module_05(void)
 		return ret;
 
 	ret = init_sysfs();
+
+	if (ret < 0)
+		proc_remove(dir);
 
 	return ret;
 }
