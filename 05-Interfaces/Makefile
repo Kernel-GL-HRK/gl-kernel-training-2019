@@ -1,4 +1,5 @@
 obj-m += test_module_procfs.o
+obj-m += test_module_sysfs.o
 
 KERNEL_DIR :=  /home/bekir/Work/LinuxKernelCamp/linux/linux-stable
 
