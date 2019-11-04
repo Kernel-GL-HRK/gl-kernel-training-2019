@@ -1,0 +1,14 @@
+bekir@bekir-GL553VE:~$ ssh -p 8022 user@localhost
+user@localhost's password: 
+$ sudo insmod test_module_procfs.ko 
+Password: 
+$ echo "qwerty123ABc" > /proc/test_module/string_convert        
+$ cat /proc/test_module/string_convert        
+QWERTY123ABC
+$ cat /proc/test_module/total_stat     
+TOTAL_CONV = 7
+TOTAL_CHARS = 12
+TOTAL_CALLS = 2
+$ sudo rmmod test_module_procfs.ko 
+$ 
+

@@ -1,0 +1,14 @@
+bekir@bekir-GL553VE:~$ ssh -p 8022 user@localhost
+user@localhost's password: 
+$ sudo insmod test_module_sysfs.ko
+Password: 
+$ echo "QWERTY123Asdf1" > /sys/class/test_module_sysfs/string_conv
+$ cat /sys/class/test_module_sysfs/string_conv 
+qwerty123asdf1
+$ cat /sys/class/test_module_sysfs/total_stat 
+TOTAL_CONV = 7
+TOTAL_CHARS = 14
+TOTAL_CALLS = 1
+$ sudo rmmod test_module_sysfs.ko 
+$ 
+
