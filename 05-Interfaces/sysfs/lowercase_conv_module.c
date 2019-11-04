@@ -7,11 +7,14 @@
 static char msg[PAGE_SIZE];
 
 static int total_calls;
+static int total_procedded_ch;
+static int total_converted_ch;
 
 static char ch_to_lower(const char ch)
 {
-
+	total_procedded_ch++;
 	if (ch >= 'A' && ch <= 'Z') {
+		total_converted_ch++;
 		return (ch + 32);
 	}
 	return ch;
@@ -29,6 +32,26 @@ static int to_lowercase(char *input_str, size_t count)
 	}
 	return 0;
 
+}
+
+static ssize_t proc_show(struct class *class,
+				struct class_attribute *attr,
+						char *buf)
+{
+	pr_info("lowercase_conv_module: num of processed is %d\n",
+						total_procedded_ch);
+	sprintf(buf, "num of processed: %d\n", total_procedded_ch);
+	return strlen(buf);
+}
+
+static ssize_t conv_show(struct class *class,
+				struct class_attribute *attr,
+						char *buf)
+{
+	pr_info("lowercase_conv_module: num of converted is %d\n",
+						total_converted_ch);
+	sprintf(buf, "num of converted: %d\n", total_converted_ch);
+	return strlen(buf);
 }
 
 static ssize_t calls_show(struct class *class,
@@ -75,6 +98,16 @@ struct class_attribute class_attr_stat_calls = {
 	.show	= calls_show,
 };
 
+struct class_attribute class_attr_stat_proc = {
+	.attr = { .name = "num_proc", .mode = 0444 },
+	.show	= proc_show,
+};
+
+struct class_attribute class_attr_stat_conv = {
+	.attr = { .name = "num_conv", .mode = 0444 },
+	.show	= conv_show,
+};
+
 static struct class *attr_class = 0;
 
 static int lowercase_converter_module_init(void)
@@ -97,6 +130,20 @@ static int lowercase_converter_module_init(void)
 	}
 
 	ret = class_create_file(attr_class, &class_attr_stat_calls);
+	if (ret) {
+		pr_err("lowercase_conv_module: error creating sysfs class attribute\n");
+		class_destroy(attr_class);
+		return ret;
+	}
+
+	ret = class_create_file(attr_class, &class_attr_stat_proc);
+	if (ret) {
+		pr_err("lowercase_conv_module: error creating sysfs class attribute\n");
+		class_destroy(attr_class);
+		return ret;
+	}
+
+	ret = class_create_file(attr_class, &class_attr_stat_conv);
 	if (ret) {
 		pr_err("lowercase_conv_module: error creating sysfs class attribute\n");
 		class_destroy(attr_class);
