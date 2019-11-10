@@ -1,0 +1,22 @@
+bekir@bekir-GL553VE:~$ ssh -p 8022 user@localhost
+user@localhost's password: 
+$ sudo insmod timers_module.ko
+Password: 
+$ cat /sys/class/timers_module/relative_time 
+0.0 s
+$ cat /sys/class/timers_module/relative_time 
+1.372 s
+$ cat /sys/class/timers_module/relative_time 
+3.896 s
+$ cat /sys/class/timers_module/absolute_time 
+0.0 s
+$ cat /sys/class/timers_module/absolute_time 
+0.454420120 s
+$ cat /sys/class/timers_module/absolute_time 
+3.713691633 s
+$ cat /sys/class/timers_module/absolute_time 
+7.430824337 s
+$ cat /sys/class/timers_module/average_load  
+0
+$ sudo rmmod timers_module.ko 
+$
