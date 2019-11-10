@@ -3,8 +3,13 @@
 #include <linux/module.h>
 #include <linux/device.h>
 #include <linux/err.h>
+#include <linux/rtc.h>
+#include <linux/time.h>
 
-unsigned long prev_jiffies;
+static unsigned long prev_jiffies;
+struct timespec ts;
+struct timespec prev_ts;
+static int one_read_abs = 0;
 
 static ssize_t rel_time_show(struct class *class,
 				struct class_attribute *attr,
@@ -23,9 +28,30 @@ static ssize_t rel_time_show(struct class *class,
 	return strlen(buf);
 }
 
+static ssize_t abs_time_show(struct class *class,
+				struct class_attribute *attr,
+						char *buf)
+{
+	getnstimeofday(&ts);
+	if (one_read_abs) {
+		pr_info("Abs time: %lu.%lu\n", prev_ts.tv_sec,
+						prev_ts.tv_nsec);
+		sprintf(buf, "Abs time: %lu.%lu\n", prev_ts.tv_sec,
+						prev_ts.tv_nsec);
+	}
+	prev_ts = ts;
+	one_read_abs = 1;
+	return strlen(buf);
+}
+
 struct class_attribute class_attr_rel_time = {
 	.attr = { .name = "rel_time", .mode = 0444 },
 	.show	= rel_time_show,
+};
+
+struct class_attribute class_attr_abs_time = {
+	.attr = { .name = "abs_time", .mode = 0444 },
+	.show	= abs_time_show,
 };
 
 static struct class *attr_class = 0;
@@ -49,6 +75,13 @@ static int timing_module_init(void)
 		return ret;
 	}
 
+	ret = class_create_file(attr_class, &class_attr_abs_time);
+	if (ret) {
+		pr_err("timing_module: error creating sysfs class attribute\n");
+		class_destroy(attr_class);
+		return ret;
+	}
+
 	pr_info("timing_module: module loaded\n");
 	return 0;
 }
@@ -56,6 +89,7 @@ static int timing_module_init(void)
 static void timing_module_exit(void)
 {
 	class_remove_file(attr_class, &class_attr_rel_time);
+	class_remove_file(attr_class, &class_attr_abs_time);
 	class_destroy(attr_class);
 
 	pr_info("timing_module: module exited\n");
