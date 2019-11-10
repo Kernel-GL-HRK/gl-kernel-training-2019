@@ -1,0 +1,13 @@
+ekir@bekir-GL553VE:~$ ssh -p 8022 user@localhost
+user@localhost's password: 
+$ ./time
+Date: 10/11/2019
+Time: 12:28:48
+$ ./time
+Date: 10/11/2019
+Time: 12:28:56
+$ ./time
+Date: 10/11/2019
+Time: 12:29:01
+$ 
+
