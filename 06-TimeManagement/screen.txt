@@ -1,0 +1,17 @@
+ 
+dmytro@dmytro-HP-EliteBook-840-G2:~/gl/gl-kernel-training-2019/06-TimeManagement$ make 
+gcc abs_time.c -o abs_time.o
+dmytro@dmytro-HP-EliteBook-840-G2:~/gl/gl-kernel-training-2019/06-TimeManagement$ ./abs_time.o 
+Date: Mon Nov 11 10:36:06 2019
+dmytro@dmytro-HP-EliteBook-840-G2:~/gl/gl-kernel-training-2019/06-TimeManagement$ ./abs_time.o 
+Date: Mon Nov 11 10:36:09 2019
+dmytro@dmytro-HP-EliteBook-840-G2:~/gl/gl-kernel-training-2019/06-TimeManagement$ ./abs_time.o 
+Date: Mon Nov 11 10:36:09 2019
+dmytro@dmytro-HP-EliteBook-840-G2:~/gl/gl-kernel-training-2019/06-TimeManagement$ ./abs_time.o 
+Date: Mon Nov 11 10:36:10 2019
+dmytro@dmytro-HP-EliteBook-840-G2:~/gl/gl-kernel-training-2019/06-TimeManagement$ ./abs_time.o 
+Date: Mon Nov 11 10:36:11 2019
+dmytro@dmytro-HP-EliteBook-840-G2:~/gl/gl-kernel-training-2019/06-TimeManagement$ ./abs_time.o 
+Date: Mon Nov 11 10:36:11 2019
+dmytro@dmytro-HP-EliteBook-840-G2:~/gl/gl-kernel-training-2019/06-TimeManagement$ make clean 
+rm abs_time.o
