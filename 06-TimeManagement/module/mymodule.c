@@ -18,6 +18,7 @@
 static struct hrtimer hr_timer;
 static struct class *attr_class;
 static struct device pdev = { .init_name = MYDEV_NAME };
+static u64 oldj64;
 
 enum hrtimer_restart my_hrtimer_callback(struct hrtimer *timer)
 {
@@ -44,7 +45,28 @@ static ssize_t abstime_show(struct class *class, struct class_attribute *attr,
 static ssize_t reltime_show(struct class *class, struct class_attribute *attr,
 	char *buf)
 {
-	return 0;
+	int ret = 0;
+	u64 j64 = 0, rel = 0;
+	struct timeval t = {};
+
+	j64 = get_jiffies_64();
+	rel = j64 - oldj64;
+	jiffies_to_timeval(rel, &t);
+
+	dev_info(&pdev, "********************************\n");
+	dev_info(&pdev, "jiffies: %ld\n", jiffies);
+	dev_info(&pdev, "jiffies to mSec: %d\n", jiffies_to_msecs(jiffies));
+	dev_info(&pdev, "jiffies 64 to mSec: %d\n", jiffies_to_msecs(j64));
+	dev_info(&pdev, "jiffies 64: %lld\n", j64);
+	dev_info(&pdev, "jiffies 64 old: %lld\n", oldj64);
+        dev_info(&pdev, "jiffies 64 rel: %lld\n", rel);
+	dev_info(&pdev, "%ld.%ld\n", t.tv_sec, t.tv_usec);
+
+	ret = sprintf(buf, "%ld.%ld\n", t.tv_sec, t.tv_usec);
+
+	oldj64 = j64;
+
+	return ret;
 }
 
 static ssize_t loadcpu_show(struct class *class, struct class_attribute *attr,
