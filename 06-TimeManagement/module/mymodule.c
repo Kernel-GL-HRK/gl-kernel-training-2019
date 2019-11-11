@@ -7,6 +7,8 @@
 #include <linux/jiffies.h>
 #include <linux/sched.h>
 #include <linux/time.h>
+#include <linux/fs.h>
+#include <linux/string.h>
 
 #define MYDEV_NAME	"TimeManagement"
 #define CLASS_NAME	"my_time_mod"
@@ -14,19 +16,60 @@
 #define RELTIME_FILE_NAME	"relation-time"
 #define LOADCPU_FILE_NAME	"load-cpu"
 #define MS_TO_NS(x) (x * 1E6L)
+#define TIMER_DELAY_MS	1000
 
 static struct hrtimer hr_timer;
 static struct class *attr_class;
 static struct device pdev = { .init_name = MYDEV_NAME };
 static u64 oldj64;
+static int cpupercent;
 
 enum hrtimer_restart my_hrtimer_callback(struct hrtimer *timer)
 {
-	ktime_t currtime , interval;
+	ktime_t currtime = 0, interval = 0;
+	struct file *f = NULL;
+	char buf[128] = {0};
+	mm_segment_t old_fs;
+	char *p = NULL;
+	int val = 0, i = 0;
+	char *endptr = NULL;
+	int cputime = 0, cpuidle = 0;
+
+	f = filp_open("/proc/stat", O_RDONLY, 0);
+	if (f == NULL) {
+		dev_err(&pdev, "filp_open error\n");
+	} else {
+		old_fs = get_fs();
+		set_fs(get_ds());
+		f->f_op->read(f, buf, 128, &f->f_pos);
+		set_fs(old_fs);
+		filp_close(f, NULL);
+
+		endptr = strstr(buf, "\n");
+		*endptr = '\0';
+		dev_info(&pdev, "stat: %s\n", buf);
+
+		p = buf;
+		p += 5;
+
+		for (i = 0; i < 8; i++) {
+			endptr = strstr(p, " ");
+			*endptr = '\0';
+			val = simple_strtol(p, &endptr, 0);
+			p = endptr + 1;
+			cputime += val;
+			if (i == 3 || i == 4)
+				cpuidle += val;
+		}
+
+		cpupercent = (cputime - cpuidle) * 100 / cputime;
+		dev_info(&pdev, "cpu: %d\n", cpupercent);
+	}
+
 	currtime  = ktime_get();
-	interval = ktime_set(0, MS_TO_NS(1000));
-	hrtimer_forward(timer, currtime , interval);
-	dev_info(&pdev, "My_hrtimer_callback called (%ld).\n", jiffies);
+	interval = ktime_set(0, MS_TO_NS(TIMER_DELAY_MS));
+	hrtimer_forward(timer, currtime, interval);
+
 	return HRTIMER_RESTART;
 }
 
@@ -37,7 +80,7 @@ static ssize_t abstime_show(struct class *class, struct class_attribute *attr,
 	struct timeval t;
 
 	do_gettimeofday(&t);
-	ret = sprintf(buf, "%ld.%ld\n", t.tv_sec, t.tv_usec);
+	ret = sprintf(buf, "%ld.%06ld\n", t.tv_sec, t.tv_usec);
 
 	return ret;
 }
@@ -59,10 +102,10 @@ static ssize_t reltime_show(struct class *class, struct class_attribute *attr,
 	dev_info(&pdev, "jiffies 64 to mSec: %d\n", jiffies_to_msecs(j64));
 	dev_info(&pdev, "jiffies 64: %lld\n", j64);
 	dev_info(&pdev, "jiffies 64 old: %lld\n", oldj64);
-        dev_info(&pdev, "jiffies 64 rel: %lld\n", rel);
-	dev_info(&pdev, "%ld.%ld\n", t.tv_sec, t.tv_usec);
+	dev_info(&pdev, "jiffies 64 rel: %lld\n", rel);
+	dev_info(&pdev, "%ld.%06ld\n", t.tv_sec, t.tv_usec);
 
-	ret = sprintf(buf, "%ld.%ld\n", t.tv_sec, t.tv_usec);
+	ret = sprintf(buf, "%ld.%06ld\n", t.tv_sec, t.tv_usec);
 
 	oldj64 = j64;
 
@@ -72,7 +115,7 @@ static ssize_t reltime_show(struct class *class, struct class_attribute *attr,
 static ssize_t loadcpu_show(struct class *class, struct class_attribute *attr,
 	char *buf)
 {
-	return 0;
+	return sprintf(buf, "%d\n", cpupercent);
 }
 
 struct class_attribute class_attr_abstime = {
@@ -130,10 +173,11 @@ static int __init init_mod(void)
 	}
 
 	dev_info(&pdev, "HR Timer module installing\n");
-	ktime = ktime_set(0, MS_TO_NS(1000));
+	ktime = ktime_set(0, MS_TO_NS(TIMER_DELAY_MS));
 	hrtimer_init(&hr_timer, CLOCK_MONOTONIC, HRTIMER_MODE_REL);
 	hr_timer.function = &my_hrtimer_callback;
-	dev_info(&pdev, "Starting timer to fire in %dms (%lu)\n", 1000, jiffies);
+	dev_info(&pdev, "Starting timer to fire in %dms (%lu)\n",
+		1000, jiffies);
 	hrtimer_start(&hr_timer, ktime, HRTIMER_MODE_REL);
 
 	dev_info(&pdev, "module loaded\n");
@@ -150,7 +194,8 @@ static void __exit exit_mod(void)
 	class_destroy(attr_class);
 
 	ret = hrtimer_cancel(&hr_timer);
-	if(ret) dev_err(&pdev, "The timer was still in use...\n");
+	if (ret)
+		dev_err(&pdev, "The timer was still in use...\n");
 
 	dev_info(&pdev, "module removed\n");
 }
