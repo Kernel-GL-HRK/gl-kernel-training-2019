@@ -1,0 +1,119 @@
+$ ./myprog 
+User-space get absolute time: 1573509230.396812
+Kernel-space get absolute time: 1573509230.396780
+
+$ ./myprog 
+User-space get absolute time: 1573509232.122705
+Kernel-space get absolute time: 1573509232.122671
+
+$ ./myprog 
+User-space get absolute time: 1573509232.552900
+Kernel-space get absolute time: 1573509232.552867
+
+$ ./myprog 
+User-space get absolute time: 1573509233.010594
+Kernel-space get absolute time: 1573509233.010560
+
+$ ./myprog 
+User-space get absolute time: 1573509233.439595
+Kernel-space get absolute time: 1573509233.439561
+
+$ ./myprog 
+User-space get absolute time: 1573509234.779229
+Kernel-space get absolute time: 1573509234.778990
+
+$ ./myprog 
+User-space get absolute time: 1573509235.880543
+Kernel-space get absolute time: 1573509235.880502
+
+$ ./myprog 
+User-space get absolute time: 1573509236.221785
+Kernel-space get absolute time: 1573509236.221752
+
+$ ./myprog 
+User-space get absolute time: 1573509236.962803
+Kernel-space get absolute time: 1573509236.962769
+
+$ ./myprog 
+User-space get absolute time: 1573509238.331359
+Kernel-space get absolute time: 1573509238.331326
+
+$ ./myprog 
+User-space get absolute time: 1573509238.906965
+Kernel-space get absolute time: 1573509238.906920
+
+$ ./myprog 
+User-space get absolute time: 1573509239.279322
+Kernel-space get absolute time: 1573509239.279287
+
+$ ./myprog 
+User-space get absolute time: 1573509239.997577
+Kernel-space get absolute time: 1573509239.997540
+
+$ ./myprog 
+User-space get absolute time: 1573509241.211447
+Kernel-space get absolute time: 1573509241.211413
+
+$ ./myprog 
+User-space get absolute time: 1573509241.607607
+Kernel-space get absolute time: 1573509241.607573
+
+$ ./myprog 
+User-space get absolute time: 1573509241.914804
+Kernel-space get absolute time: 1573509241.914769
+
+$ ./myprog 
+User-space get absolute time: 1573509242.232940
+Kernel-space get absolute time: 1573509242.232898
+
+$ ./myprog 
+User-space get absolute time: 1573509242.621408
+Kernel-space get absolute time: 1573509242.621362
+
+$ ./myprog 
+User-space get absolute time: 1573509242.959460
+Kernel-space get absolute time: 1573509242.959403
+
+$ ./myprog 
+User-space get absolute time: 1573509243.211548
+Kernel-space get absolute time: 1573509243.211504
+
+$ ./myprog 
+User-space get absolute time: 1573509243.452795
+Kernel-space get absolute time: 1573509243.452755
+
+$ ./myprog 
+User-space get absolute time: 1573509245.676990
+Kernel-space get absolute time: 1573509245.676957
+
+$ ./myprog 
+User-space get absolute time: 1573509247.436590
+Kernel-space get absolute time: 1573509247.436552
+
+$ ./myprog 
+User-space get absolute time: 1573509247.816904
+Kernel-space get absolute time: 1573509247.816871
+
+$ ./myprog 
+User-space get absolute time: 1573509248.211375
+Kernel-space get absolute time: 1573509248.211338
+
+$ ./myprog 
+User-space get absolute time: 1573509249.806316
+Kernel-space get absolute time: 1573509249.806282
+
+$ ./myprog 
+User-space get absolute time: 1573509250.027849
+Kernel-space get absolute time: 1573509250.027815
+
+$ ./myprog 
+User-space get absolute time: 1573509250.243661
+Kernel-space get absolute time: 1573509250.243626
+
+$ ./myprog 
+User-space get absolute time: 1573509250.659548
+Kernel-space get absolute time: 1573509250.659506
+
+$ ./myprog 
+User-space get absolute time: 1573509252.634336
+Kernel-space get absolute time: 1573509252.634300
