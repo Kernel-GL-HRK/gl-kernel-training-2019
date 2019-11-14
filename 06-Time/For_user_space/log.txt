@@ -1,0 +1,13 @@
+anton@anton-pc:/storage/projects/userspase_time$ ./userspace_time.exe 
+Current local time and date: Thu Nov 14 03:06:16 2019
+anton@anton-pc:/storage/projects/userspase_time$ ./userspace_time.exe 
+Current local time and date: Thu Nov 14 03:06:19 2019
+anton@anton-pc:/storage/projects/userspase_time$ ./userspace_time.exe 
+Current local time and date: Thu Nov 14 03:06:21 2019
+anton@anton-pc:/storage/projects/userspase_time$ ./userspace_time.exe 
+Current local time and date: Thu Nov 14 03:06:23 2019
+anton@anton-pc:/storage/projects/userspase_time$ ./userspace_time.exe 
+Current local time and date: Thu Nov 14 03:06:26 2019
+anton@anton-pc:/storage/projects/userspase_time$ ./userspace_time.exe 
+Current local time and date: Thu Nov 14 03:06:27 2019
+
