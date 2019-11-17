@@ -7,6 +7,8 @@
 #include <linux/err.h>
 #include <linux/jiffies.h>
 #include <linux/sysfs.h>
+#include <linux/time.h>
+#include <linux/fs.h>
 
 static unsigned long prev_time_jiffies;
 
@@ -39,9 +41,9 @@ static ssize_t absolute_time_show(struct class *class,
 {
 	static struct timespec prev_ts;
 
-	pr_info("TimingManagement:PrevAbsolute time: %lu.%lu\n", prev_ts.tv_sec,
+	pr_info("TimingManagement:PrevAbsolute time: %lu.%09lu\n", prev_ts.tv_sec,
 		prev_ts.tv_nsec);
-	sprintf(buf, "TimingManagement:PrevAbsolute time: %lu.%lu\n",
+	sprintf(buf, "TimingManagement:PrevAbsolute time: %lu.%09lu\n",
 		prev_ts.tv_sec, prev_ts.tv_nsec);
 
 	getnstimeofday(&prev_ts);
@@ -52,6 +54,41 @@ static ssize_t absolute_time_show(struct class *class,
 struct class_attribute attr_absolute_time = {
 	.attr = { .name = "absolute_time", .mode = 0444 },
 	.show	= absolute_time_show,
+};
+
+
+static char buf_cpu[100];
+
+static ssize_t cpu_show(struct class *class,
+	struct class_attribute *attr, char *buf)
+{
+	pr_info("TimingManagement:CPU load: %s\n", buf_cpu);
+	sprintf(buf, "TimingManagement:CPU load: %s\n", buf_cpu);
+
+	return strlen(buf);
+}
+
+struct timer_list timer_update_cpu;
+
+static void update_load_cpu(unsigned long data)
+{
+	struct file *filp;
+
+	filp = filp_open("proc/loadavg", O_RDONLY, 0);
+	if (filp == NULL) {
+		pr_err("TimingManagement:can not file open\n");
+	} else {
+		filp->f_op->read(filp, buf_cpu, sizeof(buf_cpu), &filp->f_pos);
+		filp_close(filp, NULL);
+	}
+
+	mod_timer(&timer_update_cpu, jiffies + HZ);
+}
+
+
+struct class_attribute class_attr_cpu = {
+	.attr = { .name = "cpu", .mode = 0444 },
+	.show	= cpu_show,
 };
 
 static struct class *attr_class;
@@ -79,12 +116,26 @@ static int __init conv_init(void)
 		return ret;
 	}
 
+	ret = class_create_file(attr_class, &class_attr_cpu);
+	if (ret) {
+		class_destroy(attr_class);
+		pr_err("TimingManagement: error creating sysfs class attribute\n");
+		return ret;
+	}
+
+	init_timer(&timer_update_cpu);
+	timer_update_cpu.expires = jiffies + HZ;
+	timer_update_cpu.function = update_load_cpu;
+	//timer_update_cpu.data = NULL;
+	add_timer(&timer_update_cpu);
+
 	pr_info("TimingManagement:loaded\n");
 	return 0;
 }
 
 static void __exit conv_exit(void)
 {
+	del_timer(&timer_update_cpu);
 	class_remove_file(attr_class, &attr_relation_time);
 	class_remove_file(attr_class, &attr_absolute_time);
 	class_destroy(attr_class);
