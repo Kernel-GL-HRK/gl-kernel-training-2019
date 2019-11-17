@@ -33,6 +33,27 @@ struct class_attribute attr_relation_time = {
 	.show	= relation_time_show,
 };
 
+
+static ssize_t absolute_time_show(struct class *class,
+	struct class_attribute *attr, char *buf)
+{
+	static struct timespec prev_ts;
+
+	pr_info("TimingManagement:PrevAbsolute time: %lu.%lu\n", prev_ts.tv_sec,
+		prev_ts.tv_nsec);
+	sprintf(buf, "TimingManagement:PrevAbsolute time: %lu.%lu\n",
+		prev_ts.tv_sec, prev_ts.tv_nsec);
+
+	getnstimeofday(&prev_ts);
+
+	return strlen(buf);
+}
+
+struct class_attribute attr_absolute_time = {
+	.attr = { .name = "absolute_time", .mode = 0444 },
+	.show	= absolute_time_show,
+};
+
 static struct class *attr_class;
 
 static int __init conv_init(void)
@@ -51,6 +72,13 @@ static int __init conv_init(void)
 		return ret;
 	}
 
+	ret = class_create_file(attr_class, &attr_absolute_time);
+	if (ret) {
+		class_destroy(attr_class);
+		pr_err("TimingManagement: error creating sysfs class attribute\n");
+		return ret;
+	}
+
 	pr_info("TimingManagement:loaded\n");
 	return 0;
 }
@@ -58,6 +86,7 @@ static int __init conv_init(void)
 static void __exit conv_exit(void)
 {
 	class_remove_file(attr_class, &attr_relation_time);
+	class_remove_file(attr_class, &attr_absolute_time);
 	class_destroy(attr_class);
 	pr_info("TimingManagement: closed");
 }
