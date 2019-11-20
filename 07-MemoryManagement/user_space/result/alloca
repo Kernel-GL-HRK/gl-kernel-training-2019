@@ -1,0 +1,23 @@
+alloca:
+number  addr            size            allocate(ns)    free(ns)
+ 1      0x7ffd1e29b1f0            1            110                0
+ 2      0x7ffd1e29b1f0            2             83                0
+ 3      0x7ffd1e29b1f0            4             57                0
+ 4      0x7ffd1e29b1f0            8             63                0
+ 5      0x7ffd1e29b1e0           16             52                0
+ 6      0x7ffd1e29b1d0           32             48                0
+ 7      0x7ffd1e29b1b0           64             51                0
+ 8      0x7ffd1e29b170          128             48                0
+ 9      0x7ffd1e29b0f0          256             49                0
+10      0x7ffd1e29aff0          512             51                0
+11      0x7ffd1e29adf0         1024             47                0
+12      0x7ffd1e29a9f0         2048             49                0
+13      0x7ffd1e29a1f0         4096             91                0
+14      0x7ffd1e2991f0         8192          15463                0
+15      0x7ffd1e2971f0        16384           8131                0
+16      0x7ffd1e2931f0        32768          20279                0
+17      0x7ffd1e28b1f0        65536          44459                0
+18      0x7ffd1e27b1f0       131072          96648                0
+19      0x7ffd1e25b1f0       262144         181271                0
+20      0x7ffd1e21b1f0       524288         355975                0
+
