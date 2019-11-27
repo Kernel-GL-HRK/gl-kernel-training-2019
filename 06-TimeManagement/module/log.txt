@@ -1,0 +1,12 @@
+# uname -a
+Linux qemuLinux 4.13.0 #1 SMP Tue Oct 22 22:51:53 EEST 2019 i686 GNU/Linux
+
+# cat /sys/module_06/absolute_time 
+dt: 1.031806746 s
+
+# cat /sys/module_06/relation_time 
+dt: 1.043 s
+
+# cat /sys/module_06/real_loadavg 
+CPU: 5.20 %
+
