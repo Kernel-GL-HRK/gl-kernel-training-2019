@@ -1,0 +1,4 @@
+sudo ./test_speed.sh 
+Start reading 100 points.
+5177388 nanoseconds/points
+5.177388 ms/points
