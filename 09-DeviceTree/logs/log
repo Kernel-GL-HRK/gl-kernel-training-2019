@@ -1,0 +1,22 @@
+bekir@bekir-GL553VE:~$ ssh root@192.168.100.2
+root@192.168.100.2's password: 
+  ___  ____  _    ___             
+ / _ \|  _ \(_)  / _ \ _ __   ___ 
+| | | | |_) | | | | | | '_ \ / _ \
+| |_| |  __/| | | |_| | | | |  __/
+ \___/|_|   |_|  \___/|_| |_|\___|
+                                  
+Welcome to Armbian Bionic with Linux 5.3.7-dirty
+
+System load:   0.00 0.00 0.00  	Up time:       45 min		
+Memory usage:  9 % of 498MB  	IP:            192.168.100.2
+Usage of /:    18% of 7.3G   	
+
+Last login: Tue Dec  3 13:17:31 2019
+
+root@orangepione:~# sudo insmod ./mpu6050_overlay_test.ko
+insmod: ERROR: could not load module ./mpu6050_overlay_test.ko: No such file or directory
+root@orangepione:~# cd /home/bekir/
+root@orangepione:/home/bekir# sudo insmod ./mpu6050_overlay_test.ko
+root@orangepione:/home/bekir# sudo rmmod mpu6050_overlay_test
+root@orangepione:/home/bekir#

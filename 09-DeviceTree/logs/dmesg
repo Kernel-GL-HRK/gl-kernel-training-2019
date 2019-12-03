@@ -1,0 +1,6 @@
+root@orangepione:~# dmesg -c
+root@orangepione:~# dmesg -c
+[ 2769.718059] mpu6050_module_info: function - mpu6050_test_probe:41 - mpu6050_test_driver is loaded!
+[ 2774.018039] mpu6050_module_info: function - mpu6050_test_remove:47 - mpu6050_test_driver is unloaded!
+root@orangepione:~# 
+
