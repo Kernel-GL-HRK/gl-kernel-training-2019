@@ -1,0 +1,32 @@
+dmitry@orangepione:~$ lsmod
+Module                  Size  Used by
+zstd                   16384  4
+snd_soc_hdmi_codec     16384  1
+sun8i_codec_analog     24576  0
+sun4i_i2s              20480  2
+snd_soc_simple_card    16384  1
+sun8i_adda_pr_regmap    16384  1 sun8i_codec_analog
+snd_soc_simple_card_utils    16384  1 snd_soc_simple_card
+lima                   40960  0
+snd_soc_core          110592  5 sun4i_i2s,sun8i_codec_analog,snd_soc_hdmi_codec,snd_soc_simple_card_utils,snd_soc_simple_card
+dw_hdmi_cec            16384  0
+dw_hdmi_i2s_audio      16384  0
+snd_pcm_dmaengine      16384  1 snd_soc_core
+gpu_sched              20480  1 lima
+snd_pcm                69632  4 sun4i_i2s,snd_pcm_dmaengine,snd_soc_hdmi_codec,snd_soc_core
+ttm                    57344  1 lima
+snd_timer              24576  1 snd_pcm
+snd                    45056  6 snd_soc_hdmi_codec,snd_timer,snd_soc_core,snd_pcm
+sun4i_gpadc_iio        16384  0
+soundcore              16384  1 snd
+industrialio           49152  1 sun4i_gpadc_iio
+sun8i_ths              16384  0
+zram                   24576  2
+cpufreq_dt             16384  0
+evdev                  20480  1
+fake_module            16384  0
+uio_pdrv_genirq        16384  0
+thermal_sys            57344  3 cpufreq_dt,sun8i_ths,sun4i_gpadc_iio
+uio                    16384  1 uio_pdrv_genirq
+ip_tables              20480  0
+x_tables               20480  1 ip_tables
