@@ -1,0 +1,78 @@
+dmitry@orangepione:~$ dmesg
+[    2.213202] of_cfs_init
+[    2.213302] of_cfs_init: OK
+[    2.216820] Freeing unused kernel memory: 1024K
+[    2.233155] Run /init as init process
+[    2.909139] [drm] Cannot find any crtc or sizes
+[    3.068917] random: fast init done
+[    3.086544] EXT4-fs (mmcblk0p1): mounted filesystem with writeback data mode. Opts: (null)
+[    3.814488] systemd[1]: System time before build time, advancing clock.
+[    3.865176] systemd[1]: systemd 241 running in system mode. (+PAM +AUDIT +SELINUX +IMA +APPARMOR +SMACK +SYSVINIT +UTMP +LIBCRYPTSETUP +GCRYPT +GNUTLS +ACL +XZ +LZ4 +SECCOMP +BLKID +ELFUTILS +KMOD -IDN2 +IDN -PCRE2 default-hierarchy=hybrid)
+[    3.865822] systemd[1]: Detected architecture arm.
+[    3.890015] systemd[1]: Set hostname to <orangepione>.
+[    3.891809] systemd[1]: Failed to bump fs.file-max, ignoring: Invalid argument
+[    4.509913] random: systemd: uninitialized urandom read (16 bytes read)
+[    4.521796] random: systemd: uninitialized urandom read (16 bytes read)
+[    4.522352] systemd[1]: Started Dispatch Password Requests to Console Directory Watch.
+[    4.541161] random: systemd: uninitialized urandom read (16 bytes read)
+[    4.541710] systemd[1]: Listening on udev Control Socket.
+[    4.560326] systemd[1]: Listening on Syslog Socket.
+[    4.573145] systemd[1]: Reached target Remote File Systems.
+[    4.585456] systemd[1]: Listening on Journal Socket (/dev/log).
+[    4.601317] systemd[1]: Created slice system-getty.slice.
+[    4.980121] EXT4-fs (mmcblk0p1): re-mounted. Opts: commit=600,errors=remount-ro
+[    5.389670] systemd-journald[234]: Received request to flush runtime journal from PID 1
+[    5.845299] fake_module: loading out-of-tree module taints kernel.
+[    5.846030] fake-module-dt fake_module@0: Module started
+[    5.853486] cpu cpu0: Linked as a consumer to regulator.5
+[    5.854124] cpu cpu0: Dropping the link to regulator.5
+[    5.854358] cpu cpu0: Linked as a consumer to regulator.5
+[    5.855136] core: _opp_supported_by_regulators: OPP minuV: 1320000 maxuV: 1320000, not supported by regulator
+[    5.855147] cpu cpu0: _opp_add: OPP not supported by regulators (1056000000)
+[    5.855226] core: _opp_supported_by_regulators: OPP minuV: 1320000 maxuV: 1320000, not supported by regulator
+[    5.855233] cpu cpu0: _opp_add: OPP not supported by regulators (1104000000)
+[    5.855341] core: _opp_supported_by_regulators: OPP minuV: 1320000 maxuV: 1320000, not supported by regulator
+[    5.855349] cpu cpu0: _opp_add: OPP not supported by regulators (1152000000)
+[    5.855450] core: _opp_supported_by_regulators: OPP minuV: 1320000 maxuV: 1320000, not supported by regulator
+[    5.855457] cpu cpu0: _opp_add: OPP not supported by regulators (1200000000)
+[    5.855543] core: _opp_supported_by_regulators: OPP minuV: 1340000 maxuV: 1340000, not supported by regulator
+[    5.855551] cpu cpu0: _opp_add: OPP not supported by regulators (1224000000)
+[    5.855668] core: _opp_supported_by_regulators: OPP minuV: 1340000 maxuV: 1340000, not supported by regulator
+[    5.855676] cpu cpu0: _opp_add: OPP not supported by regulators (1248000000)
+[    5.855803] core: _opp_supported_by_regulators: OPP minuV: 1340000 maxuV: 1340000, not supported by regulator
+[    5.855812] cpu cpu0: _opp_add: OPP not supported by regulators (1296000000)
+[    5.855907] core: _opp_supported_by_regulators: OPP minuV: 1400000 maxuV: 1400000, not supported by regulator
+[    5.855915] cpu cpu0: _opp_add: OPP not supported by regulators (1344000000)
+[    5.856038] core: _opp_supported_by_regulators: OPP minuV: 1400000 maxuV: 1400000, not supported by regulator
+[    5.856046] cpu cpu0: _opp_add: OPP not supported by regulators (1368000000)
+[    5.856513] thermal thermal_zone0: binding zone cpu-thermal with cdev thermal-cpufreq-0 failed:-22
+[    5.861694] zram: Added device: zram0
+[    5.866599] zram: Added device: zram1
+[    5.867276] zram: Added device: zram2
+[    5.989953] sun8i_ths 1c25000.thermal-sensor: no memory resources defined
+[    5.989988] sun8i_ths: probe of 1c25000.thermal-sensor failed with error -22
+[    6.012507] thermal thermal_zone0: failed to read out thermal zone (-110)
+[    6.022345] zram1: detected capacity change from 0 to 258437120
+[    6.103373] lima 1c40000.gpu: bus rate = 200000000
+[    6.103394] lima 1c40000.gpu: mod rate = 384000000
+[    6.108165] [TTM] Zone  kernel: Available graphics memory: 252380 kiB
+[    6.108176] [TTM] Initializing pool allocator
+[    6.109172] lima 1c40000.gpu: gp - mali400 version major 1 minor 1
+[    6.109228] lima 1c40000.gpu: pp0 - mali400 version major 1 minor 1
+[    6.109280] lima 1c40000.gpu: pp1 - mali400 version major 1 minor 1
+[    6.109333] lima 1c40000.gpu: l2 cache 64K, 4-way, 64byte cache line, 64bit external bus
+[    6.122711] [drm] Initialized lima 1.0.0 20170325 for 1c40000.gpu on minor 1
+[    6.410216] asoc-simple-card soc:sound: i2s-hifi <-> 1c22800.i2s mapping ok
+[    6.903715] Generic PHY 0.1:01: attached PHY driver [Generic PHY] (mii_bus:phy_addr=0.1:01, irq=POLL)
+[    6.905758] dwmac-sun8i 1c30000.ethernet eth0: No Safety Features support found
+[    6.905773] dwmac-sun8i 1c30000.ethernet eth0: No MAC Management Counters available
+[    6.905781] dwmac-sun8i 1c30000.ethernet eth0: PTP not supported by HW
+[    6.906271] IPv6: ADDRCONF(NETDEV_UP): eth0: link is not ready
+[    7.117556] Adding 252376k swap on /dev/zram1.  Priority:5 extents:1 across:252376k SSFS
+[    7.264857] zram0: detected capacity change from 0 to 52428800
+[    7.463299] random: crng init done
+[    7.463312] random: 7 urandom warning(s) missed due to ratelimiting
+[    7.792428] EXT4-fs (zram0): mounted filesystem without journal. Opts: discard
+[    9.981516] dwmac-sun8i 1c30000.ethernet eth0: Link is Up - 100Mbps/Full - flow control rx/tx
+[    9.981561] IPv6: ADDRCONF(NETDEV_CHANGE): eth0: link becomes ready
+
