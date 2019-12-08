@@ -176,7 +176,7 @@ static ssize_t gyro_z_show(struct class *class,
 	return strlen(buf);
 }
 
-static ssize_t temp_show(struct class *class,
+static ssize_t temperature_show(struct class *class,
 			 struct class_attribute *attr, char *buf)
 {
 	mpu6050_read_data();
@@ -185,13 +185,13 @@ static ssize_t temp_show(struct class *class,
 	return strlen(buf);
 }
 
-CLASS_ATTR(accel_x, 0444, &accel_x_show, NULL);
-CLASS_ATTR(accel_y, 0444, &accel_y_show, NULL);
-CLASS_ATTR(accel_z, 0444, &accel_z_show, NULL);
-CLASS_ATTR(gyro_x, 0444, &gyro_x_show, NULL);
-CLASS_ATTR(gyro_y, 0444, &gyro_y_show, NULL);
-CLASS_ATTR(gyro_z, 0444, &gyro_z_show, NULL);
-CLASS_ATTR(temperature, 0444, &temp_show, NULL);
+CLASS_ATTR_RO(accel_x);
+CLASS_ATTR_RO(accel_y);
+CLASS_ATTR_RO(accel_z);
+CLASS_ATTR_RO(gyro_x);
+CLASS_ATTR_RO(gyro_y);
+CLASS_ATTR_RO(gyro_z);
+CLASS_ATTR_RO(temperature);
 
 static struct class *attr_class;
 
