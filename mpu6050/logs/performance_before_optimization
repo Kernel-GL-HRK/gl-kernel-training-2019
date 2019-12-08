@@ -1,0 +1,13 @@
+root@orangepione:/home/bekir# insmod ./mpu6050.ko
+root@orangepione:/home/bekir# ./checking_perfomance
+file_name:                                      reading_time, ns
+/sys/class/mpu6050/accel_x                      3725987
+/sys/class/mpu6050/accel_y                      3685989
+/sys/class/mpu6050/accel_z                      3897772
+/sys/class/mpu6050/gyro_x                       3654490
+/sys/class/mpu6050/gyro_y                       3763236
+/sys/class/mpu6050/gyro_z                       3710237
+/sys/class/mpu6050/temp                         3688613
+root@orangepione:/home/bekir# rmmod mpu6050
+root@orangepione:/home/bekir# 
+
