@@ -1,32 +1,23 @@
-#
-# mpu6050 accelerometer & gyroscope
-#
-ifneq ($(KERNELRELEASE),)
-
 obj-m := mpu6050.o
+ccflags-y := -Wall
 
-else
+PWD=$(shell pwd)
+BUILD_KERNEL?=$(PWD)/../../build/kernel_opi
+KERNEL_VERSION?=5.4.0-rc1-00258-g2d00aee21a5d
+DTC=$(BUILD_KERNEL)/scripts/dtc/dtc
+export CROSS_COMPILE?=$(PWD)/../../toolchain/gcc-linaro-7.4.1-2019.02-x86_64_arm-linux-gnueabihf/bin/arm-linux-gnueabihf-
+export ARCH?=arm
 
+DT_SRCS=$(wildcard *.dts)
+DT_OBJS=$(DT_SRCS:.dts=.dtbo)
 
-ifeq ($(KERNELDIR),)
-ifeq ($(BBB_KERNEL),)
-	$(error Path to kernel tree - KERNELDIR or BBB_KERNEL variable is not defined!)
-endif
-endif
-
-KERNELDIR ?= $(BBB_KERNEL)
-
-export ARCH = arm
-export CROSS_COMPILE ?= arm-linux-gnueabihf-
+SSH_ORANGE?=root@192.168.1.108
 
 
 .PHONY: all clean
 
 all:
-	$(MAKE) -C $(KERNELDIR) M=$(CURDIR) modules
+	$(MAKE) -C $(BUILD_KERNEL) M=$(PWD) modules
 
 clean:
-	$(MAKE) -C $(KERNELDIR) M=$(CURDIR) clean
-
-
-endif
+	$(MAKE) -C $(BUILD_KERNEL) M=$(PWD) clean

@@ -5,6 +5,9 @@
 #include <linux/i2c.h>
 #include <linux/i2c-dev.h>
 
+#include <linux/kobject.h>
+#include <linux/sysfs.h>
+
 #include "mpu6050-regs.h"
 
 
@@ -185,13 +188,23 @@ static ssize_t temp_show(struct class *class,
 	return strlen(buf);
 }
 
-CLASS_ATTR(accel_x, 0444, &accel_x_show, NULL);
+/*CLASS_ATTR(accel_x, 0444, &accel_x_show, NULL);
 CLASS_ATTR(accel_y, 0444, &accel_y_show, NULL);
 CLASS_ATTR(accel_z, 0444, &accel_z_show, NULL);
 CLASS_ATTR(gyro_x, 0444, &gyro_x_show, NULL);
 CLASS_ATTR(gyro_y, 0444, &gyro_y_show, NULL);
 CLASS_ATTR(gyro_z, 0444, &gyro_z_show, NULL);
 CLASS_ATTR(temperature, 0444, &temp_show, NULL);
+*/
+
+CLASS_ATTR_RO(accel_x);
+CLASS_ATTR_RO(accel_y);
+CLASS_ATTR_RO(accel_z);
+CLASS_ATTR_RO(gyro_x);
+CLASS_ATTR_RO(gyro_y);
+CLASS_ATTR_RO(gyro_z);
+CLASS_ATTR_RO(temp);
+
 
 static struct class *attr_class;
 
@@ -253,7 +266,7 @@ static int mpu6050_init(void)
 		return ret;
 	}
 	/* Create temperature */
-	ret = class_create_file(attr_class, &class_attr_temperature);
+	ret = class_create_file(attr_class, &class_attr_temp);
 	if (ret) {
 		pr_err("mpu6050: failed to create sysfs class attribute temperature: %d\n", ret);
 		return ret;
@@ -274,7 +287,7 @@ static void mpu6050_exit(void)
 		class_remove_file(attr_class, &class_attr_gyro_x);
 		class_remove_file(attr_class, &class_attr_gyro_y);
 		class_remove_file(attr_class, &class_attr_gyro_z);
-		class_remove_file(attr_class, &class_attr_temperature);
+		class_remove_file(attr_class, &class_attr_temp);
 		pr_info("mpu6050: sysfs class attributes removed\n");
 
 		class_destroy(attr_class);
