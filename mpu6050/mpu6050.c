@@ -37,7 +37,7 @@ static int mpu6050_read_data(void)
 	 * (TEMP_OUT Register Value  as a signed quantity)/340 + 36.53
 	 */
 	temp = (s16)((u16)i2c_smbus_read_word_swapped(drv_client, REG_TEMP_OUT_H));
-	g_mpu6050_data.temperature = (temp + 12420 + 170) / 340;
+	g_mpu6050_data.temperature = (temp * 1000) / 340 + 36530;
 
 	dev_info(&drv_client->dev, "sensor data read:\n");
 	dev_info(&drv_client->dev, "ACCEL[X,Y,Z] = [%d, %d, %d]\n",
