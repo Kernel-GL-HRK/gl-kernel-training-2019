@@ -1,0 +1,69 @@
+		Outdoor tmp (Google tmp 2°C)
+user@orangepione:~$ sudo bash read_temp_mpu6050.sh 10
+Time     Celsius    Fahrenheit
+21:24:34 4.6712 °C 40.4081 °F
+Time     Celsius    Fahrenheit
+21:24:34 4.5771 °C 40.2387 °F
+Time     Celsius    Fahrenheit
+21:24:34 4.6712 °C 40.4081 °F
+Time     Celsius    Fahrenheit
+21:24:34 4.6242 °C 40.3235 °F
+Time     Celsius    Fahrenheit
+21:24:34 4.7183 °C 40.4929 °F
+Time     Celsius    Fahrenheit
+21:24:34 4.7183 °C 40.4929 °F
+Time     Celsius    Fahrenheit
+21:24:35 4.7183 °C 40.4929 °F
+Time     Celsius    Fahrenheit
+21:24:35 4.6712 °C 40.4081 °F
+Time     Celsius    Fahrenheit
+21:24:35 4.6242 °C 40.3235 °F
+Time     Celsius    Fahrenheit
+21:24:35 4.7183 °C 40.4929 °F
+
+		Indoor tmp (~23°C)
+user@orangepione:~$ sudo bash read_temp_mpu6050.sh 10
+Time     Celsius    Fahrenheit
+21:14:36 25.0006 °C 77.0010 °F
+Time     Celsius    Fahrenheit
+21:14:36 25.0006 °C 77.0010 °F
+Time     Celsius    Fahrenheit
+21:14:36 25.0477 °C 77.0858 °F
+Time     Celsius    Fahrenheit
+21:14:36 25.0477 °C 77.0858 °F
+Time     Celsius    Fahrenheit
+21:14:36 25.0006 °C 77.0010 °F
+Time     Celsius    Fahrenheit
+21:14:36 25.0006 °C 77.0010 °F
+Time     Celsius    Fahrenheit
+21:14:36 25.0477 °C 77.0858 °F
+Time     Celsius    Fahrenheit
+21:14:36 25.0477 °C 77.0858 °F
+Time     Celsius    Fahrenheit
+21:14:36 25.0948 °C 77.1706 °F
+Time     Celsius    Fahrenheit
+21:14:36 25.0948 °C 77.1706 °F
+
+        Extreme tmp(hot air min= 100°C)
+user@orangepione:~$ sudo bash read_temp_mpu6050.sh 10
+Time     Celsius    Fahrenheit
+21:30:22 87.6829 °C 189.8292 °F
+Time     Celsius    Fahrenheit
+21:30:22 87.7300 °C 189.9140 °F
+Time     Celsius    Fahrenheit
+21:30:22 87.6358 °C 189.7444 °F
+Time     Celsius    Fahrenheit
+21:30:22 87.6358 °C 189.7444 °F
+Time     Celsius    Fahrenheit
+21:30:23 87.7770 °C 189.9986 °F
+Time     Celsius    Fahrenheit
+21:30:23 87.7770 °C 189.9986 °F
+Time     Celsius    Fahrenheit
+21:30:23 87.7300 °C 189.9140 °F
+Time     Celsius    Fahrenheit
+21:30:23 87.8241 °C 190.0833 °F
+Time     Celsius    Fahrenheit
+21:30:23 87.8241 °C 190.0833 °F
+Time     Celsius    Fahrenheit
+21:30:23 87.8711 °C 190.1679 °F
+
