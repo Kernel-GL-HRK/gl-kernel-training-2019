@@ -1,0 +1,10 @@
+root@orangepione:/home/bekir# ./checking_performance 
+file_name:                                      reading_time, ns                                cnt_per_sec
+/sys/class/mpu6050/accel_x                      27625                                           36199
+/sys/class/mpu6050/accel_y                      10500                                           95238
+/sys/class/mpu6050/accel_z                      9041                                            110607
+/sys/class/mpu6050/gyro_x                       8625                                            115942
+/sys/class/mpu6050/gyro_y                       8041                                            124362
+/sys/class/mpu6050/gyro_z                       7833                                            127665
+/sys/class/mpu6050/temp                         11041                                           90571
+root@orangepione:/home/bekir# 

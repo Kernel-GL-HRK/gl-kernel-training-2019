@@ -1,0 +1,284 @@
+[ 2815.975720] gl,mpu6050 0-0068: i2c mpu6050 device found, WHO_AM_I register value = 0x68
+[ 2815.978607] gl,mpu6050 0-0068: i2c driver probed
+[ 2815.978822] mpu6050: i2c driver created
+[ 2815.978861] mpu6050: sysfs class created
+[ 2815.978895] mpu6050: sysfs class attributes created
+[ 2815.978898] mpu6050: module loaded
+[ 2818.484149] gl,mpu6050 0-0068: sensor data read:
+[ 2818.484169] gl,mpu6050 0-0068: ACCEL[X,Y,Z] = [-2564, -1088, 16600]
+[ 2818.484176] gl,mpu6050 0-0068: GYRO[X,Y,Z] = [56, 179, -620]
+[ 2818.484182] gl,mpu6050 0-0068: TEMP = 9028
+[ 2822.784346] gl,mpu6050 0-0068: sensor data read:
+[ 2822.784366] gl,mpu6050 0-0068: ACCEL[X,Y,Z] = [-2036, -856, 16760]
+[ 2822.784373] gl,mpu6050 0-0068: GYRO[X,Y,Z] = [-437, -94, -194]
+[ 2822.784380] gl,mpu6050 0-0068: TEMP = 8980
+[ 4023.855504] mpu6050: sysfs class attributes removed
+[ 4023.855591] mpu6050: sysfs class destroyed
+[ 4023.855646] gl,mpu6050 0-0068: i2c driver removed
+[ 4023.855754] mpu6050: i2c driver deleted
+[ 4023.855758] mpu6050: module exited
+[ 4029.652119] gl,mpu6050 0-0068: i2c client address is 0x68
+[ 4029.652575] gl,mpu6050 0-0068: i2c mpu6050 device found, WHO_AM_I register value = 0x68
+[ 4029.655417] gl,mpu6050 0-0068: i2c driver probed
+[ 4029.655640] mpu6050: i2c driver created
+[ 4029.655677] mpu6050: sysfs class created
+[ 4029.655704] mpu6050: sysfs class attributes created
+[ 4029.655707] mpu6050: module loaded
+[ 4034.731887] gl,mpu6050 0-0068: sensor data read:
+[ 4034.731905] gl,mpu6050 0-0068: value = [-3408]
+[ 4036.659436] gl,mpu6050 0-0068: sensor data read:
+[ 4036.659455] gl,mpu6050 0-0068: value = [-3408]
+[ 4042.344180] gl,mpu6050 0-0068: sensor data read:
+[ 4042.344198] gl,mpu6050 0-0068: value = [-2796]
+[ 4045.031863] gl,mpu6050 0-0068: sensor data read:
+[ 4045.031881] gl,mpu6050 0-0068: value = [-836]
+[ 4047.267835] gl,mpu6050 0-0068: sensor data read:
+[ 4047.267853] gl,mpu6050 0-0068: value = [16792]
+[ 4052.690848] gl,mpu6050 0-0068: sensor data read:
+[ 4052.690866] gl,mpu6050 0-0068: value = [-356]
+[ 4055.188624] gl,mpu6050 0-0068: sensor data read:
+[ 4055.188642] gl,mpu6050 0-0068: value = [-300]
+[ 4057.392566] gl,mpu6050 0-0068: sensor data read:
+[ 4057.392585] gl,mpu6050 0-0068: value = [-237]
+[ 4061.593085] gl,mpu6050 0-0068: sensor data read:
+[ 4061.593103] gl,mpu6050 0-0068: value = [-3408]
+[ 4072.033545] mpu6050: sysfs class attributes removed
+[ 4072.033628] mpu6050: sysfs class destroyed
+[ 4072.033692] gl,mpu6050 0-0068: i2c driver removed
+[ 4072.033795] mpu6050: i2c driver deleted
+[ 4072.033813] mpu6050: module exited
+[10252.850966] gl,mpu6050 0-0068: i2c client address is 0x68
+[10252.851423] gl,mpu6050 0-0068: i2c mpu6050 device found, WHO_AM_I register value = 0x68
+[10252.854327] gl,mpu6050 0-0068: i2c driver probed
+[10252.854550] mpu6050: i2c driver created
+[10252.854591] mpu6050: sysfs class created
+[10252.854615] mpu6050: sysfs class attributes created
+[10252.854617] mpu6050: module loaded
+[11392.841580] gl,mpu6050 0-0068: sensor data read:
+[11392.841597] gl,mpu6050 0-0068: value = [-3152]
+[11519.362266] gl,mpu6050 0-0068: sensor data read:
+[11519.362284] gl,mpu6050 0-0068: value = [-3116]
+[11527.002039] gl,mpu6050 0-0068: sensor data read:
+[11527.002056] gl,mpu6050 0-0068: value = [-3008]
+[11568.259042] gl,mpu6050 0-0068: sensor data read:
+[11568.259059] gl,mpu6050 0-0068: value = [-3024]
+[11569.708528] gl,mpu6050 0-0068: sensor data read:
+[11569.708545] gl,mpu6050 0-0068: value = [-2752]
+[11573.117027] mpu6050: sysfs class attributes removed
+[11573.117115] mpu6050: sysfs class destroyed
+[11573.117176] gl,mpu6050 0-0068: i2c driver removed
+[11573.117280] mpu6050: i2c driver deleted
+[11573.117284] mpu6050: module exited
+[11580.425656] gl,mpu6050 0-0068: i2c client address is 0x68
+[11580.426111] gl,mpu6050 0-0068: i2c mpu6050 device found, WHO_AM_I register value = 0x68
+[11580.428940] gl,mpu6050 0-0068: i2c driver probed
+[11580.429150] mpu6050: i2c driver created
+[11580.429188] mpu6050: sysfs class created
+[11580.429211] mpu6050: sysfs class attributes created
+[11580.429214] mpu6050: module loaded
+[11583.172187] gl,mpu6050 0-0068: sensor data read:
+[11583.172206] gl,mpu6050 0-0068: ACCEL[X,Y,Z] = [-2608, -992, 16712]
+[11583.172213] gl,mpu6050 0-0068: GYRO[X,Y,Z] = [-302, -318, -316]
+[11583.172219] gl,mpu6050 0-0068: TEMP = 9012
+[11898.320269] gl,mpu6050 0-0068: sensor data read:
+[11898.320288] gl,mpu6050 0-0068: ACCEL[X,Y,Z] = [-3160, -1060, 16748]
+[11898.320295] gl,mpu6050 0-0068: GYRO[X,Y,Z] = [-520, -154, -248]
+[11898.320301] gl,mpu6050 0-0068: TEMP = 8996
+[11898.324377] gl,mpu6050 0-0068: sensor data read:
+[11898.324389] gl,mpu6050 0-0068: ACCEL[X,Y,Z] = [-3160, -944, 16784]
+[11898.324396] gl,mpu6050 0-0068: GYRO[X,Y,Z] = [-525, -275, -192]
+[11898.324402] gl,mpu6050 0-0068: TEMP = 9012
+[11898.328430] gl,mpu6050 0-0068: sensor data read:
+[11898.328442] gl,mpu6050 0-0068: ACCEL[X,Y,Z] = [-2864, -1064, 16756]
+[11898.328449] gl,mpu6050 0-0068: GYRO[X,Y,Z] = [433, -400, -30]
+[11898.328454] gl,mpu6050 0-0068: TEMP = 9044
+[12149.305825] gl,mpu6050 0-0068: sensor data read:
+[12149.305844] gl,mpu6050 0-0068: ACCEL[X,Y,Z] = [-3304, -1132, 16688]
+[12149.305851] gl,mpu6050 0-0068: GYRO[X,Y,Z] = [-764, -48, -299]
+[12149.305857] gl,mpu6050 0-0068: TEMP = 8948
+[12149.309494] gl,mpu6050 0-0068: sensor data read:
+[12149.309504] gl,mpu6050 0-0068: ACCEL[X,Y,Z] = [-3096, -1072, 16928]
+[12149.309510] gl,mpu6050 0-0068: GYRO[X,Y,Z] = [-91, -201, -294]
+[12149.309516] gl,mpu6050 0-0068: TEMP = 8916
+[12149.313162] gl,mpu6050 0-0068: sensor data read:
+[12149.313175] gl,mpu6050 0-0068: ACCEL[X,Y,Z] = [-2932, -1128, 16780]
+[12149.313188] gl,mpu6050 0-0068: GYRO[X,Y,Z] = [376, -290, -184]
+[12149.313193] gl,mpu6050 0-0068: TEMP = 8932
+[12172.687159] gl,mpu6050 0-0068: sensor data read:
+[12172.687178] gl,mpu6050 0-0068: ACCEL[X,Y,Z] = [-3156, -908, 16476]
+[12172.687185] gl,mpu6050 0-0068: GYRO[X,Y,Z] = [-622, -116, -87]
+[12172.687191] gl,mpu6050 0-0068: TEMP = 8916
+[12172.690826] gl,mpu6050 0-0068: sensor data read:
+[12172.690836] gl,mpu6050 0-0068: ACCEL[X,Y,Z] = [-3060, -1368, 16792]
+[12172.690842] gl,mpu6050 0-0068: GYRO[X,Y,Z] = [753, -155, -664]
+[12172.690848] gl,mpu6050 0-0068: TEMP = 8868
+[12172.694488] gl,mpu6050 0-0068: sensor data read:
+[12172.694501] gl,mpu6050 0-0068: ACCEL[X,Y,Z] = [-2896, -836, 16844]
+[12172.694507] gl,mpu6050 0-0068: GYRO[X,Y,Z] = [-1068, -185, 28]
+[12172.694513] gl,mpu6050 0-0068: TEMP = 8916
+[12266.565543] gl,mpu6050 0-0068: sensor data read:
+[12266.565562] gl,mpu6050 0-0068: ACCEL[X,Y,Z] = [-3204, -1016, 16684]
+[12266.565570] gl,mpu6050 0-0068: GYRO[X,Y,Z] = [-338, -182, -157]
+[12266.565576] gl,mpu6050 0-0068: TEMP = 8948
+[12266.569539] gl,mpu6050 0-0068: sensor data read:
+[12266.569551] gl,mpu6050 0-0068: ACCEL[X,Y,Z] = [-2896, -1356, 16752]
+[12266.569557] gl,mpu6050 0-0068: GYRO[X,Y,Z] = [341, -232, -528]
+[12266.569563] gl,mpu6050 0-0068: TEMP = 8916
+[12266.573367] gl,mpu6050 0-0068: sensor data read:
+[12266.573376] gl,mpu6050 0-0068: ACCEL[X,Y,Z] = [-2876, -872, 16816]
+[12266.573383] gl,mpu6050 0-0068: GYRO[X,Y,Z] = [-924, -211, -158]
+[12266.573388] gl,mpu6050 0-0068: TEMP = 8932
+[12289.541056] gl,mpu6050 0-0068: sensor data read:
+[12289.541076] gl,mpu6050 0-0068: ACCEL[X,Y,Z] = [-3044, -796, 16768]
+[12289.541082] gl,mpu6050 0-0068: GYRO[X,Y,Z] = [-583, -276, 7]
+[12289.541089] gl,mpu6050 0-0068: TEMP = 8916
+[12289.544777] gl,mpu6050 0-0068: sensor data read:
+[12289.544789] gl,mpu6050 0-0068: ACCEL[X,Y,Z] = [-2876, -1156, 16752]
+[12289.544796] gl,mpu6050 0-0068: GYRO[X,Y,Z] = [513, -86, -600]
+[12289.544801] gl,mpu6050 0-0068: TEMP = 8916
+[12289.548447] gl,mpu6050 0-0068: sensor data read:
+[12289.548460] gl,mpu6050 0-0068: ACCEL[X,Y,Z] = [-2820, -836, 16964]
+[12289.548466] gl,mpu6050 0-0068: GYRO[X,Y,Z] = [-666, -242, -54]
+[12289.548472] gl,mpu6050 0-0068: TEMP = 8932
+[12452.253398] gl,mpu6050 0-0068: sensor data read:
+[12452.253417] gl,mpu6050 0-0068: ACCEL[X,Y,Z] = [-3016, -976, 16648]
+[12452.253424] gl,mpu6050 0-0068: GYRO[X,Y,Z] = [-186, -250, -260]
+[12452.253430] gl,mpu6050 0-0068: TEMP = 8900
+[12452.257132] gl,mpu6050 0-0068: sensor data read:
+[12452.257143] gl,mpu6050 0-0068: ACCEL[X,Y,Z] = [-2892, -1028, 16816]
+[12452.257150] gl,mpu6050 0-0068: GYRO[X,Y,Z] = [-91, -75, -330]
+[12452.257155] gl,mpu6050 0-0068: TEMP = 8868
+[12452.260784] gl,mpu6050 0-0068: sensor data read:
+[12452.260794] gl,mpu6050 0-0068: ACCEL[X,Y,Z] = [-2600, -1108, 16864]
+[12452.260800] gl,mpu6050 0-0068: GYRO[X,Y,Z] = [-291, -216, -352]
+[12452.260805] gl,mpu6050 0-0068: TEMP = 8884
+[12452.264437] gl,mpu6050 0-0068: sensor data read:
+[12452.264450] gl,mpu6050 0-0068: ACCEL[X,Y,Z] = [-2668, -888, 16840]
+[12452.264456] gl,mpu6050 0-0068: GYRO[X,Y,Z] = [-433, -261, -249]
+[12452.264462] gl,mpu6050 0-0068: TEMP = 8868
+[12452.268092] gl,mpu6050 0-0068: sensor data read:
+[12452.268104] gl,mpu6050 0-0068: ACCEL[X,Y,Z] = [-2744, -1052, 16732]
+[12452.268110] gl,mpu6050 0-0068: GYRO[X,Y,Z] = [137, -372, -268]
+[12452.268116] gl,mpu6050 0-0068: TEMP = 8884
+[12452.271733] gl,mpu6050 0-0068: sensor data read:
+[12452.271743] gl,mpu6050 0-0068: ACCEL[X,Y,Z] = [-2884, -1032, 16756]
+[12452.271750] gl,mpu6050 0-0068: GYRO[X,Y,Z] = [-7, -314, -168]
+[12452.271756] gl,mpu6050 0-0068: TEMP = 8884
+[12452.275384] gl,mpu6050 0-0068: sensor data read:
+[12452.275398] gl,mpu6050 0-0068: ACCEL[X,Y,Z] = [-3188, -1140, 16752]
+[12452.275405] gl,mpu6050 0-0068: GYRO[X,Y,Z] = [-33, -207, -389]
+[12452.275410] gl,mpu6050 0-0068: TEMP = 8868
+[12500.636800] mpu6050: sysfs class attributes removed
+[12500.636889] mpu6050: sysfs class destroyed
+[12500.636952] gl,mpu6050 0-0068: i2c driver removed
+[12500.637056] mpu6050: i2c driver deleted
+[12500.637060] mpu6050: module exited
+[12657.155601] gl,mpu6050 0-0068: i2c client address is 0x68
+[12657.157065] gl,mpu6050 0-0068: i2c mpu6050 device found, WHO_AM_I register value = 0x68
+[12657.159951] gl,mpu6050 0-0068: i2c driver probed
+[12657.161710] mpu6050: i2c driver created
+[12657.161780] mpu6050: sysfs class created
+[12657.164506] mpu6050: sysfs class attributes created
+[12657.164519] mpu6050: module loaded
+[12658.354187] gl,mpu6050 0-0068: sensor data read:
+[12658.354207] gl,mpu6050 0-0068: ACCEL[X,Y,Z] = [-3260, -844, 16784]
+[12658.354214] gl,mpu6050 0-0068: GYRO[X,Y,Z] = [-615, -225, -25]
+[12658.354220] gl,mpu6050 0-0068: TEMP = 8852
+[12658.357971] gl,mpu6050 0-0068: sensor data read:
+[12658.357982] gl,mpu6050 0-0068: ACCEL[X,Y,Z] = [-3060, -1248, 16536]
+[12658.357988] gl,mpu6050 0-0068: GYRO[X,Y,Z] = [598, -164, -595]
+[12658.357994] gl,mpu6050 0-0068: TEMP = 8868
+[12658.361696] gl,mpu6050 0-0068: sensor data read:
+[12658.361709] gl,mpu6050 0-0068: ACCEL[X,Y,Z] = [-2868, -972, 16748]
+[12658.361716] gl,mpu6050 0-0068: GYRO[X,Y,Z] = [-832, -127, -66]
+[12658.361722] gl,mpu6050 0-0068: TEMP = 8852
+[12658.365376] gl,mpu6050 0-0068: sensor data read:
+[12658.365387] gl,mpu6050 0-0068: ACCEL[X,Y,Z] = [-3112, -1220, 16924]
+[12658.365394] gl,mpu6050 0-0068: GYRO[X,Y,Z] = [-183, -312, -433]
+[12658.365400] gl,mpu6050 0-0068: TEMP = 8852
+[12658.369226] gl,mpu6050 0-0068: sensor data read:
+[12658.369236] gl,mpu6050 0-0068: ACCEL[X,Y,Z] = [-2820, -876, 16764]
+[12658.369243] gl,mpu6050 0-0068: GYRO[X,Y,Z] = [131, -358, -100]
+[12658.369248] gl,mpu6050 0-0068: TEMP = 8852
+[12658.373064] gl,mpu6050 0-0068: sensor data read:
+[12658.373075] gl,mpu6050 0-0068: ACCEL[X,Y,Z] = [-2868, -980, 16704]
+[12658.373082] gl,mpu6050 0-0068: GYRO[X,Y,Z] = [35, -316, -326]
+[12658.373088] gl,mpu6050 0-0068: TEMP = 8804
+[12658.376940] gl,mpu6050 0-0068: sensor data read:
+[12658.376950] gl,mpu6050 0-0068: ACCEL[X,Y,Z] = [-3236, -1068, 16748]
+[12658.376956] gl,mpu6050 0-0068: GYRO[X,Y,Z] = [-260, -89, -359]
+[12658.376962] gl,mpu6050 0-0068: TEMP = 8852
+[13076.962994] mpu6050: sysfs class attributes removed
+[13076.963082] mpu6050: sysfs class destroyed
+[13076.963144] gl,mpu6050 0-0068: i2c driver removed
+[13076.963250] mpu6050: i2c driver deleted
+[13076.963253] mpu6050: module exited
+[13093.459623] gl,mpu6050 0-0068: i2c client address is 0x68
+[13093.460077] gl,mpu6050 0-0068: i2c mpu6050 device found, WHO_AM_I register value = 0x68
+[13093.462929] gl,mpu6050 0-0068: i2c driver probed
+[13093.463147] mpu6050: i2c driver created
+[13093.463183] mpu6050: sysfs class created
+[13093.463207] mpu6050: sysfs class attributes created
+[13093.463210] mpu6050: module loaded
+[13111.123953] gl,mpu6050 0-0068: sensor data read:
+[13111.123973] gl,mpu6050 0-0068: ACCEL[X,Y,Z] = [-2880, -936, 16444]
+[13111.123981] gl,mpu6050 0-0068: GYRO[X,Y,Z] = [65, 21, -370]
+[13111.123986] gl,mpu6050 0-0068: TEMP = 8948
+[13113.355665] gl,mpu6050 0-0068: sensor data read:
+[13113.355686] gl,mpu6050 0-0068: ACCEL[X,Y,Z] = [-2876, -960, 16816]
+[13113.355693] gl,mpu6050 0-0068: GYRO[X,Y,Z] = [-243, -462, -320]
+[13113.355699] gl,mpu6050 0-0068: TEMP = 8916
+[13115.511881] gl,mpu6050 0-0068: sensor data read:
+[13115.511901] gl,mpu6050 0-0068: ACCEL[X,Y,Z] = [-3132, -1108, 16684]
+[13115.511908] gl,mpu6050 0-0068: GYRO[X,Y,Z] = [-182, -403, -343]
+[13115.511914] gl,mpu6050 0-0068: TEMP = 8916
+[13122.247110] gl,mpu6050 0-0068: sensor data read:
+[13122.247129] gl,mpu6050 0-0068: ACCEL[X,Y,Z] = [-3180, -904, 16448]
+[13122.247135] gl,mpu6050 0-0068: GYRO[X,Y,Z] = [-213, -208, -306]
+[13122.247142] gl,mpu6050 0-0068: TEMP = 8900
+[13124.418680] gl,mpu6050 0-0068: sensor data read:
+[13124.418699] gl,mpu6050 0-0068: ACCEL[X,Y,Z] = [-3140, -916, 16876]
+[13124.418706] gl,mpu6050 0-0068: GYRO[X,Y,Z] = [-255, -440, -309]
+[13124.418712] gl,mpu6050 0-0068: TEMP = 8884
+[13125.903729] gl,mpu6050 0-0068: sensor data read:
+[13125.903749] gl,mpu6050 0-0068: ACCEL[X,Y,Z] = [-3180, -964, 16960]
+[13125.903756] gl,mpu6050 0-0068: GYRO[X,Y,Z] = [-368, -426, -286]
+[13125.903762] gl,mpu6050 0-0068: TEMP = 8932
+[13129.884542] gl,mpu6050 0-0068: sensor data read:
+[13129.884562] gl,mpu6050 0-0068: ACCEL[X,Y,Z] = [-3048, -892, 16720]
+[13129.884570] gl,mpu6050 0-0068: GYRO[X,Y,Z] = [-152, -254, -365]
+[13129.884576] gl,mpu6050 0-0068: TEMP = 8932
+[13144.345473] mpu6050: sysfs class attributes removed
+[13144.345560] mpu6050: sysfs class destroyed
+[13144.345624] gl,mpu6050 0-0068: i2c driver removed
+[13144.345732] mpu6050: i2c driver deleted
+[13144.345750] mpu6050: module exited
+[13160.619040] gl,mpu6050 0-0068: i2c client address is 0x68
+[13160.619493] gl,mpu6050 0-0068: i2c mpu6050 device found, WHO_AM_I register value = 0x68
+[13160.622330] gl,mpu6050 0-0068: i2c driver probed
+[13160.622550] mpu6050: i2c driver created
+[13160.622589] mpu6050: sysfs class created
+[13160.622612] mpu6050: sysfs class attributes created
+[13160.622615] mpu6050: module loaded
+[13166.511019] gl,mpu6050 0-0068: sensor data read:
+[13166.511037] gl,mpu6050 0-0068: value = [-3120]
+[13171.951156] gl,mpu6050 0-0068: sensor data read:
+[13171.951173] gl,mpu6050 0-0068: value = [-956]
+[13177.774212] gl,mpu6050 0-0068: sensor data read:
+[13177.774230] gl,mpu6050 0-0068: value = [16956]
+[13186.758990] gl,mpu6050 0-0068: sensor data read:
+[13186.759008] gl,mpu6050 0-0068: value = [-370]
+[13190.839127] gl,mpu6050 0-0068: sensor data read:
+[13190.839145] gl,mpu6050 0-0068: value = [-381]
+[13194.461677] gl,mpu6050 0-0068: sensor data read:
+[13194.461694] gl,mpu6050 0-0068: value = [-252]
+[13198.739566] gl,mpu6050 0-0068: sensor data read:
+[13198.739583] gl,mpu6050 0-0068: value = [-3488]
+[13203.339938] gl,mpu6050 0-0068: sensor data read:
+[13203.339956] gl,mpu6050 0-0068: value = [-3456]
+[13211.500557] mpu6050: sysfs class attributes removed
+[13211.500642] mpu6050: sysfs class destroyed
+[13211.500704] gl,mpu6050 0-0068: i2c driver removed
+[13211.500815] mpu6050: i2c driver deleted
+[13211.500818] mpu6050: module exited
+
