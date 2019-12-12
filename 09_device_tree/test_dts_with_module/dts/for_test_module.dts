@@ -1,0 +1,16 @@
+/dts-v1/;
+/plugin/;
+
+/ {
+	compatible = "allwinner,sun8i-h3";
+	
+	fragment@0 {
+		target-path = "/";
+		__overlay__ {
+			test_module@0 {
+				compatible = "orangepi_one,test_module_for_mpu6050";
+				status = "okay";
+			};
+		};
+	};
+};
