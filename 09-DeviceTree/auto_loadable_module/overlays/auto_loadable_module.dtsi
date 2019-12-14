@@ -1,0 +1,16 @@
+/dts-v1/;
+/plugin/;
+
+/ {
+	compatible = "allwinner,sun8i-h3";
+
+	fragment@0 {
+		target-path = "/";
+		__overlay__ {
+			auto_mod@0 {
+				compatible = "auto_loadable_module";
+				status = "okay"; // okay disabled
+			};
+		};
+	};
+};
