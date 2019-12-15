@@ -2,11 +2,26 @@
 #include <linux/module.h>
 #include <linux/device.h>
 #include <linux/err.h>
+
+#include <linux/jiffies.h>
+#include <linux/time.h>
+#include <linux/types.h>
+
+#include <linux/kthread.h>
+#include <linux/delay.h>
+#include <linux/sched/signal.h>
+
 #include <linux/i2c.h>
 #include <linux/i2c-dev.h>
-
 #include "mpu6050-regs.h"
 
+#include <asm/atomic.h>
+#include <linux/spinlock.h>
+#include <linux/completion.h>
+
+
+static long data_timeout_ms = MSEC_PER_SEC;
+module_param(data_timeout_ms, long, 0644);
 
 struct mpu6050_data {
 	struct i2c_client *drv_client;
@@ -17,7 +32,13 @@ struct mpu6050_data {
 
 static struct mpu6050_data g_mpu6050_data;
 
-static int mpu6050_read_data(void)
+static u64 timestamp;
+static struct task_struct *sub_task;
+static atomic_t update_req = ATOMIC_INIT(0);
+static DEFINE_MUTEX(read_data_lock);
+static DECLARE_COMPLETION(read_done);
+
+static int mpu6050_exec_reading(void)
 {
 	int temp;
 	struct i2c_client *drv_client = g_mpu6050_data.drv_client;
@@ -52,6 +73,37 @@ static int mpu6050_read_data(void)
 		g_mpu6050_data.temperature);
 
 	return 0;
+}
+
+void mpu6050_read_data(void)
+{
+	/**lock this function*/
+	mutex_lock(&read_data_lock);
+	pr_info("mpu6050: lock read_data");
+
+	u64 curr_time, delta_time, delta_ms;
+
+	curr_time = get_jiffies_64();
+	delta_time = curr_time - timestamp;
+	delta_ms = jiffies64_to_msecs(delta_time);
+
+	/**check if data is not old*/
+	pr_info("mpu6050: %s: curr_time = %lld", __func__, curr_time);
+	pr_info("mpu6050: %s: timestamp = %lld", __func__, timestamp);
+	pr_info("mpu6050: %s: delta_ms = %lld", __func__, delta_ms);
+	pr_info("mpu6050: %s: data_timeout_ms = %ld", __func__, data_timeout_ms);
+	if (delta_ms > data_timeout_ms) {
+		wake_up_process(sub_task);
+		pr_info("mpu6050: %s: wake_up_process(sub_task)", __func__);
+		/**wait completions*/
+		pr_info("mpu6050: %s: wait_for_completion(&read_done);", __func__);
+		wait_for_completion(&read_done);
+		pr_info("mpu6050: %s: waiting_done", __func__);
+	}
+
+	/**unlock function*/
+	pr_info("mpu6050: %s: unlocking read_data", __func__);
+	mutex_unlock(&read_data_lock);
 }
 
 static int mpu6050_probe(struct i2c_client *drv_client,
@@ -195,9 +247,33 @@ CLASS_ATTR_RO(temperature);
 
 static struct class *attr_class;
 
+int bg_thread(void *data)
+{
+	pr_info("mpu6050: %s started", __func__);
+	while (!kthread_should_stop()) {
+		/**check requirement for*/
+		pr_info("mpu6050: %s executing", __func__);
+		mpu6050_exec_reading();
+		atomic_set(&update_req, 0);
+		timestamp = get_jiffies_64();
+		pr_info("mpu6050: reset update_req and read_done");
+		complete(&read_done);
+		set_current_state(TASK_INTERRUPTIBLE);
+		schedule();
+	}
+	set_current_state(TASK_RUNNING);
+	pr_info("mpu6050: %s sub_task stoped\n", __func__);
+	sub_task = NULL;
+	return 0;
+}
+
 static int mpu6050_init(void)
 {
 	int ret;
+
+	sub_task = kthread_create(bg_thread, NULL, "mpu6050_sub_task");
+	if (IS_ERR(sub_task))
+		return PTR_ERR(sub_task);
 
 	/* Create i2c driver */
 	ret = i2c_add_driver(&mpu6050_i2c_driver);
@@ -261,6 +337,9 @@ static int mpu6050_init(void)
 
 	pr_info("mpu6050: sysfs class attributes created\n");
 
+	atomic_set(&update_req, 0);
+	pr_info("mpu6050: reset update_req");
+
 	pr_info("mpu6050: module loaded\n");
 	return 0;
 }
@@ -283,6 +362,17 @@ static void mpu6050_exit(void)
 
 	i2c_del_driver(&mpu6050_i2c_driver);
 	pr_info("mpu6050: i2c driver deleted\n");
+
+	if (sub_task) {
+		int sss = kthread_stop(sub_task);
+
+		if (sss != -EINTR)
+			pr_info("mpu6050: sub_task successfuly stoped");
+		else
+			pr_info("mpu6050: sub_task stoped with errors");
+	}
+
+	pr_info("mpu6050: sub_task destroyed\n");
 
 	pr_info("mpu6050: module exited\n");
 }
