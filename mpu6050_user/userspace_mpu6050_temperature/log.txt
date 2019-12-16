@@ -1,0 +1,316 @@
+root@orangepione:/storage# ./userspace_mpu6050_temperature.sh 
+Tue Nov 19 17:25:32 UTC 2019
+Tc = 21.32C, Tf = 70.37F
+
+Tue Nov 19 17:25:33 UTC 2019
+Tc = 21.32C, Tf = 70.37F
+
+Tue Nov 19 17:25:34 UTC 2019
+Tc = 21.41C, Tf = 70.53F
+
+Tue Nov 19 17:25:35 UTC 2019
+Tc = 21.41C, Tf = 70.53F
+
+Tue Nov 19 17:25:36 UTC 2019
+Tc = 21.41C, Tf = 70.53F
+
+Tue Nov 19 17:25:37 UTC 2019
+Tc = 21.46C, Tf = 70.62F
+
+Tue Nov 19 17:25:39 UTC 2019
+Tc = 21.36C, Tf = 70.44F
+
+Tue Nov 19 17:25:40 UTC 2019
+Tc = 21.41C, Tf = 70.53F
+
+Tue Nov 19 17:25:41 UTC 2019
+Tc = 21.46C, Tf = 70.62F
+
+Tue Nov 19 17:25:42 UTC 2019
+Tc = 21.36C, Tf = 70.44F
+
+Tue Nov 19 17:25:43 UTC 2019
+Tc = 21.41C, Tf = 70.53F
+
+Tue Nov 19 17:25:44 UTC 2019
+Tc = 21.36C, Tf = 70.44F
+
+Tue Nov 19 17:25:45 UTC 2019
+Tc = 21.32C, Tf = 70.37F
+
+Tue Nov 19 17:25:46 UTC 2019
+Tc = 21.46C, Tf = 70.62F
+
+Tue Nov 19 17:25:47 UTC 2019
+Tc = 21.27C, Tf = 70.28F
+
+Tue Nov 19 17:25:48 UTC 2019
+Tc = 21.36C, Tf = 70.44F
+
+Tue Nov 19 17:25:49 UTC 2019
+Tc = 21.41C, Tf = 70.53F
+
+Tue Nov 19 17:25:50 UTC 2019
+Tc = 21.41C, Tf = 70.53F
+
+Tue Nov 19 17:25:51 UTC 2019
+Tc = 21.32C, Tf = 70.37F
+
+Tue Nov 19 17:25:52 UTC 2019
+Tc = 21.41C, Tf = 70.53F
+
+Tue Nov 19 17:25:53 UTC 2019
+Tc = 21.41C, Tf = 70.53F
+
+Tue Nov 19 17:25:54 UTC 2019
+Tc = 21.51C, Tf = 70.71F
+
+Tue Nov 19 17:25:55 UTC 2019
+Tc = 21.84C, Tf = 71.31F
+
+Tue Nov 19 17:25:56 UTC 2019 // нагрев феном
+Tc = 23.39C, Tf = 74.10F
+
+Tue Nov 19 17:25:57 UTC 2019
+Tc = 24.47C, Tf = 76.04F
+
+Tue Nov 19 17:25:58 UTC 2019
+Tc = 25.60C, Tf = 78.08F
+
+Tue Nov 19 17:25:59 UTC 2019
+Tc = 26.59C, Tf = 79.86F
+
+Tue Nov 19 17:26:00 UTC 2019
+Tc = 27.67C, Tf = 81.80F
+
+Tue Nov 19 17:26:02 UTC 2019
+Tc = 28.52C, Tf = 83.33F
+
+Tue Nov 19 17:26:03 UTC 2019
+Tc = 29.32C, Tf = 84.77F
+
+Tue Nov 19 17:26:04 UTC 2019
+Tc = 29.98C, Tf = 85.96F
+
+Tue Nov 19 17:26:05 UTC 2019
+Tc = 30.45C, Tf = 86.81F
+
+Tue Nov 19 17:26:06 UTC 2019
+Tc = 31.39C, Tf = 88.50F
+
+Tue Nov 19 17:26:07 UTC 2019
+Tc = 32.19C, Tf = 89.94F
+
+Tue Nov 19 17:26:08 UTC 2019
+Tc = 32.85C, Tf = 91.13F
+
+Tue Nov 19 17:26:09 UTC 2019
+Tc = 33.74C, Tf = 92.73F
+
+Tue Nov 19 17:26:10 UTC 2019
+Tc = 34.21C, Tf = 93.57F
+
+Tue Nov 19 17:26:11 UTC 2019
+Tc = 34.40C, Tf = 93.92F
+
+Tue Nov 19 17:26:12 UTC 2019
+Tc = 34.82C, Tf = 94.67F
+
+Tue Nov 19 17:26:13 UTC 2019
+Tc = 35.39C, Tf = 95.70F
+
+Tue Nov 19 17:26:14 UTC 2019
+Tc = 35.62C, Tf = 96.11F
+
+Tue Nov 19 17:26:15 UTC 2019
+Tc = 36.05C, Tf = 96.89F
+
+Tue Nov 19 17:26:16 UTC 2019
+Tc = 36.00C, Tf = 96.80F
+
+Tue Nov 19 17:26:17 UTC 2019
+Tc = 35.67C, Tf = 96.20F
+
+Tue Nov 19 17:26:18 UTC 2019
+Tc = 36.33C, Tf = 97.39F
+
+Tue Nov 19 17:26:19 UTC 2019
+Tc = 36.74C, Tf = 98.13F
+
+Tue Nov 19 17:26:20 UTC 2019
+Tc = 36.52C, Tf = 97.73F
+
+Tue Nov 19 17:26:21 UTC 2019
+Tc = 37.07C, Tf = 98.72F
+
+Tue Nov 19 17:26:22 UTC 2019
+Tc = 36.98C, Tf = 98.56F
+
+Tue Nov 19 17:26:23 UTC 2019
+Tc = 37.64C, Tf = 99.75F
+
+Tue Nov 19 17:26:24 UTC 2019
+Tc = 37.83C, Tf = 100.09F
+
+Tue Nov 19 17:26:26 UTC 2019
+Tc = 37.97C, Tf = 100.34F
+
+Tue Nov 19 17:26:27 UTC 2019
+Tc = 38.20C, Tf = 100.76F
+
+Tue Nov 19 17:26:28 UTC 2019
+Tc = 38.01C, Tf = 100.41F
+
+Tue Nov 19 17:26:29 UTC 2019
+Tc = 38.34C, Tf = 101.01F
+
+Tue Nov 19 17:26:30 UTC 2019
+Tc = 38.53C, Tf = 101.35F
+
+Tue Nov 19 17:26:31 UTC 2019
+Tc = 38.39C, Tf = 101.10F
+
+Tue Nov 19 17:26:32 UTC 2019
+Tc = 38.81C, Tf = 101.85F
+
+Tue Nov 19 17:26:33 UTC 2019
+Tc = 38.96C, Tf = 102.12F
+
+Tue Nov 19 17:26:34 UTC 2019
+Tc = 38.77C, Tf = 101.78F
+
+Tue Nov 19 17:26:35 UTC 2019
+Tc = 38.30C, Tf = 100.94F
+
+Tue Nov 19 17:26:36 UTC 2019 // охлождение феном
+Tc = 37.64C, Tf = 99.75F
+
+Tue Nov 19 17:26:37 UTC 2019
+Tc = 37.40C, Tf = 99.32F
+
+Tue Nov 19 17:26:38 UTC 2019
+Tc = 36.88C, Tf = 98.38F
+
+Tue Nov 19 17:26:39 UTC 2019
+Tc = 36.38C, Tf = 97.48F
+
+Tue Nov 19 17:26:40 UTC 2019
+Tc = 35.91C, Tf = 96.63F
+
+Tue Nov 19 17:26:41 UTC 2019
+Tc = 35.62C, Tf = 96.11F
+
+Tue Nov 19 17:26:42 UTC 2019
+Tc = 35.25C, Tf = 95.45F
+
+Tue Nov 19 17:26:43 UTC 2019
+Tc = 34.78C, Tf = 94.60F
+
+Tue Nov 19 17:26:44 UTC 2019
+Tc = 34.45C, Tf = 94.01F
+
+Tue Nov 19 17:26:45 UTC 2019
+Tc = 34.02C, Tf = 93.23F
+
+Tue Nov 19 17:26:46 UTC 2019
+Tc = 33.79C, Tf = 92.82F
+
+Tue Nov 19 17:26:47 UTC 2019
+Tc = 33.51C, Tf = 92.31F
+
+Tue Nov 19 17:26:48 UTC 2019
+Tc = 33.18C, Tf = 91.72F
+
+Tue Nov 19 17:26:49 UTC 2019
+Tc = 32.89C, Tf = 91.20F
+
+Tue Nov 19 17:26:50 UTC 2019 // охлождение на воздухе
+Tc = 32.80C, Tf = 91.04F
+
+Tue Nov 19 17:26:52 UTC 2019
+Tc = 32.42C, Tf = 90.35F
+
+Tue Nov 19 17:26:53 UTC 2019
+Tc = 32.42C, Tf = 90.35F
+
+Tue Nov 19 17:26:54 UTC 2019
+Tc = 32.28C, Tf = 90.10F
+
+Tue Nov 19 17:26:55 UTC 2019
+Tc = 32.14C, Tf = 89.85F
+
+Tue Nov 19 17:26:56 UTC 2019
+Tc = 32.09C, Tf = 89.76F
+
+Tue Nov 19 17:26:57 UTC 2019
+Tc = 32.05C, Tf = 89.69F
+
+Tue Nov 19 17:26:58 UTC 2019
+Tc = 31.86C, Tf = 89.34F
+
+Tue Nov 19 17:26:59 UTC 2019
+Tc = 31.81C, Tf = 89.25F
+
+Tue Nov 19 17:27:00 UTC 2019
+Tc = 31.67C, Tf = 89.00F
+
+Tue Nov 19 17:27:01 UTC 2019
+Tc = 31.62C, Tf = 88.91F
+
+Tue Nov 19 17:27:02 UTC 2019
+Tc = 31.53C, Tf = 88.75F
+
+Tue Nov 19 17:27:03 UTC 2019
+Tc = 31.39C, Tf = 88.50F
+
+Tue Nov 19 17:27:04 UTC 2019
+Tc = 31.29C, Tf = 88.32F
+
+Tue Nov 19 17:27:05 UTC 2019
+Tc = 31.20C, Tf = 88.16F
+
+Tue Nov 19 17:27:06 UTC 2019
+Tc = 31.20C, Tf = 88.16F
+
+Tue Nov 19 17:27:07 UTC 2019
+Tc = 31.06C, Tf = 87.90F
+
+Tue Nov 19 17:27:08 UTC 2019
+Tc = 31.06C, Tf = 87.90F
+
+Tue Nov 19 17:27:09 UTC 2019
+Tc = 30.92C, Tf = 87.65F
+
+Tue Nov 19 17:27:10 UTC 2019
+Tc = 30.82C, Tf = 87.47F
+
+Tue Nov 19 17:27:11 UTC 2019
+Tc = 30.68C, Tf = 87.22F
+
+Tue Nov 19 17:27:12 UTC 2019
+Tc = 30.64C, Tf = 87.15F
+
+Tue Nov 19 17:27:14 UTC 2019
+Tc = 30.54C, Tf = 86.97F
+
+Tue Nov 19 17:27:15 UTC 2019
+Tc = 30.49C, Tf = 86.88F
+
+Tue Nov 19 17:27:16 UTC 2019
+Tc = 30.49C, Tf = 86.88F
+
+Tue Nov 19 17:27:17 UTC 2019
+Tc = 30.35C, Tf = 86.63F
+
+Tue Nov 19 17:27:18 UTC 2019
+Tc = 30.31C, Tf = 86.55F
+
+Tue Nov 19 17:27:19 UTC 2019
+Tc = 30.12C, Tf = 86.21F
+
+Tue Nov 19 17:27:20 UTC 2019
+Tc = 30.16C, Tf = 86.28F
+
+Tue Nov 19 17:27:21 UTC 2019
+Tc = 29.98C, Tf = 85.96F
+
