@@ -1,0 +1,3 @@
+root@orangepione:~# ./mpu6050_user 
+Time :	1001237953 ns
+Count:	532
