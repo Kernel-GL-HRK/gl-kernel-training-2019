@@ -1,0 +1,94 @@
+U-Boot SPL 2019.04-armbian (Nov 18 2019 - 23:02:49 +0100)
+DRAM: 512 MiB
+Trying to boot from MMC1
+
+
+U-Boot 2019.04-armbian (Nov 18 2019 - 23:02:49 +0100) Allwinner Technology
+
+CPU:   Allwinner H3 (SUN8I 1680)
+Model: Xunlong Orange Pi One
+DRAM:  512 MiB
+MMC:   mmc@1c0f000: 0
+Loading Environment from EXT4... ** File not found /boot/boot.env **
+
+** Unable to read "/boot/boot.env" from mmc0:1 **
+In:    serial
+Out:   serial
+Err:   serial
+Net:   phy interface0
+eth0: ethernet@1c30000
+** Reading file would overwrite reserved memory **
+There is no valid bmp file at the given address
+starting USB...
+USB0:   USB EHCI 1.00
+USB1:   USB OHCI 1.0
+USB2:   USB EHCI 1.00
+USB3:   USB OHCI 1.0
+scanning bus 0 for devices... 1 USB Device(s) found
+scanning bus 1 for devices... 1 USB Device(s) found
+scanning bus 2 for devices... 1 USB Device(s) found
+scanning bus 3 for devices... 1 USB Device(s) found
+       scanning usb for storage devices... 0 Storage Device(s) found
+Autoboot in 1 seconds, press <Space> to stop
+switch to partitions #0, OK
+mmc0 is current device
+Scanning mmc 0:1...
+Found U-Boot script /boot/boot.scr
+3798 bytes read in 4 ms (926.8 KiB/s)
+## Executing script at 43100000
+U-boot loaded from SD
+Boot script loaded from mmc
+260 bytes read in 1 ms (253.9 KiB/s)
+7307897 bytes read in 359 ms (19.4 MiB/s)
+4313648 bytes read in 212 ms (19.4 MiB/s)
+Found mainline kernel configuration
+26419 bytes read in 10 ms (2.5 MiB/s)
+374 bytes read in 8 ms (44.9 KiB/s)
+Applying kernel provided DT overlay sun8i-h3-i2c0.dtbo
+374 bytes read in 3 ms (121.1 KiB/s)
+Applying kernel provided DT overlay sun8i-h3-i2c1.dtbo
+374 bytes read in 4 ms (90.8 KiB/s)
+Applying kernel provided DT overlay sun8i-h3-i2c2.dtbo
+266 bytes read in 4 ms (64.5 KiB/s)
+Applying user provided DT overlay auto_loadable_module.dtbo
+4155 bytes read in 5 ms (811.5 KiB/s)
+Applying kernel provided DT fixup script (sun8i-h3-fixup.scr)
+## Executing script at 44000000
+## Loading init Ramdisk from Legacy Image at 43300000 ...
+   Image Name:   uInitrd
+   Image Type:   ARM Linux RAMDisk Image (gzip compressed)
+   Data Size:    7307833 Bytes = 7 MiB
+   Load Address: 00000000
+   Entry Point:  00000000
+   Verifying Checksum ... OK
+## Flattened Device Tree blob at 43000000
+   Booting using the fdt blob at 0x43000000
+EHCI failed to shut down host controller.
+   Loading Ramdisk to 49907000, end 49fff239 ... OK
+   Loading Device Tree to 49898000, end 49906fff ... OK
+
+Starting kernel ...
+
+
+Armbian 19.11.3 Buster ttyS0 
+
+orangepione login: root
+Password: 
+Last login: Tue Nov 19 16:22:46 UTC 2019 from 192.168.88.26 on pts/0
+  ___  ____  _    ___             
+ / _ \|  _ \(_)  / _ \ _ __   ___ 
+| | | | |_) | | | | | | '_ \ / _ \
+| |_| |  __/| | | |_| | | | |  __/
+ \___/|_|   |_|  \___/|_| |_|\___|
+                                  
+Welcome to Armbian Buster with Linux 5.5.0-rc1
+
+System load:   3.44 0.97 0.33   Up time:       0 min
+Memory usage:  8 % of 498MB     IP:            
+Usage of /:    29% of 7.0G   
+
+
+root@orangepione:~# lsmod
+Module                  Size  Used by
+auto_loadable_module    16384  0
+
