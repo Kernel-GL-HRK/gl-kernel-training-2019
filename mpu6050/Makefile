@@ -1,32 +1,39 @@
-#
-# mpu6050 accelerometer & gyroscope
-#
-ifneq ($(KERNELRELEASE),)
+NAMELINUX = root@192.168.0.130
+QDIR = /lib/modules/4.19.83-sunxi/kernel/drivers/iio/accel
+NAME = mpu6050
+KDIR = /home/dmitry/GL/orange-pi-4.19.83
+ARCH = arm
+CCFLAGS = -C
+COMPILER = arm-linux-gnueabihf-
+PWD = $(shell pwd)
 
-obj-m := mpu6050.o
+obj-m += $(NAME).o
 
-else
+all: $(NAME).c
+	make $(CCFLAGS) $(KDIR) M=$(PWD) ARCH=$(ARCH) CROSS_COMPILE=$(COMPILER) modules
 
+dtbo:
+	~/GL/orange-pi-4.19.83/scripts/dtc/dtc -I dts -O dtb \
+		-o $(PWD)/dtsi/$(NAME).dtbo \
+		$(PWD)/dtsi/$(NAME).dtsi
 
-ifeq ($(KERNELDIR),)
-ifeq ($(BBB_KERNEL),)
-	$(error Path to kernel tree - KERNELDIR or BBB_KERNEL variable is not defined!)
-endif
-endif
+prog: test-mod.c
+	$(COMPILER)gcc $< -o $@
 
-KERNELDIR ?= $(BBB_KERNEL)
+copymod: $(NAME).ko
+	scp $< $(NAMELINUX):$(QDIR)
 
-export ARCH = arm
-export CROSS_COMPILE ?= arm-linux-gnueabihf-
+copysshid:
+	ssh-copy-id -i ~/.ssh/id_rsa.pub $(NAMELINUX)
 
+copydtbo:
+	scp $(PWD)/dtsi/$(NAME).dtbo \
+		$(NAMELINUX):/boot/overlay-user
 
-.PHONY: all clean
-
-all:
-	$(MAKE) -C $(KERNELDIR) M=$(CURDIR) modules
+copyprog: prog
+	scp $< $(NAMELINUX):/home/dmitry
 
 clean:
-	$(MAKE) -C $(KERNELDIR) M=$(CURDIR) clean
-
-
-endif
+	make $(CCFLAGS) $(KDIR) M=$(PWD) ARCH=$(ARCH) CROSS_COMPILE=$(COMPILER) clean
+	-rm ./dtsi/$(NAME).dtbo
+	-rm prog

@@ -1,0 +1,46 @@
+root@orangepione:/home/dmitry# ./prog 
+Reading...
+/sys/class/mpu6050/accel_x: -1172
+/sys/class/mpu6050/accel_y: 6396
+/sys/class/mpu6050/accel_z: 16608
+/sys/class/mpu6050/gyro_x: 259
+/sys/class/mpu6050/gyro_y: -244
+/sys/class/mpu6050/gyro_z: -96
+/sys/class/mpu6050/temp: 24.130
+Time readed nS = 4921249
+Reading...
+/sys/class/mpu6050/accel_x: -1340
+/sys/class/mpu6050/accel_y: 6212
+/sys/class/mpu6050/accel_z: 16328
+/sys/class/mpu6050/gyro_x: 354
+/sys/class/mpu6050/gyro_y: -284
+/sys/class/mpu6050/gyro_z: -43
+/sys/class/mpu6050/temp: 24.083
+Time readed nS = 4715423
+Reading...
+/sys/class/mpu6050/accel_x: -1296
+/sys/class/mpu6050/accel_y: 6320
+/sys/class/mpu6050/accel_z: 16548
+/sys/class/mpu6050/gyro_x: 385
+/sys/class/mpu6050/gyro_y: -294
+/sys/class/mpu6050/gyro_z: -36
+/sys/class/mpu6050/temp: 24.224
+Time readed nS = 4881708
+Reading...
+/sys/class/mpu6050/accel_x: -1268
+/sys/class/mpu6050/accel_y: 6316
+/sys/class/mpu6050/accel_z: 16584
+/sys/class/mpu6050/gyro_x: 367
+/sys/class/mpu6050/gyro_y: -294
+/sys/class/mpu6050/gyro_z: -44
+/sys/class/mpu6050/temp: 24.177
+Time readed nS = 4714131
+Reading...
+/sys/class/mpu6050/accel_x: -1188
+/sys/class/mpu6050/accel_y: 6160
+/sys/class/mpu6050/accel_z: 16648
+/sys/class/mpu6050/gyro_x: 344
+/sys/class/mpu6050/gyro_y: -285
+/sys/class/mpu6050/gyro_z: -21
+/sys/class/mpu6050/temp: 24.083
+Time readed nS = 4961956

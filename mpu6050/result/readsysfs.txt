@@ -1,0 +1,142 @@
+root@orangepione:~# cat /sys/class/mpu6050/temp 
+24.883
+root@orangepione:~# cat /sys/class/mpu6050/temp 
+24.930
+root@orangepione:~# cat /sys/class/mpu6050/temp 
+24.977
+root@orangepione:~# cat /sys/class/mpu6050/temp 
+24.930
+root@orangepione:~# cat /sys/class/mpu6050/temp 
+27.518
+root@orangepione:~# cat /sys/class/mpu6050/temp 
+27.565
+root@orangepione:~# cat /sys/class/mpu6050/temp 
+27.518
+root@orangepione:~# cat /sys/class/mpu6050/temp 
+30.812
+root@orangepione:~# cat /sys/class/mpu6050/temp 
+30.483
+root@orangepione:~# cat /sys/class/mpu6050/temp 
+30.577
+root@orangepione:~# cat /sys/class/mpu6050/temp 
+30.483
+root@orangepione:~# cat /sys/class/mpu6050/temp 
+30.295
+root@orangepione:~# cat /sys/class/mpu6050/temp 
+30.200
+root@orangepione:~# cat /sys/class/mpu6050/temp 
+29.542
+root@orangepione:~# cat /sys/class/mpu6050/temp 
+29.542
+root@orangepione:~# cat /sys/class/mpu6050/temp 
+29.542
+root@orangepione:~# cat /sys/class/mpu6050/temp 
+29.259
+root@orangepione:~# cat /sys/class/mpu6050/temp 
+29.071
+root@orangepione:~# cat /sys/class/mpu6050/temp 
+28.789
+root@orangepione:~# cat /sys/class/mpu6050/temp 
+28.459
+root@orangepione:~# cat /sys/class/mpu6050/temp 
+28.459
+root@orangepione:~# cat /sys/class/mpu6050/accel_x
+-1660
+root@orangepione:~# cat /sys/class/mpu6050/accel_x
+-1608
+root@orangepione:~# cat /sys/class/mpu6050/accel_x
+-1648
+root@orangepione:~# cat /sys/class/mpu6050/accel_x
+-1776
+root@orangepione:~# cat /sys/class/mpu6050/accel_x
+-1456
+root@orangepione:~# cat /sys/class/mpu6050/accel_x
+-1400
+root@orangepione:~# cat /sys/class/mpu6050/accel_x
+-1596
+root@orangepione:~# cat /sys/class/mpu6050/accel_x
+-1708
+root@orangepione:~# cat /sys/class/mpu6050/accel_x
+-1388
+root@orangepione:~# cat /sys/class/mpu6050/accel_x
+-1496
+root@orangepione:~# cat /sys/class/mpu6050/accel_x
+-1528
+root@orangepione:~# cat /sys/class/mpu6050/accel_x
+-1536
+root@orangepione:~# cat /sys/class/mpu6050/accel_x
+-1484
+root@orangepione:~# cat /sys/class/mpu6050/accel_x
+-1576
+root@orangepione:~# cat /sys/class/mpu6050/accel_x
+-1560
+root@orangepione:~# cat /sys/class/mpu6050/accel_x
+-1692
+root@orangepione:~# cat /sys/class/mpu6050/accel_x
+-1624
+root@orangepione:~# cat /sys/class/mpu6050/accel_x
+-1448
+root@orangepione:~# cat /sys/class/mpu6050/accel_x
+-1412
+root@orangepione:~# cat /sys/class/mpu6050/accel_x
+-1540
+root@orangepione:~# cat /sys/class/mpu6050/accel_x
+-1544
+root@orangepione:~# cat /sys/class/mpu6050/accel_y
+5664
+root@orangepione:~# cat /sys/class/mpu6050/accel_y
+5820
+root@orangepione:~# cat /sys/class/mpu6050/accel_y
+5628
+root@orangepione:~# cat /sys/class/mpu6050/accel_y
+5556
+root@orangepione:~# cat /sys/class/mpu6050/accel_y
+5804
+root@orangepione:~# cat /sys/class/mpu6050/accel_z
+16752
+root@orangepione:~# cat /sys/class/mpu6050/accel_z
+16596
+root@orangepione:~# cat /sys/class/mpu6050/accel_z
+16548
+root@orangepione:~# cat /sys/class/mpu6050/accel_z
+16488
+root@orangepione:~# cat /sys/class/mpu6050/accel_z
+16792
+root@orangepione:~# cat /sys/class/mpu6050/gyro_x
+215
+root@orangepione:~# cat /sys/class/mpu6050/gyro_x
+51
+root@orangepione:~# cat /sys/class/mpu6050/gyro_x
+77
+root@orangepione:~# cat /sys/class/mpu6050/gyro_x
+207
+root@orangepione:~# cat /sys/class/mpu6050/gyro_x
+411
+root@orangepione:~# cat /sys/class/mpu6050/gyro_x
+326
+root@orangepione:~# cat /sys/class/mpu6050/gyro_x
+429
+root@orangepione:~# cat /sys/class/mpu6050/gyro_x
+209
+root@orangepione:~# cat /sys/class/mpu6050/gyro_y
+-252
+root@orangepione:~# cat /sys/class/mpu6050/gyro_y
+-259
+root@orangepione:~# cat /sys/class/mpu6050/gyro_y
+-248
+root@orangepione:~# cat /sys/class/mpu6050/gyro_y
+-358
+root@orangepione:~# cat /sys/class/mpu6050/gyro_y
+-327
+root@orangepione:~# cat /sys/class/mpu6050/gyro_y
+-275
+root@orangepione:~# cat /sys/class/mpu6050/gyro_z
+-29
+root@orangepione:~# cat /sys/class/mpu6050/gyro_z
+-154
+root@orangepione:~# cat /sys/class/mpu6050/gyro_z
+-74
+root@orangepione:~# cat /sys/class/mpu6050/gyro_z
+40
+root@orangepione:~# cat /sys/class/mpu6050/gyro_z
+-149
