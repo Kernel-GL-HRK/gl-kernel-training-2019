@@ -1,0 +1,40 @@
+root@orangepione:/home/bekir# insmod mpu6050.ko sleep_ms=20
+root@orangepione:/home/bekir# cat /sys/class/mpu6050/accel_x
+-7748
+root@orangepione:/home/bekir# cat /sys/class/mpu6050/accel_y
+-5052
+root@orangepione:/home/bekir# cat /sys/class/mpu6050/accel_z
+14124
+root@orangepione:/home/bekir# cat /sys/class/mpu6050/gyro_x
+-173
+root@orangepione:/home/bekir# cat /sys/class/mpu6050/gyro_y
+-223
+root@orangepione:/home/bekir# cat /sys/class/mpu6050/gyro_z
+-303
+root@orangepione:/home/bekir# cat /sys/class/mpu6050/temp
+26.060
+root@orangepione:/home/bekir# while true; do cat /sys/class/mpu6050/temp; sleep 0.1; done
+26.060
+26.076
+26.092
+26.060
+26.076
+26.060
+26.092
+26.060
+26.076
+26.076
+26.092
+26.076
+26.092
+26.092
+26.108
+26.060
+26.076
+26.060
+26.092
+26.108
+26.076
+26.092
+26.092
+26.076

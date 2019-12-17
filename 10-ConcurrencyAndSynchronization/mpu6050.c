@@ -4,12 +4,29 @@
 #include <linux/err.h>
 #include <linux/i2c.h>
 #include <linux/i2c-dev.h>
+#include <linux/kobject.h>
+#include <linux/sysfs.h>
+#include <linux/device.h>
+
+#include <linux/of.h>
+#include <linux/of_platform.h>
+#include <linux/platform_device.h>
+#include <linux/delay.h>
+#include <linux/kthread.h>
+#include <linux/mutex.h>
+#include <linux/jiffies.h>
 
 #include "mpu6050-regs.h"
 
+static int sleep_ms = 1000;
+module_param(sleep_ms, int, 0);
+
+struct task_struct *reading_thread;
+//DEFINE_MUTEX(mutex_for_reading);
 
 struct mpu6050_data {
 	struct i2c_client *drv_client;
+	struct mutex mutex_for_reading;
 	int accel_values[3];
 	int gyro_values[3];
 	int temperature;
@@ -22,22 +39,30 @@ static int mpu6050_read_data(void)
 	int temp;
 	struct i2c_client *drv_client = g_mpu6050_data.drv_client;
 
-	if (drv_client == 0)
-		return -ENODEV;
+		if (drv_client == 0)
+			return -ENODEV;
 
 	/* accel */
-	g_mpu6050_data.accel_values[0] = (s16)((u16)i2c_smbus_read_word_swapped(drv_client, REG_ACCEL_XOUT_H));
-	g_mpu6050_data.accel_values[1] = (s16)((u16)i2c_smbus_read_word_swapped(drv_client, REG_ACCEL_YOUT_H));
-	g_mpu6050_data.accel_values[2] = (s16)((u16)i2c_smbus_read_word_swapped(drv_client, REG_ACCEL_ZOUT_H));
+	g_mpu6050_data.accel_values[0] =
+	(s16)((u16)i2c_smbus_read_word_swapped(drv_client, REG_ACCEL_XOUT_H));
+	g_mpu6050_data.accel_values[1] =
+	(s16)((u16)i2c_smbus_read_word_swapped(drv_client, REG_ACCEL_YOUT_H));
+	g_mpu6050_data.accel_values[2] =
+	(s16)((u16)i2c_smbus_read_word_swapped(drv_client, REG_ACCEL_ZOUT_H));
 	/* gyro */
-	g_mpu6050_data.gyro_values[0] = (s16)((u16)i2c_smbus_read_word_swapped(drv_client, REG_GYRO_XOUT_H));
-	g_mpu6050_data.gyro_values[1] = (s16)((u16)i2c_smbus_read_word_swapped(drv_client, REG_GYRO_YOUT_H));
-	g_mpu6050_data.gyro_values[2] = (s16)((u16)i2c_smbus_read_word_swapped(drv_client, REG_GYRO_ZOUT_H));
+	g_mpu6050_data.gyro_values[0] =
+	(s16)((u16)i2c_smbus_read_word_swapped(drv_client, REG_GYRO_XOUT_H));
+	g_mpu6050_data.gyro_values[1] =
+	(s16)((u16)i2c_smbus_read_word_swapped(drv_client, REG_GYRO_YOUT_H));
+	g_mpu6050_data.gyro_values[2] =
+	(s16)((u16)i2c_smbus_read_word_swapped(drv_client, REG_GYRO_ZOUT_H));
 	/* Temperature in degrees C =
 	 * (TEMP_OUT Register Value  as a signed quantity)/340 + 36.53
 	 */
 	temp = (s16)((u16)i2c_smbus_read_word_swapped(drv_client, REG_TEMP_OUT_H));
-	g_mpu6050_data.temperature = (temp + 12420 + 170) / 340;
+	g_mpu6050_data.temperature = (temp + 12420);
+
+
 
 	dev_info(&drv_client->dev, "sensor data read:\n");
 	dev_info(&drv_client->dev, "ACCEL[X,Y,Z] = [%d, %d, %d]\n",
@@ -52,6 +77,16 @@ static int mpu6050_read_data(void)
 		g_mpu6050_data.temperature);
 
 	return 0;
+}
+
+static int mpu6050_read_thread(void *data)
+{
+	while (!kthread_should_stop()) {
+		mutex_lock(&((struct mpu6050_data *)data)->mutex_for_reading);
+		mpu6050_read_data();
+		mutex_unlock(&((struct mpu6050_data *)data)->mutex_for_reading);
+		msleep(sleep_ms);
+	}
 }
 
 static int mpu6050_probe(struct i2c_client *drv_client,
@@ -93,6 +128,10 @@ static int mpu6050_probe(struct i2c_client *drv_client,
 	i2c_smbus_write_byte_data(drv_client, REG_PWR_MGMT_2, 0);
 
 	g_mpu6050_data.drv_client = drv_client;
+	mutex_init(&g_mpu6050_data.mutex_for_reading);
+
+	reading_thread = kthread_run(mpu6050_read_thread, &g_mpu6050_data,
+								"reading_thread");
 
 	dev_info(&drv_client->dev, "i2c driver probed\n");
 	return 0;
@@ -102,6 +141,7 @@ static int mpu6050_remove(struct i2c_client *drv_client)
 {
 	g_mpu6050_data.drv_client = 0;
 
+	kthread_stop(reading_thread);
 	dev_info(&drv_client->dev, "i2c driver removed\n");
 	return 0;
 }
@@ -114,7 +154,7 @@ MODULE_DEVICE_TABLE(i2c, mpu6050_idtable);
 
 static struct i2c_driver mpu6050_i2c_driver = {
 	.driver = {
-		.name = "gl_mpu6050",
+		.name = "gl,mpu6050",
 	},
 
 	.probe = mpu6050_probe,
@@ -125,73 +165,92 @@ static struct i2c_driver mpu6050_i2c_driver = {
 static ssize_t accel_x_show(struct class *class,
 			    struct class_attribute *attr, char *buf)
 {
-	mpu6050_read_data();
-
+	mutex_lock(&g_mpu6050_data.mutex_for_reading);
+	//mpu6050_read_data();
 	sprintf(buf, "%d\n", g_mpu6050_data.accel_values[0]);
+	mutex_unlock(&g_mpu6050_data.mutex_for_reading);
+
 	return strlen(buf);
 }
 
 static ssize_t accel_y_show(struct class *class,
 			    struct class_attribute *attr, char *buf)
 {
-	mpu6050_read_data();
-
+	mutex_lock(&g_mpu6050_data.mutex_for_reading);
+	//mpu6050_read_data();
 	sprintf(buf, "%d\n", g_mpu6050_data.accel_values[1]);
+	mutex_unlock(&g_mpu6050_data.mutex_for_reading);
+
 	return strlen(buf);
 }
 
 static ssize_t accel_z_show(struct class *class,
 			    struct class_attribute *attr, char *buf)
 {
-	mpu6050_read_data();
-
+	mutex_lock(&g_mpu6050_data.mutex_for_reading);
+	//mpu6050_read_data();
 	sprintf(buf, "%d\n", g_mpu6050_data.accel_values[2]);
+	mutex_unlock(&g_mpu6050_data.mutex_for_reading);
+
 	return strlen(buf);
 }
 
 static ssize_t gyro_x_show(struct class *class,
 			   struct class_attribute *attr, char *buf)
 {
-	mpu6050_read_data();
-
+	mutex_lock(&g_mpu6050_data.mutex_for_reading);
+	//mpu6050_read_data();
 	sprintf(buf, "%d\n", g_mpu6050_data.gyro_values[0]);
+	mutex_unlock(&g_mpu6050_data.mutex_for_reading);
+
 	return strlen(buf);
 }
 
 static ssize_t gyro_y_show(struct class *class,
 			   struct class_attribute *attr, char *buf)
 {
-	mpu6050_read_data();
-
+	mutex_lock(&g_mpu6050_data.mutex_for_reading);
+	//mpu6050_read_data();
 	sprintf(buf, "%d\n", g_mpu6050_data.gyro_values[1]);
+	mutex_unlock(&g_mpu6050_data.mutex_for_reading);
+
 	return strlen(buf);
 }
 
 static ssize_t gyro_z_show(struct class *class,
 			   struct class_attribute *attr, char *buf)
 {
-	mpu6050_read_data();
-
+	mutex_lock(&g_mpu6050_data.mutex_for_reading);
+	//mpu6050_read_data();
 	sprintf(buf, "%d\n", g_mpu6050_data.gyro_values[2]);
+	mutex_unlock(&g_mpu6050_data.mutex_for_reading);
+
 	return strlen(buf);
 }
 
 static ssize_t temp_show(struct class *class,
 			 struct class_attribute *attr, char *buf)
 {
-	mpu6050_read_data();
+	int temp_int = 0;
+	int temp_frac = 0;
 
-	sprintf(buf, "%d\n", g_mpu6050_data.temperature);
+	mutex_lock(&g_mpu6050_data.mutex_for_reading);
+	//mpu6050_read_data();
+	temp_int = g_mpu6050_data.temperature / 340;
+	temp_frac = g_mpu6050_data.temperature % 340;
+	sprintf(buf, "%i.%03i\n", temp_int, temp_frac);
+	mutex_unlock(&g_mpu6050_data.mutex_for_reading);
+
 	return strlen(buf);
 }
 
-CLASS_ATTR(accel_x, 0444, &accel_x_show, NULL);
-CLASS_ATTR(accel_y, 0444, &accel_y_show, NULL);
-CLASS_ATTR(accel_z, 0444, &accel_z_show, NULL);
-CLASS_ATTR(gyro_x, 0444, &gyro_x_show, NULL);
-CLASS_ATTR(gyro_y, 0444, &gyro_y_show, NULL);
-CLASS_ATTR(gyro_z, 0444, &gyro_z_show, NULL);
-CLASS_ATTR(temperature, 0444, &temp_show, NULL);
+CLASS_ATTR_RO(accel_x);
+CLASS_ATTR_RO(accel_y);
+CLASS_ATTR_RO(accel_z);
+CLASS_ATTR_RO(gyro_x);
+CLASS_ATTR_RO(gyro_y);
+CLASS_ATTR_RO(gyro_z);
+CLASS_ATTR_RO(temp);
 
 static struct class *attr_class;
 
@@ -219,43 +278,50 @@ static int mpu6050_init(void)
 	/* Create accel_x */
 	ret = class_create_file(attr_class, &class_attr_accel_x);
 	if (ret) {
-		pr_err("mpu6050: failed to create sysfs class attribute accel_x: %d\n", ret);
+		pr_err("mpu6050: failed to create sysfs class attribute accel_x:%d\n",
+				ret);
 		return ret;
 	}
 	/* Create accel_y */
 	ret = class_create_file(attr_class, &class_attr_accel_y);
 	if (ret) {
-		pr_err("mpu6050: failed to create sysfs class attribute accel_y: %d\n", ret);
+		pr_err("mpu6050: failed to create sysfs class attribute accel_y:%d\n",
+				ret);
 		return ret;
 	}
 	/* Create accel_z */
 	ret = class_create_file(attr_class, &class_attr_accel_z);
 	if (ret) {
-		pr_err("mpu6050: failed to create sysfs class attribute accel_z: %d\n", ret);
+		pr_err("mpu6050: failed to create sysfs class attribute accel_z:%d\n",
+				ret);
 		return ret;
 	}
 	/* Create gyro_x */
 	ret = class_create_file(attr_class, &class_attr_gyro_x);
 	if (ret) {
-		pr_err("mpu6050: failed to create sysfs class attribute gyro_x: %d\n", ret);
+		pr_err("mpu6050: failed to create sysfs class attribute gyro_x:%d\n",
+				ret);
 		return ret;
 	}
 	/* Create gyro_y */
 	ret = class_create_file(attr_class, &class_attr_gyro_y);
 	if (ret) {
-		pr_err("mpu6050: failed to create sysfs class attribute gyro_y: %d\n", ret);
+		pr_err("mpu6050: failed to create sysfs class attribute gyro_y:%d\n",
+				ret);
 		return ret;
 	}
 	/* Create gyro_z */
 	ret = class_create_file(attr_class, &class_attr_gyro_z);
 	if (ret) {
-		pr_err("mpu6050: failed to create sysfs class attribute gyro_z: %d\n", ret);
+		pr_err("mpu6050: failed to create sysfs class attribute gyro_z:%d\n",
+				ret);
 		return ret;
 	}
 	/* Create temperature */
-	ret = class_create_file(attr_class, &class_attr_temperature);
+	ret = class_create_file(attr_class, &class_attr_temp);
 	if (ret) {
-		pr_err("mpu6050: failed to create sysfs class attribute temperature: %d\n", ret);
+		pr_err("mpu6050: failed to create sysfs class attribute temperature:%d\n",
+				ret);
 		return ret;
 	}
 
@@ -274,7 +340,7 @@ static void mpu6050_exit(void)
 		class_remove_file(attr_class, &class_attr_gyro_x);
 		class_remove_file(attr_class, &class_attr_gyro_y);
 		class_remove_file(attr_class, &class_attr_gyro_z);
-		class_remove_file(attr_class, &class_attr_temperature);
+		class_remove_file(attr_class, &class_attr_temp);
 		pr_info("mpu6050: sysfs class attributes removed\n");
 
 		class_destroy(attr_class);
