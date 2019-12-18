@@ -1,32 +1,34 @@
-#
-# mpu6050 accelerometer & gyroscope
-#
-ifneq ($(KERNELRELEASE),)
-
-obj-m := mpu6050.o
-
-else
-
-
-ifeq ($(KERNELDIR),)
-ifeq ($(BBB_KERNEL),)
-	$(error Path to kernel tree - KERNELDIR or BBB_KERNEL variable is not defined!)
-endif
-endif
-
-KERNELDIR ?= $(BBB_KERNEL)
-
-export ARCH = arm
-export CROSS_COMPILE ?= arm-linux-gnueabihf-
+MODULE_NAME=mpu6050
+obj-m :=$(MODULE_NAME).o
+ccflags-y := -Wall
+DT_SRCS=$(wildcard *.dts)
+DT_OBJS=$(DT_SRCS:.dts=.dtbo)
 
 
 .PHONY: all clean
 
-all:
-	$(MAKE) -C $(KERNELDIR) M=$(CURDIR) modules
+all: $(DT_OBJS)
+	$(MAKE) -C $(BUILD_KERNEL) M=$(PWD) modules
 
 clean:
-	$(MAKE) -C $(KERNELDIR) M=$(CURDIR) clean
+	$(MAKE) -C $(BUILD_KERNEL) M=$(PWD) clean
+	-rm ./*.dtbo
 
 
-endif
+$(DT_OBJS): $(DT_SRCS)
+	$(DTC) -@ -I dts -O dtb -o $@ $<
+
+
+upload_config:
+	ssh-copy-id -i ~/.ssh/id_rsa.pub $(SSH_ORANGE)
+	echo $(KERNEL_VERSION)
+	-ssh $(SSH_ORANGE) '[ ! -d "/lib/modules/$(KERNEL_VERSION)/kernel/drivers/" ] && mkdir -p "/lib/modules/$(KERNEL_VERSION)/kernel/drivers/"'
+
+upload_dtso: $(DT_OBJS)
+	-scp $< $(SSH_ORANGE):/boot/dtb/overlay/
+
+upload_module: $(MODULE_NAME).ko
+	-scp $< $(SSH_ORANGE):/lib/modules/$(KERNEL_VERSION)/kernel/drivers/
+	-ssh $(SSH_ORANGE) 'depmod'
+
+upload: upload_dtso upload_module
