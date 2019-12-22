@@ -1,3 +1,4 @@
+obj-m += mpu6050_interrupt.o
 obj-m +=mpu6050.o
 
 KERNEL_DIR :=  /home/bekir/Work/LinuxKernelCamp/linux/linux-stable
