@@ -1,0 +1,1 @@
+[  606.926203] dummy_module: loading out-of-tree module taints kernel.
