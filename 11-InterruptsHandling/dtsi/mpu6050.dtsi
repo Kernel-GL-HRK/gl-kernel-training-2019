@@ -1,0 +1,43 @@
+/dts-v1/;
+/plugin/;
+
+//IRQ_TYPE_EDGE_RISING	= 1
+//IRQ_TYPE_EDGE_FALLING	= 2
+//IRQ_TYPE_LEVEL_HIGH	= 4
+//IRQ_TYPE_LEVEL_LOW	= 8
+
+//GIC_SPI = 0
+//GIC_PPI = 1
+
+/ {
+	compatible = "allwinner,sun8i-h3";
+
+	fragment@0 {
+		target = <&pio>;
+		__overlay__ {
+			mpu6050_int: pin_int {
+			pins = "PA6";
+			function = "gpio_in";
+			};
+		};
+	};
+
+	fragment@1 {
+		target = <&i2c0>;
+		__overlay__ {
+			status = "okay";
+			#address-cells = <1>;
+			#size-cells = <0>;
+
+			mpu: mpu6050@68 {
+				compatible = "gl, mpu6050";
+				pinctrl-names = "default";
+				reg = <0x68>;
+				pinctrl-0 = <&mpu6050_int>;
+				interrupt-parent = <&pio>;
+				interrupts = <0 6 2>; // PA6
+				status = "okay";
+			};
+		};
+	};
+};
