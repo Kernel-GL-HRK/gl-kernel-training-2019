@@ -2,12 +2,20 @@
 #define _MPU6050_REGS_H
 
 /* Registed addresses */
-#define REG_CONFIG			0x1A
+#define REG_CONFIG		0x1A
 #define REG_GYRO_CONFIG		0x1B
 #define REG_ACCEL_CONFIG	0x1C
-#define REG_FIFO_EN			0x23
+#define REG_FF_THR		0x1D
+#define REG_FF_DUR		0x1E
+#define REG_MOT_THR		0x1F
+#define REG_MOT_DUR		0x20
+#define REG_ZRMOT_THR		0x21
+#define REG_ZRMOT_DUR		0x22
+#define REG_FIFO_EN		0x23
+#define REG_SMPRT_DIV		0x25
 #define REG_INT_PIN_CFG		0x37
 #define REG_INT_ENABLE		0x38
+#define REG_INT_STATUS		0x3A
 #define REG_ACCEL_XOUT_H	0x3B
 #define REG_ACCEL_XOUT_L	0x3C
 #define REG_ACCEL_YOUT_H	0x3D
@@ -26,6 +34,7 @@
 #define REG_PWR_MGMT_1		0x6B
 #define REG_PWR_MGMT_2		0x6C
 #define REG_WHO_AM_I		0x75
+#define REG_MOT_DETECT_STATUS	0x97
 
 /* Register values */
 #define MPU6050_WHO_AM_I	0x68
