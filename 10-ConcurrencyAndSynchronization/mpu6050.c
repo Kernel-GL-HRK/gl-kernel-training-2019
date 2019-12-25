@@ -1,12 +1,17 @@
 #include <linux/init.h>
 #include <linux/module.h>
+#include <linux/moduleparam.h>
 #include <linux/device.h>
 #include <linux/err.h>
 #include <linux/i2c.h>
 #include <linux/i2c-dev.h>
 
+#include <linux/delay.h>
+#include <linux/kthread.h>
+
 #include "mpu6050-regs.h"
 
+#define UPDATE_INTERVAL 100
 
 struct mpu6050_data {
 	struct i2c_client *drv_client;
@@ -17,6 +22,8 @@ struct mpu6050_data {
 };
 
 static struct mpu6050_data g_mpu6050_data;
+
+static struct task_struct *updateThread;
 
 static int mpu6050_read_data(void)
 {
@@ -65,6 +72,16 @@ static int mpu6050_read_data(void)
 	return 0;
 }
 
+static int threadRoutine(void *data)
+{
+	while (!kthread_should_stop()) {
+		mpu6050_read_data();
+		msleep(UPDATE_INTERVAL);
+	}
+
+	return 0;
+}
+
 static int mpu6050_probe(struct i2c_client *drv_client,
 			 const struct i2c_device_id *id)
 {
@@ -105,6 +122,9 @@ static int mpu6050_probe(struct i2c_client *drv_client,
 
 	g_mpu6050_data.drv_client = drv_client;
 
+	updateThread = kthread_run(threadRoutine, &g_mpu6050_data,
+								"thread");
+
 	dev_info(&drv_client->dev, "i2c driver probed\n");
 	return 0;
 }
@@ -112,6 +132,8 @@ static int mpu6050_probe(struct i2c_client *drv_client,
 static int mpu6050_remove(struct i2c_client *drv_client)
 {
 	g_mpu6050_data.drv_client = 0;
+
+	kthread_stop(updateThread);
 
 	dev_info(&drv_client->dev, "i2c driver removed\n");
 	return 0;
@@ -144,8 +166,6 @@ static struct i2c_driver mpu6050_i2c_driver = {
 static ssize_t accel_x_show(struct class *class,
 			    struct class_attribute *attr, char *buf)
 {
-	mpu6050_read_data();
-
 	sprintf(buf, "%d\n", g_mpu6050_data.accel_values[0]);
 	return strlen(buf);
 }
@@ -153,8 +173,6 @@ static ssize_t accel_x_show(struct class *class,
 static ssize_t accel_y_show(struct class *class,
 			    struct class_attribute *attr, char *buf)
 {
-	mpu6050_read_data();
-
 	sprintf(buf, "%d\n", g_mpu6050_data.accel_values[1]);
 	return strlen(buf);
 }
@@ -162,8 +180,6 @@ static ssize_t accel_y_show(struct class *class,
 static ssize_t accel_z_show(struct class *class,
 			    struct class_attribute *attr, char *buf)
 {
-	mpu6050_read_data();
-
 	sprintf(buf, "%d\n", g_mpu6050_data.accel_values[2]);
 	return strlen(buf);
 }
@@ -171,8 +187,6 @@ static ssize_t accel_z_show(struct class *class,
 static ssize_t gyro_x_show(struct class *class,
 			   struct class_attribute *attr, char *buf)
 {
-	mpu6050_read_data();
-
 	sprintf(buf, "%d\n", g_mpu6050_data.gyro_values[0]);
 	return strlen(buf);
 }
@@ -180,8 +194,6 @@ static ssize_t gyro_x_show(struct class *class,
 static ssize_t gyro_y_show(struct class *class,
 			   struct class_attribute *attr, char *buf)
 {
-	mpu6050_read_data();
-
 	sprintf(buf, "%d\n", g_mpu6050_data.gyro_values[1]);
 	return strlen(buf);
 }
@@ -189,8 +201,6 @@ static ssize_t gyro_y_show(struct class *class,
 static ssize_t gyro_z_show(struct class *class,
 			   struct class_attribute *attr, char *buf)
 {
-	mpu6050_read_data();
-
 	sprintf(buf, "%d\n", g_mpu6050_data.gyro_values[2]);
 	return strlen(buf);
 }
@@ -198,8 +208,6 @@ static ssize_t gyro_z_show(struct class *class,
 static ssize_t temp_show(struct class *class,
 			 struct class_attribute *attr, char *buf)
 {
-	mpu6050_read_data();
-
 	sprintf(buf, "%i.%03i\n", g_mpu6050_data.tempInt,
 		g_mpu6050_data.tempFract);
 	return strlen(buf);
