@@ -7,10 +7,11 @@
 #include <linux/i2c-dev.h>
 #include <linux/delay.h>
 #include <linux/kthread.h>
+#include <linux/jiffies.h>
 
 #include "mpu6050-regs.h"
 
-#define UPDATE_INTERVAL 100
+#define UPDATE_INTERVAL_MS  100
 
 struct mpu6050_data {
 	struct i2c_client *drv_client;
@@ -18,6 +19,9 @@ struct mpu6050_data {
 	int gyro_values[3];
 	int tempInt;
 	int tempFract;
+	unsigned long lastUpdateJiffies;
+	unsigned long updateIntervalJiffies;
+	unsigned int updateIntervalMs;
 };
 
 static struct mpu6050_data g_mpu6050_data;
@@ -74,14 +78,18 @@ static int mpu6050_read_data(void)
 
 static void checkDataUpdate(void)
 {
-	wake_up_process(updateThread);
-	wait_for_completion(&dataIsUpdated);
+	if (jiffies - g_mpu6050_data.lastUpdateJiffies >
+		g_mpu6050_data.updateIntervalJiffies) {
+		wake_up_process(updateThread);
+		wait_for_completion(&dataIsUpdated);
+	}
 }
 
 static int threadRoutine(void *data)
 {
 	while (!kthread_should_stop()) {
 		mpu6050_read_data();
+		g_mpu6050_data.lastUpdateJiffies = jiffies;
 		complete(&dataIsUpdated);
 		set_current_state(TASK_INTERRUPTIBLE);
 		schedule();
@@ -129,6 +137,16 @@ static int mpu6050_probe(struct i2c_client *drv_client,
 	i2c_smbus_write_byte_data(drv_client, REG_PWR_MGMT_2, 0);
 
 	g_mpu6050_data.drv_client = drv_client;
+
+	if(of_find_property(drv_client->dev.of_node, "update_interval", NULL)) {
+		of_property_read_u32(drv_client->dev.of_node, "update_interval",
+			&g_mpu6050_data.updateIntervalMs);
+	} else {
+		g_mpu6050_data.updateIntervalMs = UPDATE_INTERVAL_MS;
+	}
+
+	g_mpu6050_data.updateIntervalJiffies =
+		HZ * g_mpu6050_data.updateIntervalMs / 1000;
 
 	updateThread = kthread_run(threadRoutine, &g_mpu6050_data,
 								"thread");
