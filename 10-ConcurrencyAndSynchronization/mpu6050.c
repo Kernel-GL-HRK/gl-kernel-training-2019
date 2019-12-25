@@ -5,7 +5,6 @@
 #include <linux/err.h>
 #include <linux/i2c.h>
 #include <linux/i2c-dev.h>
-
 #include <linux/delay.h>
 #include <linux/kthread.h>
 
@@ -22,8 +21,9 @@ struct mpu6050_data {
 };
 
 static struct mpu6050_data g_mpu6050_data;
-
 static struct task_struct *updateThread;
+static DECLARE_COMPLETION(dataIsUpdated);
+static DEFINE_MUTEX(readingIsBlocked);
 
 static int mpu6050_read_data(void)
 {
@@ -72,11 +72,19 @@ static int mpu6050_read_data(void)
 	return 0;
 }
 
+static void checkDataUpdate(void)
+{
+	wake_up_process(updateThread);
+	wait_for_completion(&dataIsUpdated);
+}
+
 static int threadRoutine(void *data)
 {
 	while (!kthread_should_stop()) {
 		mpu6050_read_data();
-		msleep(UPDATE_INTERVAL);
+		complete(&dataIsUpdated);
+		set_current_state(TASK_INTERRUPTIBLE);
+		schedule();
 	}
 
 	return 0;
@@ -166,50 +174,92 @@ static struct i2c_driver mpu6050_i2c_driver = {
 static ssize_t accel_x_show(struct class *class,
 			    struct class_attribute *attr, char *buf)
 {
+	mutex_lock(&readingIsBlocked);
+
+	checkDataUpdate();
 	sprintf(buf, "%d\n", g_mpu6050_data.accel_values[0]);
+
+	mutex_unlock(&readingIsBlocked);
+
 	return strlen(buf);
 }
 
 static ssize_t accel_y_show(struct class *class,
 			    struct class_attribute *attr, char *buf)
 {
+	mutex_lock(&readingIsBlocked);
+
+	checkDataUpdate();
 	sprintf(buf, "%d\n", g_mpu6050_data.accel_values[1]);
+
+	mutex_unlock(&readingIsBlocked);
+
 	return strlen(buf);
 }
 
 static ssize_t accel_z_show(struct class *class,
 			    struct class_attribute *attr, char *buf)
 {
+	mutex_lock(&readingIsBlocked);
+
+	checkDataUpdate();
 	sprintf(buf, "%d\n", g_mpu6050_data.accel_values[2]);
+
+	mutex_unlock(&readingIsBlocked);
+
 	return strlen(buf);
 }
 
 static ssize_t gyro_x_show(struct class *class,
 			   struct class_attribute *attr, char *buf)
 {
+	mutex_lock(&readingIsBlocked);
+
+	checkDataUpdate();
 	sprintf(buf, "%d\n", g_mpu6050_data.gyro_values[0]);
+
+	mutex_unlock(&readingIsBlocked);
+
 	return strlen(buf);
 }
 
 static ssize_t gyro_y_show(struct class *class,
 			   struct class_attribute *attr, char *buf)
 {
+	mutex_lock(&readingIsBlocked);
+
+	checkDataUpdate();
 	sprintf(buf, "%d\n", g_mpu6050_data.gyro_values[1]);
+
+	mutex_unlock(&readingIsBlocked);
+
 	return strlen(buf);
 }
 
 static ssize_t gyro_z_show(struct class *class,
 			   struct class_attribute *attr, char *buf)
 {
+	mutex_lock(&readingIsBlocked);
+
+	checkDataUpdate();
 	sprintf(buf, "%d\n", g_mpu6050_data.gyro_values[2]);
+
+	mutex_unlock(&readingIsBlocked);
+
 	return strlen(buf);
 }
 
 static ssize_t temp_show(struct class *class,
 			 struct class_attribute *attr, char *buf)
 {
+	mutex_lock(&readingIsBlocked);
+
+	checkDataUpdate();
 	sprintf(buf, "%i.%03i\n", g_mpu6050_data.tempInt,
 		g_mpu6050_data.tempFract);
+
+	mutex_unlock(&readingIsBlocked);
+
 	return strlen(buf);
 }
 
