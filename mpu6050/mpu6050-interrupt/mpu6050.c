@@ -8,6 +8,8 @@
 #include <linux/sysfs.h>
 #include <linux/device.h>
 
+#include <linux/spinlock.h>
+#include <linux/mutex.h>
 #include <linux/of.h>
 #include <linux/of_platform.h>
 #include <linux/platform_device.h>
@@ -23,6 +25,8 @@ struct mpu6050_data {
 	struct i2c_client *drv_client;
 	struct workqueue_struct *queue;
 	struct work_struct work;
+	struct mutex mutex_sysfs;
+	struct spinlock spinlock_irq;
 	int accel_values[3];
 	int gyro_values[3];
 	int temperature;
@@ -44,7 +48,9 @@ static int mpu6050_read_data(int reg, int *value)
 
 static irqreturn_t interrupt_handler(int irq, void *dev)
 {
+	spin_lock(&g_mpu6050_data.spinlock_irq);
 	queue_work(g_mpu6050_data.queue, &g_mpu6050_data.work);
+	spin_unlock(&g_mpu6050_data.spinlock_irq);
 	return IRQ_HANDLED;
 }
 
@@ -52,6 +58,7 @@ static void work_func(struct work_struct *work)
 {
 	int temp;
 
+	mutex_lock(&g_mpu6050_data.mutex_sysfs);
 	mpu6050_read_data(REG_ACCEL_XOUT_H, &g_mpu6050_data.accel_values[0]);
 	mpu6050_read_data(REG_ACCEL_YOUT_H, &g_mpu6050_data.accel_values[1]);
 	mpu6050_read_data(REG_ACCEL_ZOUT_H, &g_mpu6050_data.accel_values[2]);
@@ -63,6 +70,7 @@ static void work_func(struct work_struct *work)
 	g_mpu6050_data.temperature = (temp + 12420);
 
 	pr_info("delay work is active\n");
+	mutex_unlock(&g_mpu6050_data.mutex_sysfs);
 }
 
 static int mpu6050_probe(struct i2c_client *drv_client,
@@ -102,6 +110,8 @@ static int mpu6050_probe(struct i2c_client *drv_client,
 	i2c_smbus_write_byte_data(drv_client, REG_INT_ENABLE, 1);
 
 	g_mpu6050_data.drv_client = drv_client;
+	mutex_init(&g_mpu6050_data.mutex_sysfs);
+	spin_lock_init(&g_mpu6050_data.spinlock_irq);
 
 	g_mpu6050_data.queue = create_singlethread_workqueue("mpu6050_work_queue");
 	INIT_WORK(&g_mpu6050_data.work, work_func);
@@ -152,50 +162,64 @@ static struct i2c_driver mpu6050_i2c_driver = {
 static ssize_t accel_x_show(struct class *class,
 			    struct class_attribute *attr, char *buf)
 {
+	mutex_lock(&g_mpu6050_data.mutex_sysfs);
 	sprintf(buf, "%d\n", g_mpu6050_data.accel_values[0]);
+	mutex_unlock(&g_mpu6050_data.mutex_sysfs);
 	return strlen(buf);
 }
 
 static ssize_t accel_y_show(struct class *class,
 			    struct class_attribute *attr, char *buf)
 {
+	mutex_lock(&g_mpu6050_data.mutex_sysfs);
 	sprintf(buf, "%d\n", g_mpu6050_data.accel_values[1]);
+	mutex_unlock(&g_mpu6050_data.mutex_sysfs);
 	return strlen(buf);
 }
 
 static ssize_t accel_z_show(struct class *class,
 			    struct class_attribute *attr, char *buf)
 {
+	mutex_lock(&g_mpu6050_data.mutex_sysfs);
 	sprintf(buf, "%d\n", g_mpu6050_data.accel_values[2]);
+	mutex_unlock(&g_mpu6050_data.mutex_sysfs);
 	return strlen(buf);
 }
 
 static ssize_t gyro_x_show(struct class *class,
 			   struct class_attribute *attr, char *buf)
 {
+	mutex_lock(&g_mpu6050_data.mutex_sysfs);
 	sprintf(buf, "%d\n", g_mpu6050_data.gyro_values[0]);
+	mutex_unlock(&g_mpu6050_data.mutex_sysfs);
 	return strlen(buf);
 }
 
 static ssize_t gyro_y_show(struct class *class,
 			   struct class_attribute *attr, char *buf)
 {
+	mutex_lock(&g_mpu6050_data.mutex_sysfs);
 	sprintf(buf, "%d\n", g_mpu6050_data.gyro_values[1]);
+	mutex_unlock(&g_mpu6050_data.mutex_sysfs);
 	return strlen(buf);
 }
 
 static ssize_t gyro_z_show(struct class *class,
 			   struct class_attribute *attr, char *buf)
 {
+	mutex_lock(&g_mpu6050_data.mutex_sysfs);
 	sprintf(buf, "%d\n", g_mpu6050_data.gyro_values[2]);
+	mutex_unlock(&g_mpu6050_data.mutex_sysfs);
 	return strlen(buf);
 }
 
 static ssize_t temp_show(struct class *class,
 			 struct class_attribute *attr, char *buf)
 {
+	mutex_lock(&g_mpu6050_data.mutex_sysfs);
 	sprintf(buf, "%i.%03i\n", g_mpu6050_data.temperature / 340,
 					g_mpu6050_data.temperature % 340);
+	mutex_unlock(&g_mpu6050_data.mutex_sysfs);
 	return strlen(buf);
 }
 
