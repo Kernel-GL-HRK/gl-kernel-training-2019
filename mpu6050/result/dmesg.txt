@@ -1,0 +1,37 @@
+[    5.863800] zram: Added device: zram0
+[    5.864310] zram: Added device: zram1
+[    5.864882] zram: Added device: zram2
+[    5.927299] zram1: detected capacity change from 0 to 258437120
+[    6.001219] sun8i_ths 1c25000.thermal-sensor: no memory resources defined
+[    6.001250] sun8i_ths: probe of 1c25000.thermal-sensor failed with error -22
+[    6.064440] thermal thermal_zone0: failed to read out thermal zone (-110)
+[    6.084256] mpu6050: sysfs class created
+[    6.084290] mpu6050 0-0068: sysfs class attributes created
+[    6.084297] mpu6050 0-0068: i2c client address is 0x68
+[    6.084772] mpu6050 0-0068: i2c mpu6050 device found, WHO_AM_I register value = 0x68
+[    6.105227] mpu6050 0-0068: i2c driver probed
+[    6.167604] lima 1c40000.gpu: bus rate = 200000000
+[    6.167617] lima 1c40000.gpu: mod rate = 384000000
+[    6.173109] [TTM] Zone  kernel: Available graphics memory: 252380 kiB
+[    6.173118] [TTM] Initializing pool allocator
+[    6.173992] lima 1c40000.gpu: gp - mali400 version major 1 minor 1
+[    6.174048] lima 1c40000.gpu: pp0 - mali400 version major 1 minor 1
+[    6.174115] lima 1c40000.gpu: pp1 - mali400 version major 1 minor 1
+[    6.174164] lima 1c40000.gpu: l2 cache 64K, 4-way, 64byte cache line, 64bit external bus
+[    6.190150] [drm] Initialized lima 1.0.0 20170325 for 1c40000.gpu on minor 1
+[    6.458876] asoc-simple-card soc:sound: i2s-hifi <-> 1c22800.i2s mapping ok
+[    6.923947] Generic PHY 0.1:01: attached PHY driver [Generic PHY] (mii_bus:phy_addr=0.1:01, irq=POLL)
+[    6.928396] dwmac-sun8i 1c30000.ethernet eth0: No Safety Features support found
+[    6.928412] dwmac-sun8i 1c30000.ethernet eth0: No MAC Management Counters available
+[    6.928420] dwmac-sun8i 1c30000.ethernet eth0: PTP not supported by HW
+[    6.928965] IPv6: ADDRCONF(NETDEV_UP): eth0: link is not ready
+[    7.009988] Adding 252376k swap on /dev/zram1.  Priority:5 extents:1 across:252376k SSFS
+[    7.179630] zram0: detected capacity change from 0 to 52428800
+[    7.484767] random: crng init done
+[    7.484779] random: 7 urandom warning(s) missed due to ratelimiting
+[    7.825611] EXT4-fs (zram0): mounted filesystem without journal. Opts: discard
+[   10.009387] dwmac-sun8i 1c30000.ethernet eth0: Link is Up - 100Mbps/Full - flow control rx/tx
+[   10.009432] IPv6: ADDRCONF(NETDEV_CHANGE): eth0: link becomes ready
+[   33.780616] vcc3v0: disabling
+[   33.780635] vcc5v0: disabling
+[   33.780645] usb0-vbus: disabling
