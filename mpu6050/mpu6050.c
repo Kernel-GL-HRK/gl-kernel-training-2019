@@ -19,7 +19,7 @@ struct mpu6050_data {
 
 static struct mpu6050_data g_mpu6050_data;
 
-static int mpu6050_read_data(void)
+static int mpu6050_read_data(int _register)
 {
 	int temp;
 	struct i2c_client *drv_client = g_mpu6050_data.drv_client;
@@ -27,41 +27,9 @@ static int mpu6050_read_data(void)
 	if (drv_client == 0)
 		return -ENODEV;
 
-	/* accel */
-	g_mpu6050_data.accel_values[0] =
-	(s16)((u16)i2c_smbus_read_word_swapped(drv_client, REG_ACCEL_XOUT_H));
-	g_mpu6050_data.accel_values[1] =
-	(s16)((u16)i2c_smbus_read_word_swapped(drv_client, REG_ACCEL_YOUT_H));
-	g_mpu6050_data.accel_values[2] =
-	(s16)((u16)i2c_smbus_read_word_swapped(drv_client, REG_ACCEL_ZOUT_H));
-	/* gyro */
-	g_mpu6050_data.gyro_values[0] =
-	(s16)((u16)i2c_smbus_read_word_swapped(drv_client, REG_GYRO_XOUT_H));
-	g_mpu6050_data.gyro_values[1] =
-	(s16)((u16)i2c_smbus_read_word_swapped(drv_client, REG_GYRO_YOUT_H));
-	g_mpu6050_data.gyro_values[2] =
-	(s16)((u16)i2c_smbus_read_word_swapped(drv_client, REG_GYRO_ZOUT_H));
-	/* Temperature in degrees C =
-	 * (TEMP_OUT Register Value  as a signed quantity)/340 + 36.53
-	 */
-	temp = (s16)((u16)i2c_smbus_read_word_swapped(drv_client,
-							REG_TEMP_OUT_H));
-	g_mpu6050_data.temperature = (temp + 12420 + 170) / 340;
-	g_mpu6050_data.temp_factor = (temp + 12420 + 170) % 340;
+	temp = (s16)((u16)i2c_smbus_read_word_swapped(drv_client, _register));
 
-	dev_info(&drv_client->dev, "sensor data read:\n");
-	dev_info(&drv_client->dev, "ACCEL[X,Y,Z] = [%d, %d, %d]\n",
-		g_mpu6050_data.accel_values[0],
-		g_mpu6050_data.accel_values[1],
-		g_mpu6050_data.accel_values[2]);
-	dev_info(&drv_client->dev, "GYRO[X,Y,Z] = [%d, %d, %d]\n",
-		g_mpu6050_data.gyro_values[0],
-		g_mpu6050_data.gyro_values[1],
-		g_mpu6050_data.gyro_values[2]);
-	dev_info(&drv_client->dev, "TEMP = %d\n",
-		g_mpu6050_data.temperature);
-
-	return 0;
+	return temp;
 }
 
 static int mpu6050_probe(struct i2c_client *drv_client,
@@ -135,8 +103,7 @@ static struct i2c_driver mpu6050_i2c_driver = {
 static ssize_t accel_x_show(struct class *class,
 			    struct class_attribute *attr, char *buf)
 {
-	mpu6050_read_data();
-
+	g_mpu6050_data.accel_values[0] = mpu6050_read_data(REG_ACCEL_XOUT_H);
 	sprintf(buf, "%d\n", g_mpu6050_data.accel_values[0]);
 	return strlen(buf);
 }
@@ -144,8 +111,7 @@ static ssize_t accel_x_show(struct class *class,
 static ssize_t accel_y_show(struct class *class,
 			    struct class_attribute *attr, char *buf)
 {
-	mpu6050_read_data();
-
+	g_mpu6050_data.accel_values[1] = mpu6050_read_data(REG_ACCEL_YOUT_H);
 	sprintf(buf, "%d\n", g_mpu6050_data.accel_values[1]);
 	return strlen(buf);
 }
@@ -153,8 +119,7 @@ static ssize_t accel_y_show(struct class *class,
 static ssize_t accel_z_show(struct class *class,
 			    struct class_attribute *attr, char *buf)
 {
-	mpu6050_read_data();
-
+	g_mpu6050_data.accel_values[2] = mpu6050_read_data(REG_ACCEL_ZOUT_H);
 	sprintf(buf, "%d\n", g_mpu6050_data.accel_values[2]);
 	return strlen(buf);
 }
@@ -162,8 +127,7 @@ static ssize_t accel_z_show(struct class *class,
 static ssize_t gyro_x_show(struct class *class,
 			   struct class_attribute *attr, char *buf)
 {
-	mpu6050_read_data();
-
+	g_mpu6050_data.gyro_values[0] = mpu6050_read_data(REG_GYRO_XOUT_H);
 	sprintf(buf, "%d\n", g_mpu6050_data.gyro_values[0]);
 	return strlen(buf);
 }
@@ -171,8 +135,7 @@ static ssize_t gyro_x_show(struct class *class,
 static ssize_t gyro_y_show(struct class *class,
 			   struct class_attribute *attr, char *buf)
 {
-	mpu6050_read_data();
-
+	g_mpu6050_data.gyro_values[1] = mpu6050_read_data(REG_GYRO_YOUT_H);
 	sprintf(buf, "%d\n", g_mpu6050_data.gyro_values[1]);
 	return strlen(buf);
 }
@@ -180,8 +143,7 @@ static ssize_t gyro_y_show(struct class *class,
 static ssize_t gyro_z_show(struct class *class,
 			   struct class_attribute *attr, char *buf)
 {
-	mpu6050_read_data();
-
+	g_mpu6050_data.gyro_values[2] = mpu6050_read_data(REG_GYRO_ZOUT_H);
 	sprintf(buf, "%d\n", g_mpu6050_data.gyro_values[2]);
 	return strlen(buf);
 }
@@ -189,7 +151,10 @@ static ssize_t gyro_z_show(struct class *class,
 static ssize_t temperature_show(struct class *class,
 			 struct class_attribute *attr, char *buf)
 {
-	mpu6050_read_data();
+	int temp = mpu6050_read_data(REG_TEMP_OUT_H);
+
+	g_mpu6050_data.temperature = (temp + 12420 + 170) / 340;
+	g_mpu6050_data.temp_factor = (temp + 12420 + 170) % 340;
 
 	sprintf(buf, "%d.%03d\n", g_mpu6050_data.temperature,
 					g_mpu6050_data.temp_factor);
@@ -281,6 +246,7 @@ ret);
 	pr_info("mpu6050: sysfs class attributes created\n");
 
 	pr_info("mpu6050: module loaded\n");
+
 	return 0;
 }
 
