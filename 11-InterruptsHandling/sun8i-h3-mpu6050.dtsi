@@ -1,0 +1,35 @@
+/dts-v1/;
+/plugin/;
+
+/ {
+	compatible = "allwinner,sun8i-h3";
+
+	fragment@0 {
+		target = <&pio>;
+		__overlay__ {
+			mpu6050_pins: mpu6050_pins {
+				pins= "PA6";
+				function = "irq";
+           		};
+		};
+	};
+
+	fragment@1 {
+		target = <&i2c0>;
+		__overlay__ {
+			#address-cells = <1>;
+			#size-cells = <0>;
+			status = "okay";
+			mpu6050@68 {
+				compatible = "mpu6050";
+				reg = <0x68>; 
+				status = "okay";
+				pinctrl-names = "default";
+				pinctrl-0 = <&mpu6050_pins>;
+				interrupt-names = "mpu6050_interrupt";
+				interrupt-parent = <&pio>;
+				interrupts = <0 6 1>; /* PA6 IRQ_TYPE_EDGE_RISING */
+			};
+		};
+	};
+};
