@@ -5,7 +5,10 @@
 #define REG_CONFIG			0x1A
 #define REG_GYRO_CONFIG		0x1B
 #define REG_ACCEL_CONFIG	0x1C
+#define REG_MOT_THR			0x1f
+#define REG_MOT_DUR			0x20
 #define REG_FIFO_EN			0x23
+#define REG_SMPRT_DIV		0x25
 #define REG_INT_PIN_CFG		0x37
 #define REG_INT_ENABLE		0x38
 #define REG_ACCEL_XOUT_H	0x3B
@@ -22,6 +25,7 @@
 #define REG_GYRO_YOUT_L		0x46
 #define REG_GYRO_ZOUT_H		0x47
 #define REG_GYRO_ZOUT_L		0x48
+#define REG_MOT_DETECT_CTRL		0x69
 #define REG_USER_CTRL		0x6A
 #define REG_PWR_MGMT_1		0x6B
 #define REG_PWR_MGMT_2		0x6C

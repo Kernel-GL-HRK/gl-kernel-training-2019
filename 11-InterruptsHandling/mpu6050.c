@@ -4,6 +4,7 @@
 #include <linux/err.h>
 #include <linux/i2c.h>
 #include <linux/i2c-dev.h>
+#include <linux/delay.h>
 
 #include "mpu6050-regs.h"
 
@@ -81,13 +82,21 @@ static int mpu6050_probe(struct i2c_client *drv_client,
 		ret);
 
 	/* Setup the device */
-	/* No error handling here! */
-	i2c_smbus_write_byte_data(drv_client, REG_CONFIG, 0);
+	/* reset mpu6050 */
+	i2c_smbus_write_byte_data(drv_client, REG_PWR_MGMT_1, 0x80);
+	msleep(100);
+	i2c_smbus_write_byte_data(drv_client, REG_PWR_MGMT_1, 0x00);
+
+	i2c_smbus_write_byte_data(drv_client, REG_CONFIG, 0x03);
+	i2c_smbus_write_byte_data(drv_client, REG_SMPRT_DIV, 0x04 /*+1*/);
 	i2c_smbus_write_byte_data(drv_client, REG_GYRO_CONFIG, 0);
-	i2c_smbus_write_byte_data(drv_client, REG_ACCEL_CONFIG, 0);
+	i2c_smbus_write_byte_data(drv_client, REG_ACCEL_CONFIG, 3);
+	i2c_smbus_write_byte_data(drv_client, REG_MOT_THR, 20);
+	i2c_smbus_write_byte_data(drv_client, REG_MOT_DUR, 1);
+	i2c_smbus_write_byte_data(drv_client, REG_MOT_DETECT_CTRL, 0x15);
 	i2c_smbus_write_byte_data(drv_client, REG_FIFO_EN, 0);
-	i2c_smbus_write_byte_data(drv_client, REG_INT_PIN_CFG, 0);
-	i2c_smbus_write_byte_data(drv_client, REG_INT_ENABLE, 0);
+	i2c_smbus_write_byte_data(drv_client, REG_INT_PIN_CFG, (1<<5));
+	i2c_smbus_write_byte_data(drv_client, REG_INT_ENABLE, (1<<6));
 	i2c_smbus_write_byte_data(drv_client, REG_USER_CTRL, 0);
 	i2c_smbus_write_byte_data(drv_client, REG_PWR_MGMT_1, 0);
 	i2c_smbus_write_byte_data(drv_client, REG_PWR_MGMT_2, 0);
