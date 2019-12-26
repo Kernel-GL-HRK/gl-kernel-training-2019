@@ -1,0 +1,16 @@
+/dts-v1/;
+/plugin/;
+
+/ {
+	compatible = "allwinner,sun8i-h3";
+
+	fragment@0 {
+			target = <&pio>;
+			__overlay__ {
+				my_dummy_overlay {
+					compatible = "dummy-module";
+					status = "disabled";
+				};
+			};
+		};
+};
