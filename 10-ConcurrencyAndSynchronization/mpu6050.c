@@ -5,17 +5,23 @@
 #include <linux/err.h>
 #include <linux/i2c.h>
 #include <linux/i2c-dev.h>
+#include <linux/workqueue.h>
 
 #include "mpu6050-regs.h"
 
 
 struct mpu6050_data {
 	struct i2c_client *drv_client;
+	struct workqueue_struct *wqueue;
 	int accel_values[3];
 	int gyro_values[3];
 	int temperature;
 	int temp_factor;
 };
+static void th_fn_read(struct work_struct *wq);
+static DECLARE_DELAYED_WORK(my_work, th_fn_read);
+
+static unsigned int onesec;
 
 static struct mpu6050_data g_mpu6050_data;
 
@@ -64,6 +70,11 @@ static int mpu6050_read_data(void)
 	return 0;
 }
 
+static void th_fn_read(struct work_struct *wq)
+{
+	mpu6050_read_data();
+}
+
 static int mpu6050_probe(struct i2c_client *drv_client,
 			 const struct i2c_device_id *id)
 {
@@ -104,6 +115,15 @@ static int mpu6050_probe(struct i2c_client *drv_client,
 
 	g_mpu6050_data.drv_client = drv_client;
 
+	onesec = msecs_to_jiffies(1000);
+	if (!g_mpu6050_data.wqueue)
+		g_mpu6050_data.wqueue =
+			create_singlethread_workqueue("thread_mpu6050");
+	else
+		queue_delayed_work(g_mpu6050_data.wqueue, &my_work, onesec);
+
+
+
 	dev_info(&drv_client->dev, "i2c driver probed\n");
 	return 0;
 }
@@ -135,8 +155,8 @@ static struct i2c_driver mpu6050_i2c_driver = {
 static ssize_t accel_x_show(struct class *class,
 			    struct class_attribute *attr, char *buf)
 {
-	mpu6050_read_data();
-
+	if (g_mpu6050_data.wqueue)
+		queue_delayed_work(g_mpu6050_data.wqueue, &my_work, onesec);
 	sprintf(buf, "%d\n", g_mpu6050_data.accel_values[0]);
 	return strlen(buf);
 }
@@ -144,8 +164,8 @@ static ssize_t accel_x_show(struct class *class,
 static ssize_t accel_y_show(struct class *class,
 			    struct class_attribute *attr, char *buf)
 {
-	mpu6050_read_data();
-
+	if (g_mpu6050_data.wqueue)
+		queue_delayed_work(g_mpu6050_data.wqueue, &my_work, onesec);
 	sprintf(buf, "%d\n", g_mpu6050_data.accel_values[1]);
 	return strlen(buf);
 }
@@ -153,8 +173,8 @@ static ssize_t accel_y_show(struct class *class,
 static ssize_t accel_z_show(struct class *class,
 			    struct class_attribute *attr, char *buf)
 {
-	mpu6050_read_data();
-
+	if (g_mpu6050_data.wqueue)
+		queue_delayed_work(g_mpu6050_data.wqueue, &my_work, onesec);
 	sprintf(buf, "%d\n", g_mpu6050_data.accel_values[2]);
 	return strlen(buf);
 }
@@ -162,8 +182,8 @@ static ssize_t accel_z_show(struct class *class,
 static ssize_t gyro_x_show(struct class *class,
 			   struct class_attribute *attr, char *buf)
 {
-	mpu6050_read_data();
-
+	if (g_mpu6050_data.wqueue)
+		queue_delayed_work(g_mpu6050_data.wqueue, &my_work, onesec);
 	sprintf(buf, "%d\n", g_mpu6050_data.gyro_values[0]);
 	return strlen(buf);
 }
@@ -171,8 +191,8 @@ static ssize_t gyro_x_show(struct class *class,
 static ssize_t gyro_y_show(struct class *class,
 			   struct class_attribute *attr, char *buf)
 {
-	mpu6050_read_data();
-
+	if (g_mpu6050_data.wqueue)
+		queue_delayed_work(g_mpu6050_data.wqueue, &my_work, onesec);
 	sprintf(buf, "%d\n", g_mpu6050_data.gyro_values[1]);
 	return strlen(buf);
 }
@@ -180,8 +200,8 @@ static ssize_t gyro_y_show(struct class *class,
 static ssize_t gyro_z_show(struct class *class,
 			   struct class_attribute *attr, char *buf)
 {
-	mpu6050_read_data();
-
+	if (g_mpu6050_data.wqueue)
+		queue_delayed_work(g_mpu6050_data.wqueue, &my_work, onesec);
 	sprintf(buf, "%d\n", g_mpu6050_data.gyro_values[2]);
 	return strlen(buf);
 }
@@ -189,8 +209,8 @@ static ssize_t gyro_z_show(struct class *class,
 static ssize_t temperature_show(struct class *class,
 			 struct class_attribute *attr, char *buf)
 {
-	mpu6050_read_data();
-
+	if (g_mpu6050_data.wqueue)
+		queue_delayed_work(g_mpu6050_data.wqueue, &my_work, onesec);
 	sprintf(buf, "%d.%03d\n", g_mpu6050_data.temperature,
 					g_mpu6050_data.temp_factor);
 	return strlen(buf);
