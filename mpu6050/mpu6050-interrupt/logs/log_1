@@ -1,0 +1,34 @@
+  ___  ____  _    ___             
+ / _ \|  _ \(_)  / _ \ _ __   ___ 
+| | | | |_) | | | | | | '_ \ / _ \
+| |_| |  __/| | | |_| | | | |  __/
+ \___/|_|   |_|  \___/|_| |_|\___|
+                                  
+Welcome to Armbian Bionic with Linux 5.3.7-dirty
+
+System load:   0.00 0.00 0.00  	Up time:       17:54 hours		
+Memory usage:  9 % of 498MB  	IP:            192.168.100.2
+Usage of /:    13% of 7.3G   	
+
+[ General system configuration (beta): armbian-config ]
+
+Last login: Fri Dec 13 03:10:59 2019
+
+root@orangepione:~# insmod ./mpu6050.ko^C
+root@orangepione:~# cd /home/bekir/
+root@orangepione:/home/bekir# insmod ./mpu6050_delay_work.ko
+root@orangepione:/home/bekir# cat /sys/class/mpu6050/temp
+25.128
+root@orangepione:/home/bekir# cat /sys/class/mpu6050/temp
+25.112
+root@orangepione:/home/bekir# cat /sys/class/mpu6050/temp
+25.128
+root@orangepione:/home/bekir# cat /sys/class/mpu6050/accel_x
+-5864
+root@orangepione:/home/bekir# cat /sys/class/mpu6050/accel_y
+-5908
+root@orangepione:/home/bekir# cat /sys/class/mpu6050/accel_z
+14868
+root@orangepione:/home/bekir# rmmod mpu6050_delay_work 
+root@orangepione:/home/bekir# 
+

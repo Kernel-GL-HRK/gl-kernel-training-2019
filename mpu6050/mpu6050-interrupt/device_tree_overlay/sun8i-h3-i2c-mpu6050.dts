@@ -1,0 +1,32 @@
+/dts-v1/;
+/plugin/;
+
+/ {
+	compatible = "allwinner,sun8i-h3";
+
+	fragment@0 {
+		target = <&i2c0>;
+		__overlay__ {
+			mpu6050@68 {
+				compatible = "gl,mpu6050";
+				reg = <0x68>;
+				interrupt-parent = <&pio>;
+				interrupts = <0 1 2>;
+				interrupt-names = "mpu6050_interrupt";
+				pinctrl-names = "default";
+				pinctrl-0 = <&mpu6050_int_pin>;
+				status = "okay";
+			};
+		};
+	};
+
+	fragment@1 {
+		target = <&pio>;
+		__overlay__ {
+			mpu6050_int_pin: mpu6050-int-pin {
+				pins = "PA1";
+				function = "gpio_in";
+			};
+		};
+	};
+};

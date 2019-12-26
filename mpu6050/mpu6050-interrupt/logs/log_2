@@ -1,0 +1,15 @@
+root@orangepione:/home/bekir# insmod ./mpu6050_interrupt.ko 
+root@orangepione:/home/bekir# cat /sys/class/mpu6050/accel_x
+-5776
+root@orangepione:/home/bekir# cat /sys/class/mpu6050/accel_y
+-5840
+root@orangepione:/home/bekir# cat /sys/class/mpu6050/accel_z
+14896
+root@orangepione:/home/bekir# cat /sys/class/mpu6050/temp 
+24.260
+root@orangepione:/home/bekir# cat /sys/class/mpu6050/temp 
+24.308
+root@orangepione:/home/bekir# cat /sys/class/mpu6050/temp 
+24.276
+root@orangepione:/home/bekir# rmmod mpu6050_interrupt 
+root@orangepione:/home/bekir#

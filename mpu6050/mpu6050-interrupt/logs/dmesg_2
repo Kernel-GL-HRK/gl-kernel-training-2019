@@ -1,0 +1,123 @@
+root@orangepione:~# dmesg -w
+[65178.875001] gl,mpu6050 0-0068: i2c client address is 0x68
+[65178.875452] gl,mpu6050 0-0068: i2c mpu6050 device found, WHO_AM_I register value = 0x68
+[65178.992653] gl,mpu6050 0-0068: drv_client->irq = 50
+[65178.992665] gl,mpu6050 0-0068: i2c driver probed
+[65178.992849] mpu6050: i2c driver created
+[65178.992887] mpu6050: sysfs class created
+[65178.992908] mpu6050: sysfs class attributes created
+[65178.992911] mpu6050: module loaded
+[65178.996524] irq 50 was generated
+[65179.101599] irq 50 was generated
+[65179.299310] irq 50 was generated
+[65179.497022] irq 50 was generated
+[65179.694747] irq 50 was generated
+[65179.892443] irq 50 was generated
+[65180.090175] irq 50 was generated
+[65180.287890] irq 50 was generated
+[65180.485590] irq 50 was generated
+[65180.683301] irq 50 was generated
+[65180.881039] irq 50 was generated
+[65181.078747] irq 50 was generated
+[65181.276467] irq 50 was generated
+[65181.474186] irq 50 was generated
+[65181.671877] irq 50 was generated
+[65181.869598] irq 50 was generated
+[65182.067307] irq 50 was generated
+[65182.265019] irq 50 was generated
+[65182.462752] irq 50 was generated
+[65182.660462] irq 50 was generated
+[65182.858172] irq 50 was generated
+[65183.055887] irq 50 was generated
+[65183.253604] irq 50 was generated
+[65183.451342] irq 50 was generated
+[65183.649027] irq 50 was generated
+[65183.846759] irq 50 was generated
+[65184.044501] irq 50 was generated
+[65184.242192] irq 50 was generated
+[65184.439910] irq 50 was generated
+[65184.637604] irq 50 was generated
+[65184.835305] irq 50 was generated
+[65185.033026] irq 50 was generated
+[65185.230743] irq 50 was generated
+[65185.428455] irq 50 was generated
+[65185.626175] irq 50 was generated
+[65185.823879] irq 50 was generated
+[65186.021607] irq 50 was generated
+[65186.219325] irq 50 was generated
+[65186.417016] irq 50 was generated
+[65186.614726] irq 50 was generated
+[65186.812447] irq 50 was generated
+[65187.010160] irq 50 was generated
+[65187.207883] irq 50 was generated
+[65187.405595] irq 50 was generated
+[65187.603309] irq 50 was generated
+[65187.801017] irq 50 was generated
+[65187.998717] irq 50 was generated
+[65188.196446] irq 50 was generated
+[65188.394142] irq 50 was generated
+[65188.591845] irq 50 was generated
+[65188.789561] irq 50 was generated
+[65188.987281] irq 50 was generated
+[65189.184998] irq 50 was generated
+[65189.382702] irq 50 was generated
+[65189.580406] irq 50 was generated
+[65189.778119] irq 50 was generated
+[65189.975857] irq 50 was generated
+[65190.173560] irq 50 was generated
+[65190.371301] irq 50 was generated
+[65190.569018] irq 50 was generated
+[65190.766736] irq 50 was generated
+[65190.964461] irq 50 was generated
+[65191.162220] irq 50 was generated
+[65191.359907] irq 50 was generated
+[65191.557638] irq 50 was generated
+[65191.755335] irq 50 was generated
+[65191.953031] irq 50 was generated
+[65192.150748] irq 50 was generated
+[65192.348482] irq 50 was generated
+[65192.546206] irq 50 was generated
+[65192.743913] irq 50 was generated
+[65192.941626] irq 50 was generated
+[65193.139310] irq 50 was generated
+[65193.337050] irq 50 was generated
+[65193.534797] irq 50 was generated
+[65193.732507] irq 50 was generated
+[65193.930195] irq 50 was generated
+[65194.127919] irq 50 was generated
+[65194.325624] irq 50 was generated
+[65194.523371] irq 50 was generated
+[65194.721098] irq 50 was generated
+[65194.918809] irq 50 was generated
+[65195.116512] irq 50 was generated
+[65195.314200] irq 50 was generated
+[65195.511935] irq 50 was generated
+[65195.709659] irq 50 was generated
+[65195.907348] irq 50 was generated
+[65196.105072] irq 50 was generated
+[65196.302814] irq 50 was generated
+[65196.500524] irq 50 was generated
+[65196.698233] irq 50 was generated
+[65196.895955] irq 50 was generated
+[65197.093680] irq 50 was generated
+[65197.291427] irq 50 was generated
+[65197.489140] irq 50 was generated
+[65197.686849] irq 50 was generated
+[65197.884599] irq 50 was generated
+[65198.082325] irq 50 was generated
+[65198.280022] irq 50 was generated
+[65198.477759] irq 50 was generated
+[65198.675486] irq 50 was generated
+[65198.873205] irq 50 was generated
+[65199.070924] irq 50 was generated
+[65199.268645] irq 50 was generated
+[65199.466356] irq 50 was generated
+[65199.664083] irq 50 was generated
+[65199.861094] mpu6050: sysfs class attributes removed
+[65199.861180] mpu6050: sysfs class destroyed
+[65199.861994] irq 50 was generated
+[65199.862050] gl,mpu6050 0-0068: i2c driver removed
+[65199.862200] mpu6050: i2c driver deleted
+[65199.862204] mpu6050: module exited
+
+
