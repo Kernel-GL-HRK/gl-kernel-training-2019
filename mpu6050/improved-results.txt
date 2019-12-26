@@ -1,0 +1,29 @@
+user@user-VM65:~/Projects/GL/gl-kernel-training-2019.git/mpu6050$ ssh root@192.168.78.179
+root@192.168.78.179's password: 
+  ___  ____  _    ___             
+ / _ \|  _ \(_)  / _ \ _ __   ___ 
+| | | | |_) | | | | | | '_ \ / _ \
+| |_| |  __/| | | |_| | | | |  __/
+ \___/|_|   |_|  \___/|_| |_|\___|
+                                  
+Welcome to Armbian Buster with Linux 5.3.9-sunxi
+
+System load:   0.02 0.10 0.06  	Up time:       4 min		
+Memory usage:  9 % of 498MB  	IP:            192.168.78.179
+Usage of /:    31% of 3.5G   	
+
+[ General system configuration (beta): armbian-config ]
+
+Last login: Tue Dec  3 19:19:39 2019 from 192.168.78.197
+
+root@orangepione:~# insmod /tmp/mpu6050.ko 
+root@orangepione:~# ./../home/user/checking_performance 
+/sys/class/mpu6050/accel_x - 0.000595564
+/sys/class/mpu6050/accel_y - 0.000564524
+/sys/class/mpu6050/accel_z - 0.000542399
+/sys/class/mpu6050/gyro_x - 0.000542858
+/sys/class/mpu6050/gyro_y - 0.000539732
+/sys/class/mpu6050/gyro_z - 0.000539941
+/sys/class/mpu6050/temperature - 0.000537650
+root@orangepione:~# 
+
