@@ -5,12 +5,19 @@
 #include <linux/i2c.h>
 #include <linux/i2c-dev.h>
 #include <linux/delay.h>
+#include <linux/kthread.h>
+#include <linux/moduleparam.h>
+#include <linux/interrupt.h>
+#include <linux/irq.h>
+#include <linux/workqueue.h>
 
 #include "mpu6050-regs.h"
 
 
 struct mpu6050_data {
 	struct i2c_client *drv_client;
+	struct workqueue_struct *queue;
+	struct work_struct work;
 	int accel_values[3];
 	int gyro_values[3];
 	int temperature;
@@ -53,6 +60,19 @@ static int mpu6050_read_data(void)
 		g_mpu6050_data.temperature);
 
 	return 0;
+}
+
+static irqreturn_t interrupt_handler(int irq, void *dev)
+{
+	pr_info("interrupt uppear");
+	queue_work(g_mpu6050_data.queue, &g_mpu6050_data.work);
+	return IRQ_HANDLED;
+}
+
+static void work_func(struct work_struct *work)
+{
+	pr_info("delay work is active\n");
+
 }
 
 static int mpu6050_probe(struct i2c_client *drv_client,
@@ -101,6 +121,19 @@ static int mpu6050_probe(struct i2c_client *drv_client,
 	i2c_smbus_write_byte_data(drv_client, REG_PWR_MGMT_1, 0);
 	i2c_smbus_write_byte_data(drv_client, REG_PWR_MGMT_2, 0);
 
+	g_mpu6050_data.queue = create_singlethread_workqueue("mpu6050_work_queue");
+	INIT_WORK(&g_mpu6050_data.work, work_func);
+
+	if (request_irq(drv_client->irq, interrupt_handler,
+		IRQF_ONESHOT | IRQF_TRIGGER_RISING,
+		"mpu6050", (void *)drv_client)) {
+
+		dev_info(&drv_client->dev, "interrupt is not registered\n");
+		return -EINVAL;
+
+	}
+	dev_info(&drv_client->dev, "drv_client->irq = %d\n", drv_client->irq);
+
 	g_mpu6050_data.drv_client = drv_client;
 
 	dev_info(&drv_client->dev, "i2c driver probed\n");
@@ -110,6 +143,11 @@ static int mpu6050_probe(struct i2c_client *drv_client,
 static int mpu6050_remove(struct i2c_client *drv_client)
 {
 	g_mpu6050_data.drv_client = 0;
+
+	free_irq(drv_client->irq, (void *)drv_client);
+
+	flush_workqueue(g_mpu6050_data.queue);
+	destroy_workqueue(g_mpu6050_data.queue);
 
 	dev_info(&drv_client->dev, "i2c driver removed\n");
 	return 0;
