@@ -1,0 +1,17 @@
+root@orangepione:~# ls /sys/class/mpu6050/
+accel_x  accel_y  accel_z  gyro_x  gyro_y  gyro_z  temp
+root@orangepione:~# cat /sys/class/mpu6050/accel_x
+2036
+root@orangepione:~# cat /sys/class/mpu6050/accel_y
+-14047
+root@orangepione:~# cat /sys/class/mpu6050/accel_z
+-5739
+root@orangepione:~# cat /sys/class/mpu6050/gyro_x
+2490
+root@orangepione:~# cat /sys/class/mpu6050/gyro_y
+-2510
+root@orangepione:~# cat /sys/class/mpu6050/gyro_z
+-1096
+root@orangepione:~# cat /sys/class/mpu6050/temp 
+25.589
+
