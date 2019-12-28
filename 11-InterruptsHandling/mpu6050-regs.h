@@ -11,6 +11,7 @@
 #define REG_SMPRT_DIV		0x25
 #define REG_INT_PIN_CFG		0x37
 #define REG_INT_ENABLE		0x38
+#define REG_INT_STATUS		0x3a
 #define REG_ACCEL_XOUT_H	0x3B
 #define REG_ACCEL_XOUT_L	0x3C
 #define REG_ACCEL_YOUT_H	0x3D

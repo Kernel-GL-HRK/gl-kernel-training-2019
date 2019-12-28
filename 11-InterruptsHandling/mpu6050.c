@@ -10,6 +10,8 @@
 #include <linux/interrupt.h>
 #include <linux/irq.h>
 #include <linux/workqueue.h>
+#include <linux/spinlock.h>
+#include <linux/mutex.h>
 
 #include "mpu6050-regs.h"
 
@@ -18,6 +20,8 @@ struct mpu6050_data {
 	struct i2c_client *drv_client;
 	struct workqueue_struct *queue;
 	struct work_struct work;
+	struct spinlock irq_handler_spin;
+	struct mutex read_func_mutex;
 	int accel_values[3];
 	int gyro_values[3];
 	int temperature;
@@ -28,6 +32,7 @@ static struct mpu6050_data g_mpu6050_data;
 static int mpu6050_read_data(void)
 {
 	int temp;
+	u8 int_status;
 	struct i2c_client *drv_client = g_mpu6050_data.drv_client;
 
 	if (drv_client == 0)
@@ -46,6 +51,8 @@ static int mpu6050_read_data(void)
 	 */
 	temp = (s16)((u16)i2c_smbus_read_word_swapped(drv_client, REG_TEMP_OUT_H));
 	g_mpu6050_data.temperature = (temp + 12420 + 170) / 340;
+	/* int status */
+	int_status = (u8)i2c_smbus_read_byte_data(drv_client, REG_INT_STATUS);
 
 	dev_info(&drv_client->dev, "sensor data read:\n");
 	dev_info(&drv_client->dev, "ACCEL[X,Y,Z] = [%d, %d, %d]\n",
@@ -58,21 +65,32 @@ static int mpu6050_read_data(void)
 		g_mpu6050_data.gyro_values[2]);
 	dev_info(&drv_client->dev, "TEMP = %d\n",
 		g_mpu6050_data.temperature);
+	dev_info(&drv_client->dev, "REG_INT_STATUS = %d\n", int_status);
 
 	return 0;
 }
 
+void call_mpu6050_dataread(void)
+{
+	mutex_lock(&g_mpu6050_data.read_func_mutex);
+	pr_info("mpu6050: %s\n", __func__);
+	mpu6050_read_data();
+	mutex_unlock(&g_mpu6050_data.read_func_mutex);
+}
+
 static irqreturn_t interrupt_handler(int irq, void *dev)
 {
-	pr_info("interrupt uppear");
+	spin_lock(&g_mpu6050_data.irq_handler_spin);
+	pr_info("mpu6050: interrupt uppear; irq = %d", irq);
 	queue_work(g_mpu6050_data.queue, &g_mpu6050_data.work);
+	spin_unlock(&g_mpu6050_data.irq_handler_spin);
 	return IRQ_HANDLED;
 }
 
 static void work_func(struct work_struct *work)
 {
-	pr_info("delay work is active\n");
-
+	pr_info("mpu6050: %s\n", __func__);
+	call_mpu6050_dataread();
 }
 
 static int mpu6050_probe(struct i2c_client *drv_client,
