@@ -6,20 +6,28 @@
 #include <linux/i2c.h>
 #include <linux/i2c-dev.h>
 #include <linux/workqueue.h>
+#include <linux/mutex.h>
+#include <linux/completion.h>
 
 #include "mpu6050-regs.h"
 
+static int threshold_param = 5;
+module_param(threshold_param, int, 0);
 
 struct mpu6050_data {
 	struct i2c_client *drv_client;
+	struct mutex mmutex;
 	struct workqueue_struct *wqueue;
+	struct timespec lt_access; // last time access
 	int accel_values[3];
 	int gyro_values[3];
 	int temperature;
 	int temp_factor;
 };
+
 static void th_fn_read(struct work_struct *wq);
 static DECLARE_DELAYED_WORK(my_work, th_fn_read);
+DECLARE_COMPLETION(data_read_done);
 
 static unsigned int onesec;
 
@@ -67,12 +75,62 @@ static int mpu6050_read_data(void)
 	dev_info(&drv_client->dev, "TEMP = %d\n",
 		g_mpu6050_data.temperature);
 
+	complete_all(&data_read_done);
+
 	return 0;
+}
+
+static void check_actual_data(int reg, char *buff)
+{
+	long diff;
+	struct timespec current_time;
+
+	getnstimeofday(&current_time);
+	diff = current_time.tv_sec - g_mpu6050_data.lt_access.tv_sec;
+
+	if (diff > threshold_param) {
+		if (g_mpu6050_data.wqueue) {
+			queue_delayed_work(g_mpu6050_data.wqueue, &my_work,
+					onesec);
+			wait_for_completion(&data_read_done);
+			getnstimeofday(&g_mpu6050_data.lt_access);
+		}
+	}
+
+	switch (reg) {
+	case REG_ACCEL_XOUT_H:
+		sprintf(buff, "%d\n", g_mpu6050_data.accel_values[0]);
+	break;
+	case REG_ACCEL_YOUT_H:
+		sprintf(buff, "%d\n", g_mpu6050_data.accel_values[1]);
+	break;
+	case REG_ACCEL_ZOUT_H:
+		sprintf(buff, "%d\n", g_mpu6050_data.accel_values[2]);
+	break;
+	case REG_GYRO_XOUT_H:
+		sprintf(buff, "%d\n", g_mpu6050_data.gyro_values[0]);
+	break;
+	case REG_GYRO_YOUT_H:
+		sprintf(buff, "%d\n", g_mpu6050_data.gyro_values[1]);
+	break;
+	case REG_GYRO_ZOUT_H:
+		sprintf(buff, "%d\n", g_mpu6050_data.gyro_values[2]);
+	break;
+	case REG_TEMP_OUT_H:
+		sprintf(buff, "%d.%03d\n", g_mpu6050_data.temperature, g_mpu6050_data.temp_factor);
+	break;
+	default:
+	break;
+	}
+
 }
 
 static void th_fn_read(struct work_struct *wq)
 {
+	mutex_lock(&g_mpu6050_data.mmutex);
 	mpu6050_read_data();
+	//complete(&data_read_done);
+	mutex_unlock(&g_mpu6050_data.mmutex);
 }
 
 static int mpu6050_probe(struct i2c_client *drv_client,
@@ -115,12 +173,17 @@ static int mpu6050_probe(struct i2c_client *drv_client,
 
 	g_mpu6050_data.drv_client = drv_client;
 
+	init_completion(&data_read_done);
+
 	onesec = msecs_to_jiffies(1000);
-	if (!g_mpu6050_data.wqueue)
+	if (!g_mpu6050_data.wqueue) {
+		dev_info(&drv_client->dev, "workqueeue created\n");
 		g_mpu6050_data.wqueue =
 			create_singlethread_workqueue("thread_mpu6050");
-	else
-		queue_delayed_work(g_mpu6050_data.wqueue, &my_work, onesec);
+	}
+
+	queue_delayed_work(g_mpu6050_data.wqueue, &my_work, onesec);
+	getnstimeofday(&g_mpu6050_data.lt_access);
 
 
 
@@ -155,8 +218,7 @@ static struct i2c_driver mpu6050_i2c_driver = {
 static ssize_t accel_x_show(struct class *class,
 			    struct class_attribute *attr, char *buf)
 {
-	if (g_mpu6050_data.wqueue)
-		queue_delayed_work(g_mpu6050_data.wqueue, &my_work, onesec);
+	check_actual_data(REG_ACCEL_XOUT_H, buf);
 	sprintf(buf, "%d\n", g_mpu6050_data.accel_values[0]);
 	return strlen(buf);
 }
@@ -164,8 +226,7 @@ static ssize_t accel_x_show(struct class *class,
 static ssize_t accel_y_show(struct class *class,
 			    struct class_attribute *attr, char *buf)
 {
-	if (g_mpu6050_data.wqueue)
-		queue_delayed_work(g_mpu6050_data.wqueue, &my_work, onesec);
+	check_actual_data(REG_ACCEL_YOUT_H, buf);
 	sprintf(buf, "%d\n", g_mpu6050_data.accel_values[1]);
 	return strlen(buf);
 }
@@ -173,8 +234,7 @@ static ssize_t accel_y_show(struct class *class,
 static ssize_t accel_z_show(struct class *class,
 			    struct class_attribute *attr, char *buf)
 {
-	if (g_mpu6050_data.wqueue)
-		queue_delayed_work(g_mpu6050_data.wqueue, &my_work, onesec);
+	check_actual_data(REG_ACCEL_ZOUT_H, buf);
 	sprintf(buf, "%d\n", g_mpu6050_data.accel_values[2]);
 	return strlen(buf);
 }
@@ -182,8 +242,7 @@ static ssize_t accel_z_show(struct class *class,
 static ssize_t gyro_x_show(struct class *class,
 			   struct class_attribute *attr, char *buf)
 {
-	if (g_mpu6050_data.wqueue)
-		queue_delayed_work(g_mpu6050_data.wqueue, &my_work, onesec);
+	check_actual_data(REG_GYRO_XOUT_H, buf);
 	sprintf(buf, "%d\n", g_mpu6050_data.gyro_values[0]);
 	return strlen(buf);
 }
@@ -191,8 +250,7 @@ static ssize_t gyro_x_show(struct class *class,
 static ssize_t gyro_y_show(struct class *class,
 			   struct class_attribute *attr, char *buf)
 {
-	if (g_mpu6050_data.wqueue)
-		queue_delayed_work(g_mpu6050_data.wqueue, &my_work, onesec);
+	check_actual_data(REG_GYRO_YOUT_H, buf);
 	sprintf(buf, "%d\n", g_mpu6050_data.gyro_values[1]);
 	return strlen(buf);
 }
@@ -200,8 +258,7 @@ static ssize_t gyro_y_show(struct class *class,
 static ssize_t gyro_z_show(struct class *class,
 			   struct class_attribute *attr, char *buf)
 {
-	if (g_mpu6050_data.wqueue)
-		queue_delayed_work(g_mpu6050_data.wqueue, &my_work, onesec);
+	check_actual_data(REG_GYRO_ZOUT_H, buf);
 	sprintf(buf, "%d\n", g_mpu6050_data.gyro_values[2]);
 	return strlen(buf);
 }
@@ -209,8 +266,7 @@ static ssize_t gyro_z_show(struct class *class,
 static ssize_t temperature_show(struct class *class,
 			 struct class_attribute *attr, char *buf)
 {
-	if (g_mpu6050_data.wqueue)
-		queue_delayed_work(g_mpu6050_data.wqueue, &my_work, onesec);
+	check_actual_data(REG_TEMP_OUT_H, buf);
 	sprintf(buf, "%d.%03d\n", g_mpu6050_data.temperature,
 					g_mpu6050_data.temp_factor);
 	return strlen(buf);
