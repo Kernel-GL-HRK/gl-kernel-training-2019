@@ -1,0 +1,24 @@
+root@orangepione:~# dmesg | grep mpu6050
+[    6.104628] mpu6050 0-0068: i2c client address is 0x68
+[    6.107458] mpu6050 0-0068: i2c mpu6050 device found, WHO_AM_I register value = 0x68
+[    6.213196] mpu6050 0-0068: dtsi->delay_ms = 10000
+[    6.213323] mpu6050 0-0068: sysfs class created
+[    6.213330] mpu6050 0-0068: i2c driver probed
+[  392.439916] mpu6050 0-0068: mpu6050 read thread
+[  392.439934] mpu6050 0-0068: sensor data read:
+[  392.443708] mpu6050 0-0068: ACCEL[X,Y,Z] = [-4952, -10656, 13284]
+[  392.443726] mpu6050 0-0068: GYRO[X,Y,Z] = [554, -46, 24]
+[  392.443738] mpu6050 0-0068: TEMP = 24.506
+[  402.694992] mpu6050 0-0068: delay timer callback, data can be updated
+[  403.721889] mpu6050 0-0068: mpu6050 read thread
+[  403.721906] mpu6050 0-0068: sensor data read:
+[  403.725741] mpu6050 0-0068: ACCEL[X,Y,Z] = [-4948, -11004, 13152]
+[  403.725761] mpu6050 0-0068: GYRO[X,Y,Z] = [401, -415, -128]
+[  403.725775] mpu6050 0-0068: TEMP = 24.553
+[  413.959345] mpu6050 0-0068: delay timer callback, data can be updated
+[  415.922511] mpu6050 0-0068: mpu6050 read thread
+[  415.922528] mpu6050 0-0068: sensor data read:
+[  415.926684] mpu6050 0-0068: ACCEL[X,Y,Z] = [-5032, -11100, 13196]
+[  415.926704] mpu6050 0-0068: GYRO[X,Y,Z] = [624, -408, -66]
+[  415.926718] mpu6050 0-0068: TEMP = 24.412
+[  425.991767] mpu6050 0-0068: delay timer callback, data can be updated
