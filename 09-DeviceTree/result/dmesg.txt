@@ -1,0 +1,4 @@
+ 
+root@orangepione:~# dmesg | grep fake
+[    6.441434] fake_module: loading out-of-tree module taints kernel.
+[    6.442074] fake_module_ovr fake_module@0: loaded

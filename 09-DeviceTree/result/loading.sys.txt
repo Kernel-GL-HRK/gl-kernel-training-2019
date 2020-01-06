@@ -1,0 +1,74 @@
+ [  458.082389] reboot: Restarting system
+
+U-Boot SPL 2019.04-armbian (Jan 06 2020 - 16:00:56 +0200)
+DRAM: 512 MiB
+Trying to boot from MMC1
+
+
+U-Boot 2019.04-armbian (Jan 06 2020 - 16:00:56 +0200) Allwinner Technology
+
+CPU:   Allwinner H3 (SUN8I 1680)
+Model: Xunlong Orange Pi One
+DRAM:  512 MiB
+MMC:   mmc@1c0f000: 0
+Loading Environment from EXT4... ** File not found /boot/boot.env **
+
+** Unable to read "/boot/boot.env" from mmc0:1 **
+In:    serial
+Out:   serial
+Err:   serial
+Net:   phy interface0
+eth0: ethernet@1c30000
+** Reading file would overwrite reserved memory **
+There is no valid bmp file at the given address
+starting USB...
+USB0:   USB EHCI 1.00
+USB1:   USB OHCI 1.0
+USB2:   USB EHCI 1.00
+USB3:   USB OHCI 1.0
+scanning bus 0 for devices... 1 USB Device(s) found
+scanning bus 1 for devices... 1 USB Device(s) found
+scanning bus 2 for devices... 1 USB Device(s) found
+scanning bus 3 for devices... 1 USB Device(s) found
+       scanning usb for storage devices... 0 Storage Device(s) found
+Autoboot in 1 seconds, press <Space> to stop
+switch to partitions #0, OK
+mmc0 is current device
+Scanning mmc 0:1...
+Found U-Boot script /boot/boot.scr
+3798 bytes read in 2 ms (1.8 MiB/s)
+## Executing script at 43100000
+U-boot loaded from SD
+Boot script loaded from mmc
+241 bytes read in 1 ms (235.4 KiB/s)
+7307745 bytes read in 354 ms (19.7 MiB/s)
+7645104 bytes read in 370 ms (19.7 MiB/s)
+Found mainline kernel configuration
+28283 bytes read in 10 ms (2.7 MiB/s)
+374 bytes read in 5 ms (72.3 KiB/s)
+Applying kernel provided DT overlay sun8i-h3-i2c0.dtbo
+258 bytes read in 3 ms (84 KiB/s)
+Applying user provided DT overlay fake_module.dtbo
+4155 bytes read in 3 ms (1.3 MiB/s)
+Applying kernel provided DT fixup script (sun8i-h3-fixup.scr)
+## Executing script at 44000000
+## Loading init Ramdisk from Legacy Image at 43300000 ...                         
+   Image Name:   uInitrd                                                          
+   Image Type:   ARM Linux RAMDisk Image (gzip compressed)                        
+   Data Size:    7307681 Bytes = 7 MiB                                            
+   Load Address: 00000000                                                         
+   Entry Point:  00000000
+   Verifying Checksum ... OK
+## Flattened Device Tree blob at 43000000
+   Booting using the fdt blob at 0x43000000
+EHCI failed to shut down host controller.
+   Loading Ramdisk to 49907000, end 49fff1a1 ... OK
+   Loading Device Tree to 49897000, end 49906fff ... OK
+
+Starting kernel ...
+
+Uncompressing Linux... done, booting the kernel.
+
+Armbian 19.11.3 Buster ttyS0 
+
+orangepione login: 
