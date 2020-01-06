@@ -1,8 +1,15 @@
 MODULE_NAME=mpu6050
+
+ifneq ($(KERNELRELEASE),)
+
 obj-m :=$(MODULE_NAME).o
+
+else
+
 ccflags-y := -Wall
 DT_SRCS=$(wildcard *.dts)
 DT_OBJS=$(DT_SRCS:.dts=.dtbo)
+DTC_FLAGS ?= -i $(DCT_EXTRA_PATH)
 
 
 .PHONY: all clean
@@ -32,3 +39,5 @@ upload_module: $(MODULE_NAME).ko
 	-ssh $(SSH_ORANGE) 'depmod'
 
 upload: upload_dtso upload_module
+
+endif
