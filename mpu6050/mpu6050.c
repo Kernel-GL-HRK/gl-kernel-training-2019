@@ -249,6 +249,35 @@ static ssize_t all_show(struct kobject *kobj,
 	return strlen(buf);
 }
 
+
+static ssize_t accel_xyz_last_irq_show(struct kobject *kobj,
+	struct kobj_attribute *attr,
+	char *buf)
+{
+	struct mpu6050_data *g_mpu6050_data;
+	int i;
+
+	list_for_each_entry(g_mpu6050_data, &mpu6050_data_list, list) {
+
+		if (strcmp(g_mpu6050_data->drv_client->dev.kobj.name,
+			kobj->name) == 0) {
+
+			for (i = 0; i < num_meas; ++i) {
+				sprintf(buf + strlen(buf),
+					"%d\t"
+					"%d\t"
+					"%d\n",
+					g_mpu6050_data->accel_filter[i][0],
+					g_mpu6050_data->accel_filter[i][1],
+					g_mpu6050_data->accel_filter[i][2]
+					);
+
+			}
+		}
+	}
+	return strlen(buf);
+}
+
 static struct kobj_attribute temp_attribute =
 	__ATTR(temp, 0444, all_show, NULL);
 
@@ -258,10 +287,14 @@ static struct kobj_attribute gyro_xyz_attribute =
 static struct kobj_attribute accel_xyz_attribute =
 	__ATTR(accel_xyz, 0444, all_show, NULL);
 
+static struct kobj_attribute accel_xyz_last_irq_attribute =
+	__ATTR(accel_xyz_last_irq, 0444, accel_xyz_last_irq_show, NULL);
+
 static struct attribute *attrs[] = {
 	&temp_attribute.attr,
 	&gyro_xyz_attribute.attr,
 	&accel_xyz_attribute.attr,
+	&accel_xyz_last_irq_attribute.attr,
 	NULL,	/* need to NULL terminate the list of attributes */
 };
 
