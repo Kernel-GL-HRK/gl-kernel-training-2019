@@ -7,26 +7,22 @@ obj-m := mpu6050.o
 
 else
 
+#BUILD_KERNEL ?= ~/gl/build/cache/sources/linux-mainline/orange-pi-5.3/
+CROSS_COMPILER ?= arm-linux-gnueabihf-
+CURDIR ?= $(PWD)
+ARCH = arm
 
-ifeq ($(KERNELDIR),)
-ifeq ($(BBB_KERNEL),)
-	$(error Path to kernel tree - KERNELDIR or BBB_KERNEL variable is not defined!)
+ifeq ($(BUILD_KERNEL),)
+	$(error Path to kernel tree - KERNELDIR variable is not defined!)
 endif
-endif
-
-KERNELDIR ?= $(BBB_KERNEL)
-
-export ARCH = arm
-export CROSS_COMPILE ?= arm-linux-gnueabihf-
-
 
 .PHONY: all clean
 
 all:
-	$(MAKE) -C $(KERNELDIR) M=$(CURDIR) modules
+	$(MAKE) -C $(BUILD_KERNEL) M=$(CURDIR) ARCH=$(ARCH) CROSS_COMPILE=$(CROSS_COMPILER) modules
 
 clean:
-	$(MAKE) -C $(KERNELDIR) M=$(CURDIR) clean
+	$(MAKE) -C $(BUILD_KERNEL) M=$(CURDIR) ARCH=$(ARCH) CROSS_COMPILE=$(CROSS_COMPILER) clean
 
 
 endif
