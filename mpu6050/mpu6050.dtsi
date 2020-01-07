@@ -1,0 +1,21 @@
+/dts-v1/;
+/plugin/;
+
+/ {
+	compatible = "allwinner,sun8i-h3";
+
+	fragment@0 {
+		target = <&i2c0>;
+		__overlay__ {
+			status = "okay";
+			#address-cells = <1>;
+			#size-cells = <0>;
+
+			mpu: mpu6050@68 {
+				compatible = "mpu6050";
+				reg = <0x68>;
+				status = "okay";
+			};
+		};
+	};
+};
