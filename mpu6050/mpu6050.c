@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- *  module_fake_08.c - Test module
+ *  mpu5060.c - Test module
  *
  *  Copyright (C) 2019 Andrey Pahomov <pahomov.and@gmail.com>
  */
@@ -20,6 +20,11 @@
 #include <linux/mutex.h>
 #include <linux/list.h>
 
+#include <linux/gpio/consumer.h>
+#include <linux/interrupt.h>
+
+#include <linux/workqueue.h>
+
 #include "mpu6050-regs.h"
 
 #define LEN_DATA ((REG_GYRO_ZOUT_L - REG_ACCEL_XOUT_H)+1)
@@ -31,6 +36,7 @@ static bool isDebug;
 static struct timespec old_time;
 
 static struct semaphore s_lock;
+static struct mutex m_lock;
 
 static LIST_HEAD(mpu6050_data_list);
 
@@ -70,10 +76,14 @@ struct mpu6050_data {
 
 	struct task_struct *i2c_read_thread;
 
-	// struct mutex m_lock;
 	struct completion thred_wait;
 
 	struct list_head list;
+
+	struct gpio_desc *irq_gpio;
+
+	struct workqueue_struct *queue;
+	struct work_struct qwork;
 };
 
 static inline struct temp_float temp_convert(s16 temp)
@@ -97,7 +107,8 @@ static int mpu6050_read_data(struct mpu6050_data *g_mpu6050_data)
 	if (drv_client == 0)
 		return -ENODEV;
 
-	up(&s_lock);
+	// up(&s_lock);
+	mutex_lock(&m_lock);
 
 	len = i2c_smbus_read_i2c_block_data(drv_client,
 		     REG_ACCEL_XOUT_H, LEN_DATA,
@@ -124,7 +135,8 @@ static int mpu6050_read_data(struct mpu6050_data *g_mpu6050_data)
 	g_mpu6050_data->gyro_values[2] =
 		(s16)swab16(g_mpu6050_data->g_data_map.gyro_z);
 
-	down(&s_lock);
+	// down(&s_lock);
+	mutex_unlock(&m_lock);
 
 	return 0;
 }
@@ -141,14 +153,7 @@ static int mpu6050_thread(void *p)
 	return 0;
 }
 
-
-// #define SEC_IN_NS 1000000000
-// #define SEC_IN_MKS 1000000
-#define SEC_IN_MS 1000
-
-static ssize_t all_show(struct kobject *kobj,
-	struct kobj_attribute *attr,
-	char *buf)
+static void read_delay(struct kobject *kobj)
 {
 	struct timespec  cur_time;
 	u64 cur_ns, old_ns;
@@ -182,6 +187,16 @@ static ssize_t all_show(struct kobject *kobj,
 			dalay_ms, cur_ns - old_ns);
 	}
 
+}
+
+static ssize_t all_show(struct kobject *kobj,
+	struct kobj_attribute *attr,
+	char *buf)
+{
+
+	struct mpu6050_data *g_mpu6050_data;
+
+	read_delay(kobj);
 
 	list_for_each_entry(g_mpu6050_data, &mpu6050_data_list, list) {
 
@@ -246,11 +261,73 @@ static struct attribute_group attr_group = {
 	.attrs = attrs,
 };
 
+static irqreturn_t irq_gpio(int irq, void *dev)
+{
+	struct mpu6050_data *g_mpu6050_data;
+
+	dev_info(dev, "!!!!!!!!!!!!!!!!!!\n");
+
+	list_for_each_entry(g_mpu6050_data, &mpu6050_data_list, list) {
+		if (g_mpu6050_data != NULL)
+			if (strcmp(
+				g_mpu6050_data->drv_client->dev.kobj.name,
+				((struct device *)dev)->kobj.name) == 0) {
+
+				pr_info("mpu6050: %s:%d\n", __func__, __LINE__);
+
+				queue_work(
+					g_mpu6050_data->queue,
+					&g_mpu6050_data->qwork);
+
+				pr_info("mpu6050: %s:%d\n", __func__, __LINE__);
+
+				break;
+			}
+	}
+
+	return IRQ_HANDLED;
+}
+
+static void work_func(struct work_struct *work)
+{
+	struct timespec  cur_time;
+	u64 cur_ns, old_ns;
+	struct mpu6050_data *g_mpu6050_data;
+
+	pr_info("mpu6050: %s:%d\n", __func__, __LINE__);
+
+	g_mpu6050_data = container_of(work,
+						struct mpu6050_data, qwork);
+
+
+	if (g_mpu6050_data != NULL) {
+		// read_delay(&g_mpu6050_data->kobj);
+
+		getnstimeofday(&cur_time);
+
+		cur_ns = cur_time.tv_sec * 1000 + cur_time.tv_nsec/1000000;
+		old_ns = old_time.tv_sec * 1000 + old_time.tv_nsec/1000000;
+
+		if ((cur_ns - old_ns) > dalay_ms) {
+			pr_info("read i2c. dalay_ms:%d\tdt:%lld\n",
+				dalay_ms, cur_ns - old_ns);
+
+			old_time = cur_time;
+			if (g_mpu6050_data)
+				mpu6050_read_data(g_mpu6050_data);
+	}
+	else
+		pr_info("mpu6050: %s:%d\n", __func__, __LINE__);
+
+	pr_info("mpu6050: %s:%d\n", __func__, __LINE__);
+
+}
+}
 
 static int mpu6050_probe(struct i2c_client *drv_client,
 			 const struct i2c_device_id *id)
 {
-	int ret;
+	int ret, i;
 	struct device_node *np =  drv_client->dev.of_node;
 
 	struct mpu6050_data *g_mpu6050_data;
@@ -264,6 +341,35 @@ static int mpu6050_probe(struct i2c_client *drv_client,
 	g_mpu6050_data->drv_client = drv_client;
 
 	init_completion(&g_mpu6050_data->thred_wait);
+
+	// workqueue
+	g_mpu6050_data->queue =
+		create_singlethread_workqueue("mpu6050_workqueue");
+
+	INIT_WORK(&g_mpu6050_data->qwork, work_func);
+	pr_info("mpu6050: %s:%d\n", __func__, __LINE__);
+
+
+	// IRQ
+	g_mpu6050_data->irq_gpio =
+		gpiod_get(&drv_client->dev, "mpu6050_irq", GPIOD_IN);
+
+	pr_info("mpu6050: %s:%d\n", __func__, __LINE__);
+
+	if (gpiod_direction_input(g_mpu6050_data->irq_gpio) != 0)
+		dev_info(&drv_client->dev, "gpiod_direction_input false\n");
+
+	ret = request_irq(
+		gpiod_to_irq(g_mpu6050_data->irq_gpio),
+		irq_gpio,
+		IRQF_TRIGGER_RISING,
+		// IRQF_TRIGGER_HIGH, // does not have time to work
+		"irq_gpio",
+		&drv_client->dev
+		);
+
+	if (ret)
+		dev_warn(&drv_client->dev, "Unable to request the gpio IRQ.\n");
 
 	dev_info(&drv_client->dev, "probeing\n");
 
@@ -303,22 +409,31 @@ static int mpu6050_probe(struct i2c_client *drv_client,
 
 	/* Setup the device */
 	/* No error handling here! */
-	i2c_smbus_write_byte_data(drv_client, REG_CONFIG, 0);
-	i2c_smbus_write_byte_data(drv_client, REG_GYRO_CONFIG, 0);
-	i2c_smbus_write_byte_data(drv_client, REG_ACCEL_CONFIG, 0);
-	i2c_smbus_write_byte_data(drv_client, REG_FIFO_EN, 0);
-	i2c_smbus_write_byte_data(drv_client, REG_INT_PIN_CFG, 0);
-	i2c_smbus_write_byte_data(drv_client, REG_INT_ENABLE, 0);
-	i2c_smbus_write_byte_data(drv_client, REG_USER_CTRL, 0);
-	i2c_smbus_write_byte_data(drv_client, REG_PWR_MGMT_1, 0);
-	i2c_smbus_write_byte_data(drv_client, REG_PWR_MGMT_2, 0);
+	for (i = 0; i < sizeof(init_table)/(sizeof(char)*2); ++i) {
+		if (init_table[i][0]) {
+
+			dev_info(&drv_client->dev,
+			"init_table [0x%X][0x%X]\n",
+			init_table[i][0], init_table[i][1]);
+
+			i2c_smbus_write_byte_data(
+				drv_client,
+				init_table[i][0],
+				init_table[i][1]);
+		}
+	}
 
 
 	list_add_tail(&g_mpu6050_data->list, &mpu6050_data_list);
 
-	ret = sysfs_create_group(&g_mpu6050_data->kobj, &attr_group);
+	dev_info(&drv_client->dev, "sysfs_create_group start\n");
+
+	ret = sysfs_create_group(&drv_client->dev.kobj, &attr_group);
+
 	if (ret)
 		dev_err(&drv_client->dev, "sysfs_create_group\n");
+
+	dev_info(&drv_client->dev, "sysfs_create_group end\n");
 
 	getnstimeofday(&old_time);
 
@@ -334,9 +449,22 @@ static int mpu6050_remove(struct i2c_client *drv_client)
 		if (strcmp(g_mpu6050_data->drv_client->dev.kobj.name,
 			drv_client->dev.kobj.name) == 0) {
 
+			free_irq(
+				gpiod_to_irq(
+					g_mpu6050_data->irq_gpio),
+				&g_mpu6050_data->drv_client->dev);
+
+			// sysfs_remove_group(
+			// &g_mpu6050_data->drv_client->dev.kobj,
+			// &attr_group);
+
 			kfree(g_mpu6050_data);
 			break;
 		}
+
+		sysfs_remove_group(
+				&drv_client->dev.kobj,
+				&attr_group);
 
 	}
 
@@ -387,6 +515,7 @@ static int mpu6050_init(void)
 	pr_info("mpu6050: i2c driver created\n");
 
 	sema_init(&s_lock, 0);
+	mutex_init(&m_lock);
 
 	pr_info("mpu6050: sysfs class attributes created\n");
 
@@ -413,6 +542,7 @@ module_init(mpu6050_init);
 module_exit(mpu6050_exit);
 
 MODULE_AUTHOR("Andriy.Khulap <andriy.khulap@globallogic.com>");
+MODULE_AUTHOR("Andrey Pahomov <pahomov.and@gmail.com>");
 MODULE_DESCRIPTION("mpu6050 I2C acc&gyro");
 MODULE_LICENSE("GPL");
-MODULE_VERSION("0.1");
+MODULE_VERSION("0.2");
