@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- *  sun8i-h3-fake.dts - Test module
+ *  sun8i-h3-mpu6050.dts - mpu6050 gpio irq
  *
  *  Copyright (C) 2019 Andrey Pahomov <pahomov.and@gmail.com>
  */
@@ -19,7 +19,10 @@
 					compatible = "mpu6050";
 					reg = <0x68>;
 					dalay_ms=<1000>;
-					debug;
+
+					/* &pio, PA_BASE, PA7, GPIO_ACTIVE_HIGH*/
+					mpu6050_irq-gpios = <&pio 0 7 0>;
+
 					status = "okay";
 				};
 		};

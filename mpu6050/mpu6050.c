@@ -32,6 +32,7 @@
 
 static struct task_struct *i2c_read_thread;
 static u32 dalay_ms = 2000;
+static u32 num_meas = 10;
 static bool isDebug;
 static struct timespec old_time;
 
@@ -41,6 +42,7 @@ static struct mutex m_lock;
 static LIST_HEAD(mpu6050_data_list);
 
 module_param(dalay_ms, uint, 0);
+module_param(num_meas, uint, 0);
 
 
 struct temp_float {
@@ -67,6 +69,8 @@ struct mpu6050_data {
 
 	struct i2c_client *drv_client;
 	struct kobject kobj;
+
+	int **accel_filter;
 
 	int accel_values[3];
 	int gyro_values[3];
@@ -97,6 +101,11 @@ static inline struct temp_float temp_convert(s16 temp)
 	return ret;
 }
 
+static inline int weighted_average(int new, int old, int k)
+{
+	old = (k * new)+((1000-k) * old);
+	return old/1000;
+}
 
 static int mpu6050_read_data(struct mpu6050_data *g_mpu6050_data)
 {
@@ -240,7 +249,6 @@ static ssize_t all_show(struct kobject *kobj,
 	return strlen(buf);
 }
 
-
 static struct kobj_attribute temp_attribute =
 	__ATTR(temp, 0444, all_show, NULL);
 
@@ -293,6 +301,7 @@ static void work_func(struct work_struct *work)
 	struct timespec  cur_time;
 	u64 cur_ns, old_ns;
 	struct mpu6050_data *g_mpu6050_data;
+	int i;
 
 	pr_info("mpu6050: %s:%d\n", __func__, __LINE__);
 
@@ -313,11 +322,51 @@ static void work_func(struct work_struct *work)
 				dalay_ms, cur_ns - old_ns);
 
 			old_time = cur_time;
-			if (g_mpu6050_data)
+			if (g_mpu6050_data) {
+
 				mpu6050_read_data(g_mpu6050_data);
+
+				g_mpu6050_data->accel_filter[0][0] =
+					g_mpu6050_data->accel_values[0];
+				g_mpu6050_data->accel_filter[0][1] =
+					g_mpu6050_data->accel_values[1];
+				g_mpu6050_data->accel_filter[0][2] =
+					g_mpu6050_data->accel_values[2];
+
+				pr_info("accel:%d\t%d\t%d\n",
+					g_mpu6050_data->accel_filter[0][0],
+					g_mpu6050_data->accel_filter[0][1],
+					g_mpu6050_data->accel_filter[0][2]);
+
+				for (i = 1; i < num_meas; ++i) {
+					mpu6050_read_data(g_mpu6050_data);
+
+					g_mpu6050_data->accel_filter[i][0] =
+					weighted_average(
+					g_mpu6050_data->accel_values[0],
+					g_mpu6050_data->accel_filter[i][0],
+					100);
+
+					g_mpu6050_data->accel_filter[i][1] =
+					weighted_average(
+					g_mpu6050_data->accel_values[1],
+					g_mpu6050_data->accel_filter[i][1],
+					100);
+
+					g_mpu6050_data->accel_filter[i][2] =
+					weighted_average(
+					g_mpu6050_data->accel_values[2],
+					g_mpu6050_data->accel_filter[i][2],
+					100);
+
+
+					pr_info("accel:%d\t%d\t%d\n",
+					g_mpu6050_data->accel_filter[i][0],
+					g_mpu6050_data->accel_filter[i][1],
+					g_mpu6050_data->accel_filter[i][2]);
+			}
+			}
 	}
-	else
-		pr_info("mpu6050: %s:%d\n", __func__, __LINE__);
 
 	pr_info("mpu6050: %s:%d\n", __func__, __LINE__);
 
@@ -335,6 +384,18 @@ static int mpu6050_probe(struct i2c_client *drv_client,
 	g_mpu6050_data = kzalloc(sizeof(struct mpu6050_data), GFP_KERNEL);
 	if (!g_mpu6050_data)
 		return -ENOMEM;
+
+	g_mpu6050_data->accel_filter =
+		kzalloc(num_meas*sizeof(int *), GFP_KERNEL);
+
+	if (!g_mpu6050_data->accel_filter)
+		return -ENOMEM;
+
+
+	for (i = 0; i < num_meas; ++i) {
+		g_mpu6050_data->accel_filter[i] =
+			kzalloc(3 * sizeof(int), GFP_KERNEL);
+	}
 
 
 	g_mpu6050_data->kobj =  drv_client->dev.kobj;
@@ -444,6 +505,7 @@ static int mpu6050_probe(struct i2c_client *drv_client,
 static int mpu6050_remove(struct i2c_client *drv_client)
 {
 	struct mpu6050_data *g_mpu6050_data;
+	int i;
 
 	list_for_each_entry(g_mpu6050_data, &mpu6050_data_list, list) {
 		if (strcmp(g_mpu6050_data->drv_client->dev.kobj.name,
@@ -458,6 +520,10 @@ static int mpu6050_remove(struct i2c_client *drv_client)
 			// &g_mpu6050_data->drv_client->dev.kobj,
 			// &attr_group);
 
+			for (i = 0; i < num_meas; ++i)
+				kfree(g_mpu6050_data->accel_filter[i]);
+
+			kfree(g_mpu6050_data->accel_filter);
 			kfree(g_mpu6050_data);
 			break;
 		}
