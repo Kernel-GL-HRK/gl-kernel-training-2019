@@ -4,9 +4,10 @@
 #include <linux/err.h>
 #include <linux/i2c.h>
 #include <linux/i2c-dev.h>
+#include <linux/gpio.h>
+#include <linux/interrupt.h>
 
 #include "mpu6050-regs.h"
-
 
 struct mpu6050_data {
 	struct i2c_client *drv_client;
@@ -17,6 +18,19 @@ struct mpu6050_data {
 };
 
 static struct mpu6050_data g_mpu6050_data;
+
+// gpio
+static struct gpio gpios[] = {
+	{ 8, GPIOF_IN, "gpio_mpu6050_irq" }
+};
+
+int irq_num; // number of gpio irq
+
+static irqreturn_t gpio_isr(int irq, void *data) {
+
+	pr_info("mpu6050: interrupt catched\n");	
+	return IRQ_HANDLED;
+}
 
 static int mpu6050_read_data(void)
 {
@@ -97,13 +111,33 @@ static int mpu6050_probe(struct i2c_client *drv_client,
 	i2c_smbus_write_byte_data(drv_client, REG_GYRO_CONFIG, 0);
 	i2c_smbus_write_byte_data(drv_client, REG_ACCEL_CONFIG, 0);
 	i2c_smbus_write_byte_data(drv_client, REG_FIFO_EN, 0);
-	i2c_smbus_write_byte_data(drv_client, REG_INT_PIN_CFG, 0);
-	i2c_smbus_write_byte_data(drv_client, REG_INT_ENABLE, 0);
+	i2c_smbus_write_byte_data(drv_client, REG_MOT_THR, 0x0A);
+	i2c_smbus_write_byte_data(drv_client, REG_MOT_DUR, 0x06);
+	i2c_smbus_write_byte_data(drv_client, REG_MOT_DETECT_CTRL, 0x21);
+	i2c_smbus_write_byte_data(drv_client, REG_INT_PIN_CFG, 0x1F);
+	i2c_smbus_write_byte_data(drv_client, REG_INT_ENABLE, 0x40);
 	i2c_smbus_write_byte_data(drv_client, REG_USER_CTRL, 0);
 	i2c_smbus_write_byte_data(drv_client, REG_PWR_MGMT_1, 0);
 	i2c_smbus_write_byte_data(drv_client, REG_PWR_MGMT_2, 0);
 
 	g_mpu6050_data.drv_client = drv_client;
+
+	// gpio and inerrupt handler configuration
+	ret = gpio_request_array(gpios, ARRAY_SIZE(gpios));
+	if (ret) {
+		pr_info("mpu6050: gpio configuration error\n");
+	}
+
+	ret = gpio_to_irq(8);
+	if (ret < 0) {
+		pr_info("mpu6050: irq set error");
+	}
+	irq_num = ret;
+
+	ret = request_irq(irq_num, gpio_isr, IRQF_TRIGGER_RISING, "gpio_irq", NULL);
+	if (ret) {
+		pr_info("mpu6050: irq set error");
+	}
 
 	dev_info(&drv_client->dev, "i2c driver probed\n");
 	return 0;
@@ -112,6 +146,10 @@ static int mpu6050_probe(struct i2c_client *drv_client,
 static int mpu6050_remove(struct i2c_client *drv_client)
 {
 	g_mpu6050_data.drv_client = 0;
+
+	free_irq(irq_num, NULL);
+
+	gpio_free_array(gpios, ARRAY_SIZE(gpios));
 
 	dev_info(&drv_client->dev, "i2c driver removed\n");
 	return 0;
