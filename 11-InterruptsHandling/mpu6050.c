@@ -6,6 +6,9 @@
 #include <linux/i2c-dev.h>
 #include <linux/gpio.h>
 #include <linux/interrupt.h>
+#include <linux/delay.h>
+#include <linux/kthread.h>
+#include <linux/mutex.h>
 
 #include "mpu6050-regs.h"
 
@@ -26,43 +29,73 @@ static struct gpio gpios[] = {
 
 int irq_num; // number of gpio irq
 
+// workqueu
+static struct workqueue_struct *wq;
+struct work_struct *work_read_mpu;
+
+// mutex
+static DEFINE_MUTEX(mpuWriteBusy);
+
+// interrupt hendler
 static irqreturn_t gpio_isr(int irq, void *data) {
 
+	queue_work(wq, work_read_mpu);
 	pr_info("mpu6050: interrupt catched\n");	
 	return IRQ_HANDLED;
 }
 
-static int mpu6050_read_data(void)
+static void mpu6050_read_data(struct work_struct *work)
 {
 	int tmp;
+	int dataSum[7] = { 0 };
+	int i;
+
 	struct i2c_client *drv_client = g_mpu6050_data.drv_client;
 
 	if (drv_client == 0)
-		return -ENODEV;
+		return;// -ENODEV;
+
+	mutex_lock(&mpuWriteBusy);
+
+	for (i = 0; i < 5; i++) {
+		dataSum[0] +=
+		(s16)((u16)i2c_smbus_read_word_swapped(drv_client,
+			REG_ACCEL_XOUT_H));
+		dataSum[1] +=
+		(s16)((u16)i2c_smbus_read_word_swapped(drv_client,
+			REG_ACCEL_YOUT_H));
+		dataSum[2] +=
+		(s16)((u16)i2c_smbus_read_word_swapped(drv_client,
+			REG_ACCEL_ZOUT_H));
+		dataSum[3] +=
+		(s16)((u16)i2c_smbus_read_word_swapped(drv_client,
+			REG_GYRO_XOUT_H));
+		dataSum[4] +=
+		(s16)((u16)i2c_smbus_read_word_swapped(drv_client,
+			REG_GYRO_YOUT_H));
+		dataSum[5] += 
+		(s16)((u16)i2c_smbus_read_word_swapped(drv_client,
+			REG_GYRO_ZOUT_H));
+		dataSum[6] +=
+		(s16)((u16)i2c_smbus_read_word_swapped(drv_client,
+			REG_TEMP_OUT_H));
+
+		msleep(2);
+	}
 
 	/* accel */
-	g_mpu6050_data.accel_values[0] =
-	(s16)((u16)i2c_smbus_read_word_swapped(drv_client, REG_ACCEL_XOUT_H));
-	g_mpu6050_data.accel_values[1] =
-	(s16)((u16)i2c_smbus_read_word_swapped(drv_client, REG_ACCEL_YOUT_H));
-	g_mpu6050_data.accel_values[2] =
-	(s16)((u16)i2c_smbus_read_word_swapped(drv_client, REG_ACCEL_ZOUT_H));
-
-	/* gyro */
-	g_mpu6050_data.gyro_values[0] =
-	(s16)((u16)i2c_smbus_read_word_swapped(drv_client, REG_GYRO_XOUT_H));
-	g_mpu6050_data.gyro_values[1] =
-	(s16)((u16)i2c_smbus_read_word_swapped(drv_client, REG_GYRO_YOUT_H));
-	g_mpu6050_data.gyro_values[2] =
-	(s16)((u16)i2c_smbus_read_word_swapped(drv_client, REG_GYRO_ZOUT_H));
-	/* Temperature in degrees C =
-	 * (TEMP_OUT Register Value  as a signed quantity)/340 + 36.53
-	 */
-	tmp = (s16)((u16)i2c_smbus_read_word_swapped(drv_client, 
-		REG_TEMP_OUT_H));
+	g_mpu6050_data.accel_values[0] = dataSum[0] / 5;
+	g_mpu6050_data.accel_values[1] = dataSum[1] / 5;
+	g_mpu6050_data.accel_values[2] = dataSum[2] / 5;
+	g_mpu6050_data.gyro_values[0] = dataSum[3] / 5;
+	g_mpu6050_data.gyro_values[1] = dataSum[4] / 5;
+	g_mpu6050_data.gyro_values[2] = dataSum[5] / 5;
+	tmp = dataSum[6] / 5;
 	tmp += 12420;
 	g_mpu6050_data.tempInt = tmp / 340;
 	g_mpu6050_data.tempFract = (tmp % 340) * 100 / 34;
+
+	mutex_unlock(&mpuWriteBusy);
 
 	dev_info(&drv_client->dev, "sensor data read:\n");
 	dev_info(&drv_client->dev, "ACCEL[X,Y,Z] = [%d, %d, %d]\n",
@@ -75,8 +108,7 @@ static int mpu6050_read_data(void)
 		g_mpu6050_data.gyro_values[2]);
 	dev_info(&drv_client->dev, "TEMP = %d\n",
 		g_mpu6050_data.tempInt);
-
-	return 0;
+	return;
 }
 
 static int mpu6050_probe(struct i2c_client *drv_client,
@@ -121,6 +153,15 @@ static int mpu6050_probe(struct i2c_client *drv_client,
 	i2c_smbus_write_byte_data(drv_client, REG_PWR_MGMT_2, 0);
 
 	g_mpu6050_data.drv_client = drv_client;
+
+	// workqueu configuration
+	wq = create_workqueue("queue");
+	if (wq) {
+		work_read_mpu = kmalloc(sizeof(struct work_struct), GFP_KERNEL);
+		if (work_read_mpu) {
+			INIT_WORK(work_read_mpu, mpu6050_read_data);
+		}
+	}
 
 	// gpio and inerrupt handler configuration
 	ret = gpio_request_array(gpios, ARRAY_SIZE(gpios));
@@ -182,64 +223,85 @@ static struct i2c_driver mpu6050_i2c_driver = {
 static ssize_t accel_x_show(struct class *class,
 			    struct class_attribute *attr, char *buf)
 {
-	mpu6050_read_data();
-
+	mutex_lock(&mpuWriteBusy);
+	
 	sprintf(buf, "%d\n", g_mpu6050_data.accel_values[0]);
+	
+	mutex_unlock(&mpuWriteBusy);
+	
 	return strlen(buf);
 }
 
 static ssize_t accel_y_show(struct class *class,
 			    struct class_attribute *attr, char *buf)
 {
-	mpu6050_read_data();
+	mutex_lock(&mpuWriteBusy);
 
 	sprintf(buf, "%d\n", g_mpu6050_data.accel_values[1]);
+	
+	mutex_unlock(&mpuWriteBusy);
+
 	return strlen(buf);
 }
 
 static ssize_t accel_z_show(struct class *class,
 			    struct class_attribute *attr, char *buf)
 {
-	mpu6050_read_data();
+	mutex_lock(&mpuWriteBusy);
 
 	sprintf(buf, "%d\n", g_mpu6050_data.accel_values[2]);
+	
+	mutex_unlock(&mpuWriteBusy);
+
 	return strlen(buf);
 }
 
 static ssize_t gyro_x_show(struct class *class,
 			   struct class_attribute *attr, char *buf)
 {
-	mpu6050_read_data();
+	mutex_lock(&mpuWriteBusy);
 
 	sprintf(buf, "%d\n", g_mpu6050_data.gyro_values[0]);
+
+	mutex_unlock(&mpuWriteBusy);
+
 	return strlen(buf);
 }
 
 static ssize_t gyro_y_show(struct class *class,
 			   struct class_attribute *attr, char *buf)
 {
-	mpu6050_read_data();
+	mutex_lock(&mpuWriteBusy);
 
 	sprintf(buf, "%d\n", g_mpu6050_data.gyro_values[1]);
+
+	mutex_unlock(&mpuWriteBusy);
+
 	return strlen(buf);
 }
 
 static ssize_t gyro_z_show(struct class *class,
 			   struct class_attribute *attr, char *buf)
 {
-	mpu6050_read_data();
+	mutex_lock(&mpuWriteBusy);
 
 	sprintf(buf, "%d\n", g_mpu6050_data.gyro_values[2]);
+	
+	mutex_unlock(&mpuWriteBusy);
+
 	return strlen(buf);
 }
 
 static ssize_t temp_show(struct class *class,
 			 struct class_attribute *attr, char *buf)
 {
-	mpu6050_read_data();
+	mutex_lock(&mpuWriteBusy);
 
 	sprintf(buf, "%i.%03i\n", g_mpu6050_data.tempInt,
 		g_mpu6050_data.tempFract);
+
+	mutex_unlock(&mpuWriteBusy);
+
 	return strlen(buf);
 }
 
