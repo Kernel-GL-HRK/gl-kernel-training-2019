@@ -9,6 +9,9 @@
 #include <linux/delay.h>
 #include <linux/kthread.h>
 #include <linux/mutex.h>
+#include <linux/proc_fs.h>
+#include <linux/uaccess.h>
+#include <linux/string.h>
 
 #include "mpu6050-regs.h"
 
@@ -342,6 +345,52 @@ struct class_attribute class_attr_temp = {
 
 static struct class *attr_class;
 
+// read mpu6050 data via procfs
+static ssize_t procfsmpu6050read(struct file *file, char __user *pbuf, size_t count, loff_t *ppos)
+{
+	ssize_t ret = 0;
+	
+	char buf[500] = "";
+	char tmpBuf[50];
+	size_t b_size; 
+
+	mutex_lock(&mpuWriteBusy);
+
+	sprintf(buf, "accel x: %d\n", g_mpu6050_data.accel_values[0]);
+	sprintf(tmpBuf, "accel y: %d\n", g_mpu6050_data.accel_values[1]);
+	strcat(buf, tmpBuf);
+	sprintf(tmpBuf, "accel z: %d\n", g_mpu6050_data.accel_values[2]);
+	strcat(buf, tmpBuf);
+	sprintf(tmpBuf, "gyro x: %d\n", g_mpu6050_data.gyro_values[0]);
+	strcat(buf, tmpBuf);
+	sprintf(tmpBuf, "gyro y: %d\n", g_mpu6050_data.gyro_values[1]);
+	strcat(buf, tmpBuf);
+	sprintf(tmpBuf, "gyro z: %d\n", g_mpu6050_data.gyro_values[2]);
+	strcat(buf, tmpBuf);
+	sprintf(tmpBuf, "temp: %i.%03i\n", g_mpu6050_data.tempInt,
+		g_mpu6050_data.tempFract);
+	strcat(buf, tmpBuf);
+
+	mutex_unlock(&mpuWriteBusy);
+
+	b_size = strlen(buf) + 1;
+	
+	// read data from buffer
+	ret = simple_read_from_buffer(pbuf, count, ppos, buf, b_size);
+	pr_info("mpu5060: read from parameter %d bytes\n", ret);
+	
+	return ret;
+}
+
+
+// procfs configuration
+static struct file_operations myopsmpu6050stat =
+{
+	.owner = THIS_MODULE,
+	.read = procfsmpu6050read,
+};
+static struct proc_dir_entry *entMpu6050;
+
 static int mpu6050_init(void)
 {
 	int ret;
@@ -436,12 +485,21 @@ static int mpu6050_init(void)
 
 	pr_info("mpu6050: sysfs class attributes created\n");
 
+	// procfs configuration
+	entMpu6050 = proc_create("mpu6050data", 0666, NULL, &myopsmpu6050stat);
+	if(entMpu6050 == NULL) {
+		pr_err("mpu6050: error creating procfs entry\n");
+		return -ENOMEM;
+	}
+
 	pr_info("mpu6050: module loaded\n");
 	return 0;
 }
 
 static void mpu6050_exit(void)
 {
+	proc_remove(entMpu6050);
+
 	if (attr_class) {
 		class_remove_file(attr_class, &class_attr_accel_x);
 		class_remove_file(attr_class, &class_attr_accel_y);
