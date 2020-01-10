@@ -1,0 +1,32 @@
+root@orangepione:~# lsmod
+Module                  Size  Used by
+fuse                   81920  3
+snd_soc_hdmi_codec     16384  1
+lima                   36864  0
+sun8i_codec_analog     24576  0
+sun4i_i2s              20480  2
+snd_soc_simple_card    16384  2
+sun8i_adda_pr_regmap    16384  1 sun8i_codec_analog
+snd_soc_simple_card_utils    16384  1 snd_soc_simple_card
+gpu_sched              24576  1 lima
+snd_soc_core          114688  5 sun4i_i2s,sun8i_codec_analog,snd_soc_hdmi_codec,snd_soc_simple_card_utils,snd_soc_simple_card
+dw_hdmi_i2s_audio      16384  0
+snd_pcm_dmaengine      16384  1 snd_soc_core
+dw_hdmi_cec            16384  0
+snd_pcm                65536  4 sun4i_i2s,snd_pcm_dmaengine,snd_soc_hdmi_codec,snd_soc_core
+snd_timer              24576  1 snd_pcm
+sun4i_gpadc_iio        16384  0
+snd                    45056  8 snd_soc_hdmi_codec,snd_timer,snd_soc_core,snd_pcm
+industrialio           49152  1 sun4i_gpadc_iio
+soundcore              16384  1 snd
+sun8i_thermal          16384  0
+zram                   24576  2
+evdev                  20480  2
+fake_module            16384  0
+uio_pdrv_genirq        16384  0
+uio                    16384  1 uio_pdrv_genirq
+cpufreq_dt             16384  0
+ip_tables              24576  0
+x_tables               20480  1 ip_tables
+gpio_keys              20480  0
+ 
