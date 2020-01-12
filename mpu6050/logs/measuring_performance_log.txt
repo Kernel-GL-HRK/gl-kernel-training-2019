@@ -1,0 +1,41 @@
+
+/*Before the performance improvement*/
+
+root@orangepione:/storage# ./meas_perform.exe 
+Amount of readings per second: 40
+root@orangepione:/storage# ./meas_perform.exe 
+Amount of readings per second: 40
+root@orangepione:/storage# ./meas_perform.exe 
+Amount of readings per second: 40
+root@orangepione:/storage# ./meas_perform.exe 
+Amount of readings per second: 39
+root@orangepione:/storage# ./meas_perform.exe 
+Amount of readings per second: 39
+
+/*After the performance improvement*/
+
+root@orangepione:/storage# ./meas_perform.exe 
+Amount of readings per second: 256
+root@orangepione:/storage# ./meas_perform.exe 
+Amount of readings per second: 258
+root@orangepione:/storage# ./meas_perform.exe 
+Amount of readings per second: 265
+root@orangepione:/storage# ./meas_perform.exe 
+Amount of readings per second: 265
+root@orangepione:/storage# ./meas_perform.exe 
+Amount of readings per second: 265
+root@orangepione:/storage# ./meas_perform.exe 
+Amount of readings per second: 265
+root@orangepione:/storage# ./meas_perform.exe 
+Amount of readings per second: 265
+root@orangepione:/storage# ./meas_perform.exe 
+Amount of readings per second: 265
+root@orangepione:/storage# ./meas_perform.exe 
+Amount of readings per second: 265
+root@orangepione:/storage# ./meas_perform.exe 
+Amount of readings per second: 265
+root@orangepione:/storage# ./meas_perform.exe 
+Amount of readings per second: 265
+root@orangepione:/storage# ./meas_perform.exe 
+Amount of readings per second: 265
+
