@@ -1,0 +1,198 @@
+99: 107.500 msec temp: 21.330
+
+98: 83.458 msec temp: 21.298
+
+97: 64.625 msec temp: 21.330
+
+96: 47.459 msec temp: 21.298
+
+95: 56.959 msec temp: 21.314
+
+94: 58.542 msec temp: 21.298
+
+93: 57.626 msec temp: 21.314
+
+92: 55.500 msec temp: 21.314
+
+91: 57.750 msec temp: 21.282
+
+90: 48.583 msec temp: 21.298
+
+89: 54.959 msec temp: 21.298
+
+88: 56.125 msec temp: 21.330
+
+87: 60.292 msec temp: 21.298
+
+86: 67.583 msec temp: 21.282
+
+85: 52.583 msec temp: 21.314
+
+84: 56.000 msec temp: 21.298
+
+83: 57.833 msec temp: 21.314
+
+82: 57.791 msec temp: 21.330
+
+81: 58.166 msec temp: 22.022
+
+80: 58.375 msec temp: 21.330
+
+79: 53.625 msec temp: 21.314
+
+78: 58.750 msec temp: 21.330
+
+77: 58.874 msec temp: 21.314
+
+76: 61.459 msec temp: 21.330
+
+75: 58.083 msec temp: 21.330
+
+74: 56.916 msec temp: 21.266
+
+73: 53.750 msec temp: 21.298
+
+72: 58.626 msec temp: 21.298
+
+71: 57.041 msec temp: 21.298
+
+70: 56.792 msec temp: 21.298
+
+69: 53.626 msec temp: 21.298
+
+68: 46.959 msec temp: 21.314
+
+67: 59.499 msec temp: 22.006
+
+66: 55.833 msec temp: 21.298
+
+65: 56.875 msec temp: 21.330
+
+64: 54.833 msec temp: 21.330
+
+63: 57.666 msec temp: 21.314
+
+62: 49.292 msec temp: 22.022
+
+61: 53.333 msec temp: 21.330
+
+60: 53.250 msec temp: 21.330
+
+59: 58.999 msec temp: 21.330
+
+58: 52.583 msec temp: 21.314
+
+57: 57.250 msec temp: 22.038
+
+56: 55.208 msec temp: 21.298
+
+55: 53.917 msec temp: 22.022
+
+54: 56.583 msec temp: 21.314
+
+53: 56.250 msec temp: 21.330
+
+52: 53.792 msec temp: 21.330
+
+51: 59.417 msec temp: 21.282
+
+50: 56.583 msec temp: 21.314
+
+49: 56.375 msec temp: 21.330
+
+48: 57.375 msec temp: 21.330
+
+47: 54.208 msec temp: 22.022
+
+46: 57.125 msec temp: 21.314
+
+45: 55.208 msec temp: 21.314
+
+44: 55.459 msec temp: 21.330
+
+43: 60.417 msec temp: 22.006
+
+42: 54.625 msec temp: 21.330
+
+41: 80.333 msec temp: 21.330
+
+40: 45.625 msec temp: 22.006
+
+39: 54.167 msec temp: 21.330
+
+38: 56.875 msec temp: 21.330
+
+37: 56.374 msec temp: 21.330
+
+36: 54.250 msec temp: 21.330
+
+35: 57.375 msec temp: 21.314
+
+34: 47.334 msec temp: 21.330
+
+33: 74.291 msec temp: 21.330
+
+32: 56.750 msec temp: 21.314
+
+31: 55.374 msec temp: 22.006
+
+30: 57.583 msec temp: 22.006
+
+29: 53.291 msec temp: 21.330
+
+28: 53.625 msec temp: 21.330
+
+27: 54.459 msec temp: 21.330
+
+26: 68.583 msec temp: 22.006
+
+25: 58.625 msec temp: 22.022
+
+24: 56.625 msec temp: 22.006
+
+23: 49.125 msec temp: 21.330
+
+22: 59.376 msec temp: 21.330
+
+21: 54.792 msec temp: 22.006
+
+20: 58.417 msec temp: 22.022
+
+19: 54.500 msec temp: 22.006
+
+18: 57.625 msec temp: 21.330
+
+17: 70.625 msec temp: 21.314
+
+16: 58.793 msec temp: 21.330
+
+15: 57.125 msec temp: 22.022
+
+14: 56.250 msec temp: 21.330
+
+13: 53.875 msec temp: 22.006
+
+12: 48.833 msec temp: 22.006
+
+11: 54.542 msec temp: 21.330
+
+10: 57.750 msec temp: 22.022
+
+9: 68.959 msec temp: 21.330
+
+8: 54.333 msec temp: 22.022
+
+7: 50.375 msec temp: 22.006
+
+6: 51.000 msec temp: 21.314
+
+5: 55.916 msec temp: 21.330
+
+4: 55.625 msec temp: 22.006
+
+3: 54.584 msec temp: 22.006
+
+2: 55.375 msec temp: 21.330
+
+1: 68.834 msec temp: 22.006
+
