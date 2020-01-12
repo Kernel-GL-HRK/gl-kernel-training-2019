@@ -25,51 +25,17 @@ struct mpu6050_data {
 
 static struct mpu6050_data g_mpu6050_data;
 
-static int mpu6050_read_data(void)
+static int mpu6050_read_value(uint8_t reg)
 {
-	int temp;
 	struct i2c_client *drv_client = g_mpu6050_data.drv_client;
+	int value;
 
 	if (drv_client == 0)
 		return -ENODEV;
-
-	/* accel */
-	g_mpu6050_data.accel_values[0] =
-		RD_WORD_SW(drv_client, REG_ACCEL_XOUT_H);
-	g_mpu6050_data.accel_values[1] =
-		RD_WORD_SW(drv_client, REG_ACCEL_YOUT_H);
-	g_mpu6050_data.accel_values[2] =
-		RD_WORD_SW(drv_client, REG_ACCEL_ZOUT_H);
-	/* gyro */
-	g_mpu6050_data.gyro_values[0] =
-		RD_WORD_SW(drv_client, REG_GYRO_XOUT_H);
-	g_mpu6050_data.gyro_values[1] =
-		RD_WORD_SW(drv_client, REG_GYRO_YOUT_H);
-	g_mpu6050_data.gyro_values[2] =
-		RD_WORD_SW(drv_client, REG_GYRO_ZOUT_H);
-	/* Temperature in degrees C =
-	 * (TEMP_OUT Register Value  as a signed quantity)/340 + 36.53
-	 */
-	temp = RD_WORD_SW(drv_client, REG_TEMP_OUT_H);
-	//g_mpu6050_data.temperature = (temp + 12420 + 170) / 340;
-	g_mpu6050_data.temperature.integer =
-		(temp * 1000 / 340 + 35000) / 1000;
-	g_mpu6050_data.temperature.fractional =
-		(temp * 1000 / 340 + 35000) % 1000;
-	dev_info(&drv_client->dev, "sensor data read:\n");
-	dev_info(&drv_client->dev, "ACCEL[X,Y,Z] = [%d, %d, %d]\n",
-		g_mpu6050_data.accel_values[0],
-		g_mpu6050_data.accel_values[1],
-		g_mpu6050_data.accel_values[2]);
-	dev_info(&drv_client->dev, "GYRO[X,Y,Z] = [%d, %d, %d]\n",
-		g_mpu6050_data.gyro_values[0],
-		g_mpu6050_data.gyro_values[1],
-		g_mpu6050_data.gyro_values[2]);
-	dev_info(&drv_client->dev, "TEMP = %02d.%03d\n",
-		g_mpu6050_data.temperature.integer,
-		g_mpu6050_data.temperature.fractional);
-
-	return 0;
+	value = RD_WORD_SW(drv_client, reg);
+	dev_info(&drv_client->dev,
+		"mpu6050_rd: REG:0x%X Val:%d\n", reg, value);
+	return value;
 }
 
 static int mpu6050_probe(struct i2c_client *drv_client,
@@ -143,65 +109,85 @@ static struct i2c_driver mpu6050_i2c_driver = {
 static ssize_t accel_x_show(struct class *class,
 			    struct class_attribute *attr, char *buf)
 {
-	mpu6050_read_data();
+	int value;
 
-	sprintf(buf, "%d\n", g_mpu6050_data.accel_values[0]);
+	value = mpu6050_read_value(REG_ACCEL_XOUT_H);
+
+	sprintf(buf, "%d\n", value);
 	return strlen(buf);
 }
 
 static ssize_t accel_y_show(struct class *class,
 			    struct class_attribute *attr, char *buf)
 {
-	mpu6050_read_data();
+	int value;
 
-	sprintf(buf, "%d\n", g_mpu6050_data.accel_values[1]);
+	value = mpu6050_read_value(REG_ACCEL_YOUT_H);
+
+	sprintf(buf, "%d\n", value);
 	return strlen(buf);
 }
 
 static ssize_t accel_z_show(struct class *class,
 			    struct class_attribute *attr, char *buf)
 {
-	mpu6050_read_data();
+	int value;
 
-	sprintf(buf, "%d\n", g_mpu6050_data.accel_values[2]);
+	value = mpu6050_read_value(REG_ACCEL_ZOUT_H);
+
+	sprintf(buf, "%d\n", value);
 	return strlen(buf);
 }
 
 static ssize_t gyro_x_show(struct class *class,
 			   struct class_attribute *attr, char *buf)
 {
-	mpu6050_read_data();
+	int value;
 
-	sprintf(buf, "%d\n", g_mpu6050_data.gyro_values[0]);
+	value = mpu6050_read_value(REG_GYRO_XOUT_H);
+
+	sprintf(buf, "%d\n", value);
 	return strlen(buf);
 }
 
 static ssize_t gyro_y_show(struct class *class,
 			   struct class_attribute *attr, char *buf)
 {
-	mpu6050_read_data();
+	int value;
 
-	sprintf(buf, "%d\n", g_mpu6050_data.gyro_values[1]);
+	value = mpu6050_read_value(REG_GYRO_YOUT_H);
+
+	sprintf(buf, "%d\n", value);
 	return strlen(buf);
 }
 
 static ssize_t gyro_z_show(struct class *class,
 			   struct class_attribute *attr, char *buf)
 {
-	mpu6050_read_data();
+	int value;
 
-	sprintf(buf, "%d\n", g_mpu6050_data.gyro_values[2]);
+	value = mpu6050_read_value(REG_GYRO_ZOUT_H);
+
+	sprintf(buf, "%d\n", value);
 	return strlen(buf);
 }
 
 static ssize_t temperature_show(struct class *class,
 			 struct class_attribute *attr, char *buf)
 {
-	mpu6050_read_data();
+	int value;
+	struct numb_descr temp;
+
+	value = mpu6050_read_value(REG_TEMP_OUT_H);
+
+	temp.integer =
+		(value * 1000 / 340 + 35000) / 1000;
+	temp.fractional =
+		(value * 1000 / 340 + 35000) % 1000;
 
 	sprintf(buf, "%02d.%03d\n",
-		g_mpu6050_data.temperature.integer,
-		g_mpu6050_data.temperature.fractional);
+		temp.integer,
+		temp.fractional);
 	return strlen(buf);
 }
 
