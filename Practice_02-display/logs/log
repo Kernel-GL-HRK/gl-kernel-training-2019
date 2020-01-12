@@ -1,0 +1,11 @@
+root@orangepione:/home/bekir# insmod lcd_driver.ko 
+root@orangepione:/home/bekir# echo 0xf800 > /sys/class/lcd_st7735s/fill_screen 
+root@orangepione:/home/bekir# echo 0x001f > /sys/class/lcd_st7735s/fill_screen 
+root@orangepione:/home/bekir# echo 0x03e0 > /sys/class/lcd_st7735s/fill_screen 
+root@orangepione:/home/bekir# echo "30 30 50 50 0x03e0" > /sys/class/lcd_st7735s/fill_rect 
+root@orangepione:/home/bekir# echo "0x03e0 30 30 50 50" > /sys/class/lcd_st7735s/fill_rect 
+root@orangepione:/home/bekir# echo 0x0000 > /sys/class/lcd_st7735s/fill_screen 
+root@orangepione:/home/bekir# echo "0x03e0 30 30 50 50" > /sys/class/lcd_st7735s/fill_rect 
+root@orangepione:/home/bekir# echo "0x03e0 30 30 50 50" > /sys/class/lcd_st7735s/fill_rect 
+root@orangepione:/home/bekir# rmmod lcd_driver 
+root@orangepione:/home/bekir# 

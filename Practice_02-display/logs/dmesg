@@ -1,0 +1,8 @@
+root@orangepione:~# dmesg -w
+[ 4452.917936] lcd: device init completed
+[ 4453.028007] lcd: sysfs class created
+[ 4453.028023] lcd: module loaded
+[ 4830.316654] lcd: sysfs class attributes removed
+[ 4830.316739] lcd: sysfs class destroyed
+[ 4830.316885] lcd: module exited
+
