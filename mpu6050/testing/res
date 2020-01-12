@@ -1,0 +1,14 @@
+#before optimization
+
+root@orangepione:/# bash MeasurePerformance.sh 
+Start of measurement
+File: Number
+/sys/class/mpu6050/accel_x 60
+/sys/class/mpu6050/accel_y 65
+/sys/class/mpu6050/accel_z 65
+/sys/class/mpu6050/gyro_x 65
+/sys/class/mpu6050/gyro_y 65
+/sys/class/mpu6050/gyro_z 65
+/sys/class/mpu6050/temperature 65
+End of measurement
+ 
