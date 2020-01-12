@@ -40,3 +40,20 @@ File: Number
 /sys/class/mpu6050/gyro 83
 /sys/class/mpu6050/temperature 83
 End of measurement
+
+#Add read all sensors
+
+root@orangepione:/# bash MeasurePerformance.sh 
+Start of measurement
+File: Number
+/sys/class/mpu6050/accel_x 76
+/sys/class/mpu6050/accel_y 83
+/sys/class/mpu6050/accel_z 83
+/sys/class/mpu6050/accel 83 
+/sys/class/mpu6050/gyro_x 84
+/sys/class/mpu6050/gyro_y 83
+/sys/class/mpu6050/gyro_z 83
+/sys/class/mpu6050/gyro 83
+/sys/class/mpu6050/temperature 84
+/sys/class/mpu6050/sensors 78
+End of measurement

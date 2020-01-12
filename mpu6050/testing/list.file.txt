@@ -7,3 +7,4 @@
 /sys/class/mpu6050/gyro_z
 /sys/class/mpu6050/gyro
 /sys/class/mpu6050/temperature
+/sys/class/mpu6050/sensors

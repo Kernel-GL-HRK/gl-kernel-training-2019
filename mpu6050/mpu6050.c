@@ -24,12 +24,43 @@ struct numb_descr {
 
 struct mpu6050_data {
 	struct i2c_client *drv_client;
-	int accel_values[3];
-	int gyro_values[3];
+	struct mpu6050_axic accel;
+	struct mpu6050_axic gyro;
 	struct numb_descr temperature;
 };
 
 static struct mpu6050_data g_mpu6050_data;
+
+static int mpu6050_read_sensors(void)
+{
+	struct i2c_client *drv_client = g_mpu6050_data.drv_client;
+	int status;
+	int reg_temp;
+	s16 values[7];
+
+	if (drv_client == 0)
+		return -ENODEV;
+
+	status = i2c_smbus_read_i2c_block_data(drv_client,
+					 REG_ACCEL_XOUT_H, sizeof(values),
+					 (u8 *)&values);
+	if (status != sizeof(values))
+		return -ERANGE;
+
+	g_mpu6050_data.accel.x = (s16)swab16(values[0]);
+	g_mpu6050_data.accel.y = (s16)swab16(values[1]);
+	g_mpu6050_data.accel.z = (s16)swab16(values[2]);
+	reg_temp = (s16)swab16(values[3]);
+	g_mpu6050_data.temperature.integer =
+		(reg_temp * 1000 / 340 + 35000) / 1000;
+	g_mpu6050_data.temperature.fractional =
+		(reg_temp * 1000 / 340 + 35000) % 1000;
+	g_mpu6050_data.gyro.x = (s16)swab16(values[4]);
+	g_mpu6050_data.gyro.y = (s16)swab16(values[5]);
+	g_mpu6050_data.gyro.z = (s16)swab16(values[6]);
+
+	return status;
+}
 
 static int mpu6050_read_accel(struct mpu6050_axic *accel)
 {
@@ -270,6 +301,26 @@ static ssize_t temperature_show(struct class *class,
 	return strlen(buf);
 }
 
+static ssize_t sensors_show(struct class *class,
+			 struct class_attribute *attr, char *buf)
+{
+	int status;
+	struct mpu6050_data *data =  &g_mpu6050_data;
+
+	status = mpu6050_read_sensors();
+	if (status < 0)
+		return status;
+
+	sprintf(buf, "Accel:\nx:%d\ny:%d\nz:%d\n"
+		"Gyro:\nx:%d\ny:%d\nz:%d\n"
+		"Temp:%02d.%03d\n",
+		data->accel.x, data->accel.y, data->accel.z,
+		data->gyro.x, data->gyro.y, data->gyro.z,
+		data->temperature.integer,
+		data->temperature.fractional);
+	return strlen(buf);
+}
+
 CLASS_ATTR_RO(accel_x);
 CLASS_ATTR_RO(accel_y);
 CLASS_ATTR_RO(accel_z);
@@ -279,6 +330,7 @@ CLASS_ATTR_RO(gyro_y);
 CLASS_ATTR_RO(gyro_z);
 CLASS_ATTR_RO(gyro);
 CLASS_ATTR_RO(temperature);
+CLASS_ATTR_RO(sensors);
 
 static struct class *attr_class;
 
@@ -421,6 +473,25 @@ static int mpu6050_init(void)
 		return ret;
 	}
 
+	/* Create sensors */
+	ret = class_create_file(attr_class, &class_attr_sensors);
+	if (ret) {
+		pr_err(
+			"mpu6050: failed to create sysfs class attribute temperature: %d\n",
+			ret);
+		class_remove_file(attr_class, &class_attr_temperature);
+		class_remove_file(attr_class, &class_attr_gyro);
+		class_remove_file(attr_class, &class_attr_gyro_z);
+		class_remove_file(attr_class, &class_attr_gyro_y);
+		class_remove_file(attr_class, &class_attr_gyro_x);
+		class_remove_file(attr_class, &class_attr_accel);
+		class_remove_file(attr_class, &class_attr_accel_x);
+		class_remove_file(attr_class, &class_attr_accel_z);
+		class_remove_file(attr_class, &class_attr_accel_y);
+		class_destroy(attr_class);
+		return ret;
+	}
+
 	pr_info("mpu6050: sysfs class attributes created\n");
 
 	pr_info("mpu6050: module loaded\n");
@@ -439,6 +510,7 @@ static void mpu6050_exit(void)
 		class_remove_file(attr_class, &class_attr_gyro_y);
 		class_remove_file(attr_class, &class_attr_gyro);
 		class_remove_file(attr_class, &class_attr_temperature);
+		class_remove_file(attr_class, &class_attr_sensors);
 		pr_info("mpu6050: sysfs class attributes removed\n");
 
 		class_destroy(attr_class);
