@@ -1,11 +1,13 @@
-root@orangepione:/home/bekir# insmod lcd_driver.ko 
-root@orangepione:/home/bekir# echo 0xf800 > /sys/class/lcd_st7735s/fill_screen 
-root@orangepione:/home/bekir# echo 0x001f > /sys/class/lcd_st7735s/fill_screen 
-root@orangepione:/home/bekir# echo 0x03e0 > /sys/class/lcd_st7735s/fill_screen 
-root@orangepione:/home/bekir# echo "30 30 50 50 0x03e0" > /sys/class/lcd_st7735s/fill_rect 
-root@orangepione:/home/bekir# echo "0x03e0 30 30 50 50" > /sys/class/lcd_st7735s/fill_rect 
-root@orangepione:/home/bekir# echo 0x0000 > /sys/class/lcd_st7735s/fill_screen 
-root@orangepione:/home/bekir# echo "0x03e0 30 30 50 50" > /sys/class/lcd_st7735s/fill_rect 
-root@orangepione:/home/bekir# echo "0x03e0 30 30 50 50" > /sys/class/lcd_st7735s/fill_rect 
-root@orangepione:/home/bekir# rmmod lcd_driver 
+root@orangepione:/home/bekir# insmod lcd_module.ko 
+root@orangepione:/home/bekir# ls /dev/
+Display all 642 possibilities? (y or n)
+root@orangepione:/home/bekir# ls /dev/f
+fb0   fd/   full  
+root@orangepione:/home/bekir# ls -l /dev/fb0
+crw-rw---- 1 root video 29, 0 Dec 19 12:10 /dev/fb0
+root@orangepione:/home/bekir# echo 0 > /sys/class/vtconsole/vtcon1/bind
+root@orangepione:/home/bekir# rmmod lcd_module 
+root@orangepione:/home/bekir# ls -l /dev/fb0
+ls: cannot access '/dev/fb0': No such file or directory
 root@orangepione:/home/bekir# 
+

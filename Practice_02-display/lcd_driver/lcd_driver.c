@@ -1,4 +1,8 @@
-#include "lcd_driver.h"
+/*
+ * lcd_driver.c
+ * Author: Bekir Bekirov
+ * Email: bekirbekirov1986@gmail.com
+ */
 
 #include <linux/init.h>
 #include <linux/module.h>
@@ -20,12 +24,8 @@
 
 #include "lcd_driver.h"
 
-struct lcd_data {
-	struct spi_device *spi;
-	struct mutex mutex_sysfs;
-	struct fb_info *info;
-	u16 frame_buffer[ST7735S_WIDTH * ST7735S_HEIGHT];
-};
+extern int init_fb_lcd(struct spi_device *spi);
+extern int deinit_fb_lcd(struct spi_device *spi);
 
 static struct lcd_data *lcd_st7735s_data;
 
@@ -162,7 +162,7 @@ static void lcd_set_adr_window(u8 x0, u8 y0, u8 x1, u8 y1)
 	lcd_write_command(ST7735S_RAMWR);
 }
 
-inline void lcd_update_screen(void)
+void lcd_update_screen(void)
 {
 	lcd_write_data((u8 *)lcd_st7735s_data->frame_buffer,
 			sizeof(u16) * ST7735S_WIDTH * ST7735S_HEIGHT);
@@ -171,13 +171,10 @@ inline void lcd_update_screen(void)
 void lcd_draw_pixel(u16 x, u16 y, u16 color)
 {
 	if ((x >= ST7735S_WIDTH) || (y >= ST7735S_HEIGHT))
-			goto out;
+			return;
 
 	lcd_st7735s_data->frame_buffer[x + ST7735S_WIDTH * y] = color;
 	lcd_update_screen();
-
-out:
-	return;
 }
 
 void lcd_fill_rect(u16 x, u16 y, u16 w, u16 h, u16 color)
@@ -186,7 +183,7 @@ void lcd_fill_rect(u16 x, u16 y, u16 w, u16 h, u16 color)
 	u16 j;
 
 	if ((x >= ST7735S_WIDTH) || (y >= ST7735S_HEIGHT))
-			goto out;
+		return;
 
 	if ((x + w - 1) > ST7735S_WIDTH)
 			w = ST7735S_WIDTH - x;
@@ -202,9 +199,6 @@ void lcd_fill_rect(u16 x, u16 y, u16 w, u16 h, u16 color)
 	}
 
 	lcd_update_screen();
-
-out:
-	return;
 }
 
 void lcd_fill_screen(u16 color)
@@ -244,12 +238,16 @@ static int st7735s_probe(struct spi_device *spi)
 	lcd_fill_rect(34, 60, 60, 40, 0x001f);
 	lcd_fill_rect(34, 120, 60, 40, 0xf800);
 
+	if (init_fb_lcd(spi))
+		return -EIO;
+
 	return 0;
 }
 
 static int st7735s_remove(struct spi_device *spi)
 {
 	lcd_st7735s_data = spi_get_drvdata(spi);
+	deinit_fb_lcd(spi);
 
 	if (!lcd_st7735s_data)
 		return -ENODEV;

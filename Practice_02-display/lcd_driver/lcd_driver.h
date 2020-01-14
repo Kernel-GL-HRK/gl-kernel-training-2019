@@ -1,6 +1,10 @@
 #ifndef ST7735S_TYPES_H
 #define ST7735S_TYPES_H
 
+#include <linux/spi/spi.h>
+#include <linux/mutex.h>
+#include <linux/fb.h>
+
 #define ST7735S_MADCTL_RGB 0x00
 #define ST7735S_MADCTL_BGR 0x08
 #define ST7735S_MADCTL_MY  0x80
@@ -46,5 +50,16 @@
 #define DELAY 0x80
 
 #define ST7735S_DEVICE_NAME "st7735s"
+
+struct lcd_data {
+	struct spi_device *spi;
+	struct mutex mutex_sysfs;
+	struct fb_info *info;
+	u16 frame_buffer[ST7735S_WIDTH * ST7735S_HEIGHT];
+	u32 height;
+	u32 width;
+};
+
+void lcd_update_screen(void);
 
 #endif
