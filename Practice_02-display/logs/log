@@ -1,0 +1,13 @@
+root@orangepione:/home/bekir# insmod lcd_module.ko 
+root@orangepione:/home/bekir# ls /dev/
+Display all 642 possibilities? (y or n)
+root@orangepione:/home/bekir# ls /dev/f
+fb0   fd/   full  
+root@orangepione:/home/bekir# ls -l /dev/fb0
+crw-rw---- 1 root video 29, 0 Dec 19 12:10 /dev/fb0
+root@orangepione:/home/bekir# echo 0 > /sys/class/vtconsole/vtcon1/bind
+root@orangepione:/home/bekir# rmmod lcd_module 
+root@orangepione:/home/bekir# ls -l /dev/fb0
+ls: cannot access '/dev/fb0': No such file or directory
+root@orangepione:/home/bekir# 
+

@@ -1,0 +1,13 @@
+root@orangepione:~# dmesg -w
+[21242.825872] lcd: device init completed
+[21242.935524] frame buffer is allocated
+[21242.936153] Console: switching to colour frame buffer device 16x20
+[21243.811276] frame buffer is registered
+[21243.811561] lcd: sysfs class created
+[21243.811573] lcd: module loaded
+[21340.355414] Console: switching to colour dummy device 80x30
+[21347.918165] lcd: sysfs class attributes removed
+[21347.918248] lcd: sysfs class destroyed
+[21347.918553] fb is unloaded!
+[21347.918648] lcd: module exited
+
