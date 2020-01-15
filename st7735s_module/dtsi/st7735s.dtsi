@@ -1,0 +1,39 @@
+/dts-v1/;
+/plugin/;
+
+//GIC_SPI = 0
+//GIC_PPI = 1
+
+/ {
+	compatible = "allwinner,sun8i-h3";
+
+	fragment@0 {
+		target = <&pio>;
+		__overlay__ {
+			st7735s_pins: pin_out {
+			pins = "PA0","PA1";
+			function = "gpio_out";
+			};
+		};
+	};
+
+	fragment@1 {
+		target = <&spi0>;
+		__overlay__ {
+			status = "okay";
+			#address-cells = <1>;
+			#size-cells = <0>;
+
+			st: st7735s {
+				compatible = "qd, st7735s";
+				reg = <0x00>;
+				spi-max-frequency = <0xf4240>;
+				pinctrl-names = "default";
+				pinctrl-0 = <&st7735s_pins>;
+				a0-gpios = <&pio 0 0 0>;
+				reset-gpios = <&pio 0 1 0>;
+				status = "okay";
+			};
+		};
+	};
+};
