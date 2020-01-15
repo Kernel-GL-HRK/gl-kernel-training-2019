@@ -7,26 +7,26 @@ obj-m := mpu6050.o
 
 else
 
+CROSS_COMPILER ?= arm-linux-gnueabihf-
+CURDIR ?= $(PWD)
+ARCH = arm
 
-ifeq ($(KERNELDIR),)
-ifeq ($(BBB_KERNEL),)
-	$(error Path to kernel tree - KERNELDIR or BBB_KERNEL variable is not defined!)
+ifeq ($(BUILD_KERNEL),)
+	$(error Path to kernel tree - KERNELDIR variable is not defined!)
 endif
-endif
-
-KERNELDIR ?= $(BBB_KERNEL)
-
-export ARCH = arm
-export CROSS_COMPILE ?= arm-linux-gnueabihf-
-
 
 .PHONY: all clean
 
 all:
-	$(MAKE) -C $(KERNELDIR) M=$(CURDIR) modules
+	$(MAKE) -C $(BUILD_KERNEL) M=$(CURDIR) ARCH=$(ARCH) CROSS_COMPILE=$(CROSS_COMPILER) modules
+
+dtbo:
+	$(BUILD_KERNEL)scripts/dtc/dtc -I dts -O dtb \
+		-o mpu6050.dtbo mpu6050.dtsi
 
 clean:
-	$(MAKE) -C $(KERNELDIR) M=$(CURDIR) clean
+	$(MAKE) -C $(BUILD_KERNEL) M=$(CURDIR) ARCH=$(ARCH) CROSS_COMPILE=$(CROSS_COMPILER) clean
+	-rm ./mpu6050.dtbo 
 
 
 endif

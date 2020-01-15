@@ -1,0 +1,10 @@
+/sys/class/mpu6050/accel_x
+/sys/class/mpu6050/accel_y
+/sys/class/mpu6050/accel_z
+/sys/class/mpu6050/accel
+/sys/class/mpu6050/gyro_x
+/sys/class/mpu6050/gyro_y
+/sys/class/mpu6050/gyro_z
+/sys/class/mpu6050/gyro
+/sys/class/mpu6050/temperature
+/sys/class/mpu6050/sensors
