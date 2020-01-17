@@ -1,0 +1,36 @@
+// SPDX-License-Identifier: GPL-2.0-or-later
+/*
+ *  sun8i-h3-st7735s.dts - Display driver
+ *
+ *  Copyright (C) 2020 Andrey Pahomov <pahomov.and@gmail.com>
+ */
+/dts-v1/;
+/plugin/;
+
+/ {
+	compatible = "allwinner,sun8i-h3";
+
+	fragment@0 {
+		target-path = "/soc/spi@1c68000";
+			__overlay__ {
+				status = "okay";
+/*
+				spidev@0 {
+					compatible = "spidev";
+					spi-max-frequency = <10000000>;
+					reg = <0>;
+					status = "okay";
+				};
+*/
+
+				st7735s {
+					compatible = "st7735s";
+					spi-max-frequency = <10000000>;
+					reg = <0>;
+					status = "okay";
+				};
+
+		};
+	};
+};
+

@@ -1,0 +1,43 @@
+MODULE_NAME=st7735s
+
+ifneq ($(KERNELRELEASE),)
+
+obj-m :=$(MODULE_NAME).o
+
+else
+
+ccflags-y := -Wall
+DT_SRCS=$(wildcard *.dts)
+DT_OBJS=$(DT_SRCS:.dts=.dtbo)
+DTC_FLAGS ?= -i $(DCT_EXTRA_PATH)
+
+
+.PHONY: all clean
+
+all: $(DT_OBJS)
+	$(MAKE) -C $(BUILD_KERNEL) M=$(PWD) modules
+
+clean:
+	$(MAKE) -C $(BUILD_KERNEL) M=$(PWD) clean
+	-rm ./*.dtbo
+
+
+$(DT_OBJS): $(DT_SRCS)
+	$(DTC) -@ -I dts -O dtb -o $@ $<
+
+
+upload_config:
+	ssh-copy-id -i ~/.ssh/id_rsa.pub $(SSH_ORANGE)
+	echo $(KERNEL_VERSION)
+	-ssh $(SSH_ORANGE) '[ ! -d "/lib/modules/$(KERNEL_VERSION)/kernel/drivers/" ] && mkdir -p "/lib/modules/$(KERNEL_VERSION)/kernel/drivers/"'
+
+upload_dtso: $(DT_OBJS)
+	-scp $< $(SSH_ORANGE):/boot/dtb/overlay/
+
+upload_module: $(MODULE_NAME).ko
+	-scp $< $(SSH_ORANGE):/lib/modules/$(KERNEL_VERSION)/kernel/drivers/
+	-ssh $(SSH_ORANGE) 'depmod'
+
+upload: upload_dtso upload_module
+
+endif
