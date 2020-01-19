@@ -14,19 +14,18 @@
 		target-path = "/soc/spi@1c68000";
 			__overlay__ {
 				status = "okay";
-/*
-				spidev@0 {
-					compatible = "spidev";
-					spi-max-frequency = <10000000>;
-					reg = <0>;
-					status = "okay";
-				};
-*/
 
-				st7735s {
+				st7735s@0 {
 					compatible = "st7735s";
-					spi-max-frequency = <10000000>;
-					reg = <0>;
+					reg = <0>; /* CS #0 */
+					spi-max-frequency = <5000000>;
+
+					/* &pio, PA_BASE, PC7, GPIO_ACTIVE_HIGH*/
+					dc-gpios = <&pio 2 7 0>;
+
+					/* &pio, PA_BASE, PA2, GPIO_ACTIVE_HIGH*/
+					reset-gpios = <&pio 0 2 0>;
+
 					status = "okay";
 				};
 
