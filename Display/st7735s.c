@@ -142,7 +142,6 @@ static inline void update_screen(void)
         write_data((u8*)frame_buffer, sizeof(u16) * ST7735S_WIDTH * ST7735S_HEIGHT);
 }
 
-
 static void fill_rectangle(u16 x, u16 y, u16 w, u16 h, u16 color)
 {
         u16 i;
@@ -174,7 +173,6 @@ static void fill_screen(u16 color)
         fill_rectangle(0, 0, ST7735S_WIDTH, ST7735S_HEIGHT, color);
 }
 
-
 static ssize_t draw_rect_store(struct class *class, struct class_attribute *attr, const char *buf, size_t size)
 {
         u16 color = 0xf0f0;
@@ -199,6 +197,67 @@ static ssize_t fill_screen_store(struct class *class, struct class_attribute *at
 
         return size;
 }
+
+void Graphic_setPoint(const u16 x, const u16 y)
+{
+    fill_rectangle(x, y, 1, 1, 0x0000);
+}
+
+void Graphic_drawLine(u16 x1, u16 y1, u16 x2, u16 y2)
+{
+    if ((x1 >= ST7735S_WIDTH) || (y1 >= ST7735S_HEIGHT) || 
+        (x2 >= ST7735S_WIDTH) || (y2 >= ST7735S_HEIGHT)) {
+        return;
+    }
+
+    // pr_info("Graphic_drawLine(%d, %d, %d, %d)", x1, y1, x2, y2);
+
+    int dx = x2 - x1;
+    int dy = (y2 - y1) * 1000;        // y = 00.000
+    dy /= dx;
+
+    // pr_info("dx = %d", dx);
+    // pr_info("dy = %d", dy);
+
+    if (x1 != x2)
+    {
+        int x_pos;
+        int incr = (x2 >= x1) ? 1 : -1;
+        // pr_info("incr = %d", incr);
+        for(x_pos = 0; x_pos != (dx + incr) ; x_pos += incr)
+        {
+            // pr_info("x_pos = %d", x_pos);
+            int x = x_pos + x1;
+            // pr_info("x = %d", x);
+            int y;
+            int yf = x_pos * dy;
+            // pr_info("yf = %d", yf);
+            y = yf / 1000;
+            y += (yf % 1000 >= 500) ? 1 : 0;
+            y += y1;
+            // pr_info("y = %d", y);
+
+            frame_buffer[y * ST7735S_WIDTH + x] = 0x0000;
+        }
+    }
+    else
+    {
+        int y_pos;
+        int incr = (y2 >= y1) ? 1 : -1;
+        // pr_info("incr = %d", incr);
+        for(y_pos = y1; y_pos != (y2 + incr); y_pos += incr)
+        {
+            frame_buffer[y_pos * ST7735S_WIDTH + x1] = 0x0000;
+        }
+    }
+
+    //draw start and end point
+    frame_buffer[y1 * ST7735S_WIDTH + x1] = 0x0000;
+    frame_buffer[y2 * ST7735S_WIDTH + x2] = 0x0000;
+
+    update_screen();
+}
+
 
 static void set_address_window(u8 x0, u8 y0, u8 x1, u8 y1)
 {
@@ -249,7 +308,7 @@ static int __init st7735s_init(void)
         //Register information about your slave device:
         struct spi_board_info st7735s_info = {
                 .modalias = "st7735s",
-                .max_speed_hz = 100000, //speed your device (slave) can handle
+                .max_speed_hz = 1000000, //speed your device (slave) can handle
                 .bus_num = 0,
                 .chip_select = 0,
                 .mode = SPI_MODE_0,
@@ -319,6 +378,20 @@ static int __init st7735s_init(void)
 
         pr_info("st7735s: sysfs class attributes created\n");
 
+        // test
+        update_screen();
+        Graphic_setPoint(64, 80);
+        Graphic_drawLine(10,10, 118, 150);
+        Graphic_drawLine(118,150, 10,10);
+        fill_screen(0xffff);
+        Graphic_drawLine(118,10, 10,150);
+        Graphic_drawLine(10,150, 118,10);
+        fill_screen(0xffff);
+        Graphic_drawLine(10,10, 10,150);
+        Graphic_drawLine(10,150, 118,150);
+        Graphic_drawLine(118,150, 118,10);
+        Graphic_drawLine(118,10, 10,10);
+        
         pr_info("st7735s: module loaded\n");
 
         return 0;
