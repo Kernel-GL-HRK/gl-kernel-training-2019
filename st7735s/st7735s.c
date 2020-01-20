@@ -12,6 +12,7 @@
 #include <linux/gpio/consumer.h>
 #include <linux/delay.h>
 #include <linux/of.h>
+#include <linux/fb.h>
 
 #define ST7735S_MADCTL_RGB 0x00
 #define ST7735S_MADCTL_BGR 0x08
@@ -57,18 +58,27 @@
 
 #define DELAY 0x80
 
-
+#define LCD_WIDTH		ST7735S_WIDTH
+#define LCD_HEIGHT		ST7735S_HEIGHT
 
 
 struct Tst7735s_info {
 	struct spi_device *spi;
 	struct gpio_desc *dc_gpio;
 	struct gpio_desc *reset_gpio;
+
+	struct fb_info *info;
+	struct work_struct display_update_ws;
+	u32 height;
+	u32 width;
+
+	u16 frame_buffer[ST7735S_WIDTH * ST7735S_HEIGHT];
 };
 
 
 static struct Tst7735s_info st7735s_info;
-static u16 frame_buffer[ST7735S_WIDTH * ST7735S_HEIGHT];
+//static u16 frame_buffer[ST7735S_WIDTH * ST7735S_HEIGHT];
+//static u8 *lcd_vmem;
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -209,7 +219,7 @@ static void st7735s_set_address_window(u8 x0, u8 y0, u8 x1, u8 y1)
 
 inline void st7735s_update_screen(void)
 {
-		st7735s_write_data((u8 *)frame_buffer, sizeof(u16) * ST7735S_WIDTH * ST7735S_HEIGHT);
+		st7735s_write_data((u8 *)st7735s_info.frame_buffer, sizeof(u16) * ST7735S_WIDTH * ST7735S_HEIGHT);
 }
 
 void st7735s_draw_pixel(u16 x, u16 y, u16 color)
@@ -218,7 +228,7 @@ void st7735s_draw_pixel(u16 x, u16 y, u16 color)
 				goto out;
 		}
 
-		frame_buffer[x + ST7735S_WIDTH * y] = color;
+		st7735s_info.frame_buffer[x + ST7735S_WIDTH * y] = color;
 		st7735s_update_screen();
 
 		out:
@@ -244,7 +254,7 @@ void st7735s_fill_rectangle(u16 x, u16 y, u16 w, u16 h, u16 color)
 
 		for (j = 0; j < h; ++j) {
 				for (i = 0; i < w; ++i) {
-						frame_buffer[(x + ST7735S_WIDTH * y) + (i + ST7735S_WIDTH * j)] = color;
+						st7735s_info.frame_buffer[(x + ST7735S_WIDTH * y) + (i + ST7735S_WIDTH * j)] = color;
 				}
 		}
 
@@ -261,11 +271,149 @@ void st7735s_fill_screen(u16 color)
 
 ////////////////////////////////////////////////////////////////////////////////
 
+int st7735s_ON(struct Tst7735s_info *drv_data) {
+	struct spi_device *drv_client;
+
+	drv_client = drv_data->spi;
+
+	// i2c_smbus_write_byte_data(drv_client, 0x00, 0x8D);
+	// i2c_smbus_write_byte_data(drv_client, 0x00, 0x14);
+	// i2c_smbus_write_byte_data(drv_client, 0x00, 0xAF);
+	return 0;
+}
+
+
+int st7735s_OFF(struct Tst7735s_info *drv_data) {
+	struct spi_device *drv_client;
+
+	drv_client = drv_data->spi;
+
+	// i2c_smbus_write_byte_data(drv_client, 0x00, 0x8D);
+	// i2c_smbus_write_byte_data(drv_client, 0x00, 0x10);
+	// i2c_smbus_write_byte_data(drv_client, 0x00, 0xAE);
+	return 0;
+}
+
+
+static void update_display_work(struct work_struct *work)
+{
+	//struct ssd1306_data *lcd =
+	//	container_of(work, struct st7735s_info, display_update_ws);
+	//ssd1307fb_update_display(lcd);
+	//ssd1306_UpdateScreen(lcd);
+	st7735s_update_screen();
+}
+
+
+static ssize_t st7735s_write(struct fb_info *info, const char __user *buf,
+		size_t count, loff_t *ppos)
+{
+    struct st7735s_info *lcd = info->par;
+	unsigned long total_size;
+	unsigned long p = *ppos;
+	u8 __iomem *dst;
+
+	total_size = info->fix.smem_len;
+
+	if (p > total_size)
+		return -EINVAL;
+
+	if (count + p > total_size)
+		count = total_size - p;
+
+	if (!count)
+		return -EINVAL;
+
+	dst = (void __force *) (info->screen_base + p);
+
+	if (copy_from_user(dst, buf, count))
+		return -EFAULT;
+
+	//schedule_work(&lcd->display_update_ws);
+
+	st7735s_update_screen();
+
+
+	*ppos += count;
+
+	return count;
+}
+
+static int st7735s_blank(int blank_mode, struct fb_info *info)
+{
+	// struct Tst7735s_info *lcd = info->par;
+
+/*
+	if (blank_mode != FB_BLANK_UNBLANK)
+		return ssd1307fb_write_cmd(lcd->client, SSD1307FB_DISPLAY_OFF);
+	else
+		return ssd1307fb_write_cmd(lcd->client, SSD1307FB_DISPLAY_ON);
+*/
+    // if (blank_mode != FB_BLANK_UNBLANK)
+    // 	return st7735s_OFF(lcd);
+    // else
+    // 	return st7735s_ON(lcd);
+
+    return 0;
+}
+
+static void st7735s_fillrect(struct fb_info *info, const struct fb_fillrect *rect)
+{
+    //struct Tst7735s_info *lcd = info->par;
+	//sys_fillrect(info, rect);
+	//schedule_work(&lcd->display_update_ws);
+	schedule_work(&st7735s_info.display_update_ws);
+}
+
+static void st7735s_copyarea(struct fb_info *info, const struct fb_copyarea *area)
+{
+    //struct Tst7735s_info *lcd = info->par;
+	sys_copyarea(info, area);
+	//schedule_work(&lcd->display_update_ws);
+	schedule_work(&st7735s_info.display_update_ws);
+}
+
+static void st7735s_imageblit(struct fb_info *info, const struct fb_image *image)
+{
+    //struct Tst7735s_info *lcd = info->par;
+	//sys_imageblit(info, image);
+	//schedule_work(&lcd->display_update_ws);
+	schedule_work(&st7735s_info.display_update_ws);
+}
+
+static struct fb_var_screeninfo ssd1307fb_var = {
+	.bits_per_pixel = 16,
+};
+
+static struct fb_fix_screeninfo ssd1307fb_fix = {
+	.id			= "test st7735s",
+	.type		= FB_TYPE_PACKED_PIXELS,
+	.visual		= FB_VISUAL_TRUECOLOR,
+	.xpanstep	= 0,
+	.ypanstep	= 0,
+	.ywrapstep	= 0,
+	.accel		= FB_ACCEL_NONE,
+};
+
+static struct fb_ops ssd1307fb_ops = {
+	.owner          = THIS_MODULE,
+	.fb_read        = fb_sys_read,
+	.fb_write       = st7735s_write,
+	.fb_blank       = st7735s_blank,
+	.fb_fillrect    = st7735s_fillrect,
+	.fb_copyarea    = st7735s_copyarea,
+	.fb_imageblit   = st7735s_imageblit,
+};
+
 static int st7735s_probe(struct spi_device *spi)
 {
 	int ret;
 	u32 spi_frequency = 500000;
 	struct device_node *np =  spi->dev.of_node;
+	struct fb_info *info;
+	struct Tst7735s_info *lcd;
+	u32 vmem_size;
+	u8 *vmem;
 
 	dev_info(&spi->dev, "%s:%d\n", __func__, __LINE__);
 
@@ -298,15 +446,66 @@ static int st7735s_probe(struct spi_device *spi)
 		st7735s_info.reset_gpio = NULL;
 	}
 
+	///fb
+	info = framebuffer_alloc(sizeof(struct Tst7735s_info), &spi->dev);
+
+	if (!info)
+		return -ENOMEM;
+
+	lcd = info->par;
+	lcd->info = info;
+	lcd->spi = spi;
+
+	lcd->width  = LCD_WIDTH;
+	lcd->height = LCD_HEIGHT;
+
+	vmem_size = lcd->width * lcd->height * 2;
 
 
+	// lcd_vmem = devm_kzalloc(&spi->dev, vmem_size, GFP_KERNEL);
+	
+ //    if (!lcd_vmem) {
+	// 	dev_err(&spi->dev, "Couldn't allocate graphical memory.\n");
+	// 	return -ENOMEM;        
+	// }
+
+	//vmem = lcd_vmem;//&ssd1306_Buffer[0];
+	vmem = (u8 *)(st7735s_info.frame_buffer);
+
+
+	info->fbops     = &ssd1307fb_ops;
+	info->fix       = ssd1307fb_fix;
+	//info->fix.line_length = lcd->width / 8;
+
+	//info->fbdefio = ssd1307fb_defio;
+
+	info->var = ssd1307fb_var;
+	info->var.xres = lcd->width;
+	info->var.xres_virtual = lcd->width;
+	info->var.yres = lcd->height;
+	info->var.yres_virtual = lcd->height;
+
+	info->var.red.length = 5;
+	info->var.red.offset = 0;
+	info->var.green.length = 6;
+	info->var.green.offset = 5;
+	info->var.blue.length = 5;
+	info->var.blue.offset = 11;
+
+	info->fix.line_length = lcd->width *2;//info->var.xres_virtual * ssd1307fb_var.bits_per_pixel/8;
+
+	info->screen_base = (u8 __force __iomem *)vmem;
+	info->fix.smem_start = __pa(vmem);
+	info->fix.smem_len = vmem_size;
+
+	///init display
 	st7735s_reset();
 	st7735s_execute_command_list(init_cmds1);
 	st7735s_execute_command_list(init_cmds2);
 	st7735s_execute_command_list(init_cmds3);
 	pr_info("st7735s: device init completed\n");
 
-	memset(frame_buffer, 0xFFFF, sizeof(frame_buffer));
+	memset(st7735s_info.frame_buffer, 0xFFFF, sizeof(st7735s_info.frame_buffer));
 
 	st7735s_set_address_window(0, 0, ST7735S_WIDTH - 1, ST7735S_HEIGHT - 1);
 
@@ -320,6 +519,16 @@ static int st7735s_probe(struct spi_device *spi)
 	st7735s_fill_rectangle(79, 80, 50, 60, 0x4444);
 	st7735s_fill_rectangle(0, 0, 50, 60, 0x5555);
 
+	INIT_WORK(&lcd->display_update_ws, update_display_work);
+
+	ret = register_framebuffer(info);
+	if (ret) {
+		dev_err(&spi->dev, "Couldn't register the framebuffer\n");
+		return ret;
+	}    
+
+	dev_info(&spi->dev, "DAndy fb%d: %s device registered, using %d bytes of video memory\n", info->node, info->fix.id, vmem_size);
+
 	dev_info(&spi->dev, "%s:%d\n", __func__, __LINE__);
 	return 0;
 
@@ -330,6 +539,12 @@ static int st7735s_remove(struct spi_device *spi)
 {
 	gpiod_put(st7735s_info.dc_gpio);
 	gpiod_put(st7735s_info.reset_gpio);
+
+	unregister_framebuffer(st7735s_info.info);
+	fb_dealloc_cmap(&st7735s_info.info->cmap);
+	framebuffer_release(st7735s_info.info);
+
+	dev_info(&spi->dev, "%s:%d\n", __func__, __LINE__);
 	return 0;
 }
 
