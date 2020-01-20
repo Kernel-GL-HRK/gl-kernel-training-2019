@@ -297,16 +297,19 @@ static void set_address_window(u8 x0, u8 y0, u8 x1, u8 y1)
 
 static void fb_update_display(struct fb_info *info)
 {
-    pr_info("st7535s: %s\n", __func__);
-	u8 *l_vmem = info->screen_base;
+    pr_info("st7535s: enter func %s\n", __func__);
+	u16 *l_vmem = (u16 *)info->screen_base;
 
     pr_info("st7535s: %s: l_vmem = %d\n", __func__, (int)l_vmem);
     pr_info("st7535s: %s: vmem = %d\n", __func__, (int)(vmem));
 
-    int cntr;
-    for(cntr = 0; cntr < info->fix.smem_len; cntr++)
+    u32 cntr;
+    // for(cntr = 0; cntr < (info->fix.smem_len / sizeof(u16)); cntr++)
+    for(cntr = 0; cntr < 20480; cntr++)
     {
-        if(*(l_vmem + cntr))
+        // pr_info("st7535s: %s: counter = %d\n", __func__, cntr);
+
+        if(l_vmem[cntr])
         {
             frame_buffer[cntr] = 0x0000;
         }
@@ -317,6 +320,8 @@ static void fb_update_display(struct fb_info *info)
     }
 
 	update_screen();
+
+    pr_info("st7535s: exit func %s\n", __func__);
 }
 
 
@@ -424,7 +429,7 @@ static int __init st7735s_init(void)
         //Register information about your slave device:
         struct spi_board_info st7735s_info = {
                 .modalias = "st7735s",
-                .max_speed_hz = 1000000, //speed your device (slave) can handle
+                .max_speed_hz = 25000000, //speed your device (slave) can handle
                 .bus_num = 0,
                 .chip_select = 0,
                 .mode = SPI_MODE_0,
@@ -527,9 +532,9 @@ static int __init st7735s_init(void)
         info->var.red.length = 1;
         info->var.red.offset = 0;
         info->var.green.length = 1;
-        info->var.green.offset = 0;
+        info->var.green.offset = 1;
         info->var.blue.length = 1;
-        info->var.blue.offset = 0;
+        info->var.blue.offset = 2;
 
         info->screen_base = (u8 __force __iomem *)vmem;
         info->fix.smem_start = __pa(vmem);
