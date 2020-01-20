@@ -4,6 +4,7 @@
 #include <linux/delay.h>
 #include <linux/gpio.h>
 #include <linux/device.h>
+#include <linux/fb.h>
 
 #include "st7735s_types.h"
 
@@ -17,6 +18,24 @@ MODULE_DESCRIPTION("Driver for st7735 display");
 
 static u16 frame_buffer[ST7735S_WIDTH * ST7735S_HEIGHT];
 static struct spi_device *st7735s_spi_device;
+static u32 vmem_size;
+static u8 *vmem;
+
+static struct fb_info *info;
+static struct fb_fix_screeninfo st7735s_fb_fix = {
+	.id     	= "MSP1803 ST7735S",
+	.type       = FB_TYPE_PACKED_PIXELS,
+	.visual     = FB_VISUAL_MONO10,
+	.xpanstep   = 0,
+	.ypanstep   = 0,
+	.ywrapstep  = 0,
+	.accel      = FB_ACCEL_NONE,
+};
+
+static struct fb_var_screeninfo st7735s_fb_var = {
+	.bits_per_pixel = 1,
+};
+
 
 static const u8 init_cmds1[] = { 
         // Init for st7735s, part 1 (red or green tab)
@@ -276,6 +295,42 @@ static void set_address_window(u8 x0, u8 y0, u8 x1, u8 y1)
     write_command(ST7735S_RAMWR);
 }
 
+static ssize_t st7735s_fb_write(struct fb_info *info, const char __user *buf,
+		size_t count, loff_t *ppos)
+{
+
+}
+
+static int st7735s_fb_blank(int blank_mode, struct fb_info *info)
+{
+    
+}
+
+static void st7735s_fb_fillrect(struct fb_info *info, const struct fb_fillrect *rect)
+{
+
+}
+
+static void st7735s_fb_copyarea(struct fb_info *info, const struct fb_copyarea *area)
+{
+
+}
+
+static void st7735s_fb_imageblit(struct fb_info *info, const struct fb_image *image)
+{
+
+}
+
+static struct fb_ops st7735s_fb_ops = {
+	.owner          = THIS_MODULE,
+	.fb_read        = fb_sys_read,
+	.fb_write       = st7735s_fb_write,
+	.fb_blank       = st7735s_fb_blank,
+	.fb_fillrect    = st7735s_fb_fillrect,
+	.fb_copyarea    = st7735s_fb_copyarea,
+	.fb_imageblit   = st7735s_fb_imageblit,
+};
+
 
 static struct class *attr_class;
 static struct class_attribute class_attr_draw_rect = __ATTR_WO(draw_rect);
@@ -296,6 +351,8 @@ static void __exit st7735s_exit(void)
             spi_unregister_device(st7735s_spi_device);
     }
     pr_info("st7735s: spi device unregistered\n");
+
+	unregister_framebuffer(info);
 
     pr_info("st7735s: module exited\n");
 }
@@ -391,7 +448,43 @@ static int __init st7735s_init(void)
         Graphic_drawLine(10,150, 118,150);
         Graphic_drawLine(118,150, 118,10);
         Graphic_drawLine(118,10, 10,10);
-        
+        fill_screen(0xffff);
+
+        vmem_size = ST7735S_WIDTH * ST7735S_HEIGHT * sizeof(u16);
+        vmem = kzalloc(vmem_size, GFP_KERNEL);
+
+        info = framebuffer_alloc(0, &st7735s_spi_device->dev);
+
+        info->fbops     = &st7735s_fb_ops;
+        info->fix       = st7735s_fb_fix;
+        info->fix.line_length = ST7735S_WIDTH * sizeof(u16);
+
+        info->var = st7735s_fb_var;
+        info->var.xres = ST7735S_WIDTH;
+        info->var.xres_virtual = ST7735S_WIDTH;
+        info->var.yres = ST7735S_HEIGHT;
+        info->var.yres_virtual = ST7735S_HEIGHT;
+
+        info->var.red.length = 1;
+        info->var.red.offset = 0;
+        info->var.green.length = 1;
+        info->var.green.offset = 0;
+        info->var.blue.length = 1;
+        info->var.blue.offset = 0;
+
+        info->screen_base = (u8 __force __iomem *)vmem;
+        info->fix.smem_start = __pa(vmem);
+        info->fix.smem_len = vmem_size;
+
+        ret = register_framebuffer(info);
+        if (ret) {
+            pr_err("st7735s: Couldn't register the framebuffer\n");
+            return ret;
+            //goto panel_init_error;
+        }    
+
+    	pr_info("st7735s: fb%d: %s device registered, using %d bytes of video memory\n", info->node, info->fix.id, vmem_size);
+
         pr_info("st7735s: module loaded\n");
 
         return 0;
