@@ -18,8 +18,8 @@ MODULE_DESCRIPTION("Driver for st7735 display");
 
 static u16 frame_buffer[ST7735S_WIDTH * ST7735S_HEIGHT];
 static struct spi_device *st7735s_spi_device;
-static u32 vmem_size;
-static u8 *vmem;
+static u32 vmem_size = 0;
+static u8 *vmem = 0;
 
 static struct fb_info *info;
 static struct fb_fix_screeninfo st7735s_fb_fix = {
@@ -295,30 +295,89 @@ static void set_address_window(u8 x0, u8 y0, u8 x1, u8 y1)
     write_command(ST7735S_RAMWR);
 }
 
+static void fb_update_display(struct fb_info *info)
+{
+    pr_info("st7535s: %s\n", __func__);
+	u8 *l_vmem = info->screen_base;
+
+    pr_info("st7535s: %s: l_vmem = %d\n", __func__, (int)l_vmem);
+    pr_info("st7535s: %s: vmem = %d\n", __func__, (int)(vmem));
+
+    int cntr;
+    for(cntr = 0; cntr < info->fix.smem_len; cntr++)
+    {
+        if(*(l_vmem + cntr))
+        {
+            frame_buffer[cntr] = 0x0000;
+        }
+        else
+        {
+            frame_buffer[cntr] = 0xffff;
+        }
+    }
+
+	update_screen();
+}
+
+
 static ssize_t st7735s_fb_write(struct fb_info *info, const char __user *buf,
 		size_t count, loff_t *ppos)
 {
+    pr_info("st7535s: %s\n", __func__);
+
+	unsigned long total_size;
+	unsigned long p = *ppos;
+	u8 __iomem *dst;
+
+	total_size = info->fix.smem_len;
+
+	if (p > total_size)
+		return -EINVAL;
+
+	if (count + p > total_size)
+		count = total_size - p;
+
+	if (!count)
+		return -EINVAL;
+
+	dst = (void __force *) (info->screen_base + p);
+
+	if (copy_from_user(dst, buf, count))
+		return -EFAULT;
+
+    fb_update_display(info);
+
+	*ppos += count;
+
+	return count;
 
 }
 
 static int st7735s_fb_blank(int blank_mode, struct fb_info *info)
 {
-    
+    pr_info("st7535s: %s\n", __func__);
+    return 0;
 }
 
 static void st7735s_fb_fillrect(struct fb_info *info, const struct fb_fillrect *rect)
 {
-
+    pr_info("st7535s: %s\n", __func__);
+	sys_fillrect(info, rect);
+    fb_update_display(info);
 }
 
 static void st7735s_fb_copyarea(struct fb_info *info, const struct fb_copyarea *area)
 {
-
+    pr_info("st7535s: %s\n", __func__);
+	sys_copyarea(info, area);
+    fb_update_display(info);
 }
 
 static void st7735s_fb_imageblit(struct fb_info *info, const struct fb_image *image)
 {
-
+    pr_info("st7535s: %s\n", __func__);
+	sys_imageblit(info, image);
+    fb_update_display(info);
 }
 
 static struct fb_ops st7735s_fb_ops = {
@@ -451,7 +510,7 @@ static int __init st7735s_init(void)
         fill_screen(0xffff);
 
         vmem_size = ST7735S_WIDTH * ST7735S_HEIGHT * sizeof(u16);
-        vmem = kzalloc(vmem_size, GFP_KERNEL);
+        vmem = devm_kzalloc(&st7735s_spi_device->dev, vmem_size, GFP_KERNEL);
 
         info = framebuffer_alloc(0, &st7735s_spi_device->dev);
 
@@ -475,6 +534,8 @@ static int __init st7735s_init(void)
         info->screen_base = (u8 __force __iomem *)vmem;
         info->fix.smem_start = __pa(vmem);
         info->fix.smem_len = vmem_size;
+
+        pr_info("st7735s: %s: info->screen_base = %d\n", __func__, (int)info->screen_base);
 
         ret = register_framebuffer(info);
         if (ret) {
