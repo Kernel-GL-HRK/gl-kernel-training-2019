@@ -1,7 +1,7 @@
 #!/bin/bash -e
 
 NAME=st7735s
-NAMELINUX=root@192.168.0.130
+NAMELINUX=root@192.168.0.222
 MODULEDIR=/lib/modules/4.19.83-sunxi/kernel/drivers/iio
 DTSDIR=$PWD/dtsi
 
