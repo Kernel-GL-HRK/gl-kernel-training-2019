@@ -25,7 +25,7 @@ static struct fb_info *info;
 static struct fb_fix_screeninfo st7735s_fb_fix = {
 	.id     	= "MSP1803 ST7735S",
 	.type       = FB_TYPE_PACKED_PIXELS,
-	.visual     = FB_VISUAL_MONO10,
+	.visual     = FB_VISUAL_TRUECOLOR,
 	.xpanstep   = 0,
 	.ypanstep   = 0,
 	.ywrapstep  = 0,
@@ -33,7 +33,7 @@ static struct fb_fix_screeninfo st7735s_fb_fix = {
 };
 
 static struct fb_var_screeninfo st7735s_fb_var = {
-	.bits_per_pixel = 1,
+	.bits_per_pixel = 16,
 };
 
 
@@ -303,21 +303,21 @@ static void fb_update_display(struct fb_info *info)
     pr_info("st7535s: %s: l_vmem = %d\n", __func__, (int)l_vmem);
     pr_info("st7535s: %s: vmem = %d\n", __func__, (int)(vmem));
 
-    u32 cntr;
-    // for(cntr = 0; cntr < (info->fix.smem_len / sizeof(u16)); cntr++)
-    for(cntr = 0; cntr < 20480; cntr++)
-    {
-        // pr_info("st7535s: %s: counter = %d\n", __func__, cntr);
+//     u32 cntr;
+//     // for(cntr = 0; cntr < (info->fix.smem_len / sizeof(u16)); cntr++)
+//     for(cntr = 0; cntr < 20480; cntr++)
+//     {
+//         // pr_info("st7535s: %s: counter = %d\n", __func__, cntr);
 
-        if(l_vmem[cntr])
-        {
-            frame_buffer[cntr] = 0x0000;
-        }
-        else
-        {
-            frame_buffer[cntr] = 0xffff;
-        }
-    }
+//         if(l_vmem[cntr])
+//         {
+//             frame_buffer[cntr] = 0x0000;
+//         }
+//         else
+//         {
+//             frame_buffer[cntr] = 0xffff;
+//         }
+//     }
 
 	update_screen();
 
@@ -381,7 +381,9 @@ static void st7735s_fb_copyarea(struct fb_info *info, const struct fb_copyarea *
 static void st7735s_fb_imageblit(struct fb_info *info, const struct fb_image *image)
 {
     pr_info("st7535s: %s\n", __func__);
-	sys_imageblit(info, image);
+    pr_info("st7535s: %s: info = 0x%08x\n", __func__, (u32)info);
+    pr_info("st7535s: %s: image = 0x%08x\n", __func__, (u32)image);
+	// sys_imageblit(info, image);
     fb_update_display(info);
 }
 
@@ -393,6 +395,7 @@ static struct fb_ops st7735s_fb_ops = {
 	.fb_fillrect    = st7735s_fb_fillrect,
 	.fb_copyarea    = st7735s_fb_copyarea,
 	.fb_imageblit   = st7735s_fb_imageblit,
+    .fb_sync        = 0,
 };
 
 
@@ -417,6 +420,7 @@ static void __exit st7735s_exit(void)
     pr_info("st7735s: spi device unregistered\n");
 
 	unregister_framebuffer(info);
+    kfree(vmem);
 
     pr_info("st7735s: module exited\n");
 }
@@ -515,7 +519,8 @@ static int __init st7735s_init(void)
         fill_screen(0xffff);
 
         vmem_size = ST7735S_WIDTH * ST7735S_HEIGHT * sizeof(u16);
-        vmem = devm_kzalloc(&st7735s_spi_device->dev, vmem_size, GFP_KERNEL);
+        // vmem = devm_kzalloc(&st7735s_spi_device->dev, vmem_size, GFP_KERNEL);
+        vmem = (u8 *)frame_buffer;
 
         info = framebuffer_alloc(0, &st7735s_spi_device->dev);
 
@@ -529,12 +534,14 @@ static int __init st7735s_init(void)
         info->var.yres = ST7735S_HEIGHT;
         info->var.yres_virtual = ST7735S_HEIGHT;
 
-        info->var.red.length = 1;
-        info->var.red.offset = 0;
-        info->var.green.length = 1;
-        info->var.green.offset = 1;
-        info->var.blue.length = 1;
-        info->var.blue.offset = 2;
+        info->var.red.length = 5;
+        info->var.red.offset = 11;
+        info->var.green.length = 6;
+        info->var.green.offset = 5;
+        info->var.blue.length = 5;
+        info->var.blue.offset = 0;
+        info->var.transp.offset =  0;
+        info->var.transp.length =  0;
 
         info->screen_base = (u8 __force __iomem *)vmem;
         info->fix.smem_start = __pa(vmem);
