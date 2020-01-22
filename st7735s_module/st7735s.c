@@ -10,6 +10,9 @@
 #include <linux/of.h>
 #include <linux/of_device.h>
 #include <linux/gpio/consumer.h>
+#include <linux/cdev.h>
+#include <linux/fs.h>
+#include <linux/uaccess.h>
 
 #include "st7735s_image.h"
 
@@ -51,6 +54,8 @@
 #define ST7735S_RAMWR		0x2C
 
 #define DELAY			0x80
+
+#define ST7735S_DEVICE_NAME "st7735s"
 
 static const u8 init_cmds1[] = {
 	// Init for st7735s, part 1 (red or green tab)
@@ -127,6 +132,12 @@ struct st7735s {
 	struct gpio_desc *gpiod_a0;
 	u16 frame_buffer[ST7735S_WIDTH * ST7735S_HEIGHT];
 	struct class lcd_rc_class;
+	struct cdev cdev;
+	struct class *dev_class;
+	int major;
+	int minor;
+	int count;
+	dev_t first;
 };
 
 static void st7735s_reset(struct st7735s *lcd)
@@ -239,11 +250,12 @@ void st7735s_fill_rectangle(struct st7735s *lcd, u16 x, u16 y, u16 w, u16 h,
 	if ((y + h - 1) > ST7735S_HEIGHT)
 		h = ST7735S_HEIGHT - y;
 
-	for (j = 0; j < h; ++j)
+	for (j = 0; j < h; ++j) {
 		for (i = 0; i < w; ++i) {
 			lcd->frame_buffer[(x + ST7735S_WIDTH * y) +
 		(i + ST7735S_WIDTH * j)] = st7735s_conversion_color(color);
 		}
+	}
 
 	st7735s_update_screen(lcd);
 }
@@ -252,7 +264,8 @@ static ssize_t draw_rect_store(struct class *class,
 			 struct class_attribute *attr,
 			 const char *buf, size_t count)
 {
-	struct st7735s *lcd = container_of(class, struct st7735s, lcd_rc_class);
+	struct st7735s *lcd = container_of(class, struct st7735s,
+							lcd_rc_class);
 	ssize_t result = 0;
 	u16 color = 0x0000;
 	int x = 0, y = 0, w = 0, h = 0;
@@ -271,7 +284,8 @@ static ssize_t fill_screen_store(struct class *class,
 			 struct class_attribute *attr,
 			 const char *buf, size_t count)
 {
-	struct st7735s *lcd = container_of(class, struct st7735s, lcd_rc_class);
+	struct st7735s *lcd = container_of(class, struct st7735s,
+							lcd_rc_class);
 	ssize_t result = 0;
 	u16 color = 0x0000;
 
@@ -296,6 +310,74 @@ static struct attribute *lcd_class_attrs[] = {
 };
 
 ATTRIBUTE_GROUPS(lcd_class);
+
+static ssize_t st7735s_cdev_open(struct inode *inode, struct file *filp)
+{
+	struct st7735s *lcd = container_of(inode->i_cdev, struct st7735s,
+								cdev);
+
+	filp->private_data = lcd;
+	dev_info(&lcd->spi->dev, "device open\n");
+	return 0;
+}
+
+static ssize_t st7735s_cdev_release(struct inode *inode, struct file *filp)
+{
+	struct st7735s *lcd = filp->private_data;
+
+	dev_info(&lcd->spi->dev, "device release\n");
+	return 0;
+}
+
+static ssize_t st7735s_cdev_read(struct file *filp, char __user *buf,
+					size_t count, loff_t *f_pos)
+{
+	struct st7735s *lcd = filp->private_data;
+	ssize_t ret;
+
+	dev_info(&lcd->spi->dev, "read from file %s\n",
+					filp->f_path.dentry->d_iname);
+	dev_info(&lcd->spi->dev, "read from device %d:%d\n",
+			imajor(filp->f_inode), iminor(filp->f_inode));
+
+	ret = simple_read_from_buffer(buf, count, f_pos, lcd->frame_buffer,
+						sizeof(lcd->frame_buffer));
+	dev_info(&lcd->spi->dev,
+		"dev read: simple_read_from_buffer returned %d\n", ret);
+
+	return ret;
+}
+
+static ssize_t st7735s_cdev_write(struct file *filp, const char __user *buf,
+				size_t count, loff_t *f_pos)
+{
+	struct st7735s *lcd = filp->private_data;
+	ssize_t ret;
+	int pix = 0;
+	u16 p;
+
+	ret = simple_write_to_buffer(lcd->frame_buffer,
+		sizeof(lcd->frame_buffer), f_pos, buf, count);
+	dev_info(&lcd->spi->dev,
+		"dev write: simple_write_to_buffer returned %d\n", ret);
+
+	for (pix = 0; pix < ret; pix++) {
+		p = lcd->frame_buffer[pix];
+		lcd->frame_buffer[pix] = st7735s_conversion_color(p);
+	}
+
+	st7735s_update_screen(lcd);
+
+	return ret;
+}
+
+static const struct file_operations fops = {
+	.owner = THIS_MODULE,
+	.open = st7735s_cdev_open,
+	.release = st7735s_cdev_release,
+	.read = st7735s_cdev_read,
+	.write = st7735s_cdev_write,
+};
 
 static int st7735s_probe(struct spi_device *spi)
 {
@@ -336,7 +418,7 @@ static int st7735s_probe(struct spi_device *spi)
 	lcd->gpiod_a0 = gpiod;
 	gpiod_direction_output(lcd->gpiod_a0, 0);
 
-	strcpy(spi->modalias, "st7735s");
+	strcpy(spi->modalias, ST7735S_DEVICE_NAME);
 	spi->max_speed_hz = 25e6; //speed your device (slave) can handle
 	spi->chip_select = 0;
 	spi->mode = SPI_MODE_0;
@@ -373,14 +455,50 @@ static int st7735s_probe(struct spi_device *spi)
 	// Test load image
 	st7735s_load_image(lcd, lcd_image);
 
+	lcd->count = 1;
+	ret = alloc_chrdev_region(&lcd->first, lcd->minor, lcd->count,
+					ST7735S_DEVICE_NAME);
+	lcd->major = MAJOR(lcd->first);
+
+	if (ret < 0) {
+		dev_err(&spi->dev, "can't dev a majori\n");
+		gpiod_put(lcd->gpiod_reset);
+		gpiod_put(lcd->gpiod_a0);
+		devm_kfree(&spi->dev, lcd);
+		return ret;
+	}
+
+	cdev_init(&lcd->cdev, &fops);
+	lcd->cdev.owner = THIS_MODULE;
+
+	ret = cdev_add(&lcd->cdev, lcd->first, lcd->count);
+	if (ret) {
+		dev_err(&spi->dev, "cdev_add error\n");
+		unregister_chrdev_region(lcd->first, lcd->count);
+		gpiod_put(lcd->gpiod_reset);
+		gpiod_put(lcd->gpiod_a0);
+		devm_kfree(&spi->dev, lcd);
+		return ret;
+	}
+	dev_info(&spi->dev, "character device created major %d minor %d\n",
+		lcd->major, lcd->minor);
+
+	lcd->dev_class = class_create(THIS_MODULE, "dev_class");
+	device_create(lcd->dev_class, NULL, lcd->first, NULL,
+						ST7735S_DEVICE_NAME);
+	dev_info(&spi->dev, "device created\n");
+
 	/* Device model classes */
-	lcd->lcd_rc_class.name = "st7735s";
+	lcd->lcd_rc_class.name = ST7735S_DEVICE_NAME;
 	lcd->lcd_rc_class.owner = THIS_MODULE;
 	lcd->lcd_rc_class.class_groups = lcd_class_groups;
 
 	ret = class_register(&lcd->lcd_rc_class);
 	if (ret < 0) {
 		dev_err(&spi->dev, "failed to create sysfs class: %d\n", ret);
+		device_destroy(lcd->dev_class, lcd->first);
+		cdev_del(&lcd->cdev);
+		unregister_chrdev_region(lcd->first, lcd->count);
 		gpiod_put(lcd->gpiod_reset);
 		gpiod_put(lcd->gpiod_a0);
 		devm_kfree(&spi->dev, lcd);
@@ -401,6 +519,16 @@ static int st7735s_remove(struct spi_device *spi)
 	class_unregister(&lcd->lcd_rc_class);
 	dev_info(&spi->dev, "sysfs class destroyed\n");
 
+	device_destroy(lcd->dev_class, lcd->first);
+	dev_info(&spi->dev, "device destroyed\n");
+
+	class_destroy(lcd->dev_class);
+	dev_info(&spi->dev, "dev class destroyed\n");
+	cdev_del(&lcd->cdev);
+
+	unregister_chrdev_region(lcd->first, lcd->count);
+	dev_info(&spi->dev, "cdev destroyed\n");
+
 	st7735s_write_command(lcd, ST7735S_DISPOFF);
 
 	gpiod_put(lcd->gpiod_reset);
@@ -419,7 +547,7 @@ static const struct of_device_id st7735s_ids[] = {
 MODULE_DEVICE_TABLE(of, st7735s_ids);
 
 static const struct spi_device_id st7735s_idtable[] = {
-	{ "st7735s", 0 },
+	{ ST7735S_DEVICE_NAME, 0 },
 	{ }
 };
 MODULE_DEVICE_TABLE(spi, st7735s_idtable);
@@ -427,7 +555,7 @@ MODULE_DEVICE_TABLE(spi, st7735s_idtable);
 static struct spi_driver st7735s_spi_driver = {
 	.driver = {
 		.owner = THIS_MODULE,
-		.name = "st7735s",
+		.name = ST7735S_DEVICE_NAME,
 		.of_match_table = of_match_ptr(st7735s_ids),
 	},
 	.probe = st7735s_probe,
