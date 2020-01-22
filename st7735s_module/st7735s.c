@@ -126,6 +126,7 @@ struct st7735s {
 	struct gpio_desc *gpiod_reset;
 	struct gpio_desc *gpiod_a0;
 	u16 frame_buffer[ST7735S_WIDTH * ST7735S_HEIGHT];
+	struct class lcd_rc_class;
 };
 
 static void st7735s_reset(struct st7735s *lcd)
@@ -247,6 +248,55 @@ void st7735s_fill_rectangle(struct st7735s *lcd, u16 x, u16 y, u16 w, u16 h,
 	st7735s_update_screen(lcd);
 }
 
+static ssize_t draw_rect_store(struct class *class,
+			 struct class_attribute *attr,
+			 const char *buf, size_t count)
+{
+	struct st7735s *lcd = container_of(class, struct st7735s, lcd_rc_class);
+	ssize_t result = 0;
+	u16 color = 0x0000;
+	int x = 0, y = 0, w = 0, h = 0;
+
+	result = sscanf(buf, "%hx %d %d %d %d", &color, &x, &y, &w, &h);
+	if (result != 5)
+		return -EINVAL;
+
+	st7735s_fill_rectangle(lcd, x, y, w, h, color);
+	st7735s_update_screen(lcd);
+
+	return count;
+}
+
+static ssize_t fill_screen_store(struct class *class,
+			 struct class_attribute *attr,
+			 const char *buf, size_t count)
+{
+	struct st7735s *lcd = container_of(class, struct st7735s, lcd_rc_class);
+	ssize_t result = 0;
+	u16 color = 0x0000;
+
+	result = sscanf(buf, "%hx", &color);
+	if (result != 1)
+		return -EINVAL;
+
+	st7735s_fill_rectangle(lcd, 0, 0, ST7735S_WIDTH,
+			ST7735S_HEIGHT, color);
+	st7735s_update_screen(lcd);
+
+	return count;
+}
+
+CLASS_ATTR_WO(draw_rect);
+CLASS_ATTR_WO(fill_screen);
+
+static struct attribute *lcd_class_attrs[] = {
+	&class_attr_draw_rect.attr,
+	&class_attr_fill_screen.attr,
+	NULL,
+};
+
+ATTRIBUTE_GROUPS(lcd_class);
+
 static int st7735s_probe(struct spi_device *spi)
 {
 	struct st7735s *lcd;
@@ -323,6 +373,21 @@ static int st7735s_probe(struct spi_device *spi)
 	// Test load image
 	st7735s_load_image(lcd, lcd_image);
 
+	/* Device model classes */
+	lcd->lcd_rc_class.name = "st7735s";
+	lcd->lcd_rc_class.owner = THIS_MODULE;
+	lcd->lcd_rc_class.class_groups = lcd_class_groups;
+
+	ret = class_register(&lcd->lcd_rc_class);
+	if (ret < 0) {
+		dev_err(&spi->dev, "failed to create sysfs class: %d\n", ret);
+		gpiod_put(lcd->gpiod_reset);
+		gpiod_put(lcd->gpiod_a0);
+		devm_kfree(&spi->dev, lcd);
+		return ret;
+	}
+	dev_info(&spi->dev, "sysfs class created\n");
+
 	dev_set_drvdata(&spi->dev, lcd);
 
 	dev_info(&spi->dev, "spi driver probed\n");
@@ -332,6 +397,9 @@ static int st7735s_probe(struct spi_device *spi)
 static int st7735s_remove(struct spi_device *spi)
 {
 	struct st7735s *lcd = dev_get_drvdata(&spi->dev);
+
+	class_unregister(&lcd->lcd_rc_class);
+	dev_info(&spi->dev, "sysfs class destroyed\n");
 
 	st7735s_write_command(lcd, ST7735S_DISPOFF);
 
