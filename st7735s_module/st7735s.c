@@ -11,6 +11,8 @@
 #include <linux/of_device.h>
 #include <linux/gpio/consumer.h>
 
+#include "st7735s_image.h"
+
 #define ST7735S_MADCTL_RGB	0x00
 #define ST7735S_MADCTL_BGR	0x08
 #define ST7735S_MADCTL_MY	0x80
@@ -50,7 +52,7 @@
 
 #define DELAY			0x80
 
-static const u8 init_cmds1[] = { 
+static const u8 init_cmds1[] = {
 	// Init for st7735s, part 1 (red or green tab)
 	15,			// 15 commands in list:
 	ST7735S_SWRESET, DELAY,	// 1: Software reset, 0 args, w/delay
@@ -83,13 +85,13 @@ static const u8 init_cmds1[] = {
 	ST7735S_VMCTR1, 1,	// 12: Power control, 1 arg, no delay:
 	0x0E,
 	ST7735S_INVOFF, 0,	// 13: Don't invert display, no args, no delay
-	ST7735S_MADCTL, 1,	// 14: Memory access control (directions), 1 arg:
+	ST7735S_MADCTL, 1, // 14: Memory access control (directions), 1 arg:
 	ST7735S_ROTATION,	// row addr/col addr, bottom to top refresh
 	ST7735S_COLMOD, 1,	// 15: set color mode, 1 arg, no delay:
 	0x05
-}, // 16-bit color
+}; // 16-bit color
 
-init_cmds2[] = {
+static const u8 init_cmds2[] = {
 	// Init for st7735s, part 2
 	2,			// 2 commands in list:
 	ST7735S_CASET, 4,	// 1: Column addr set, 4 args, no delay:
@@ -98,9 +100,9 @@ init_cmds2[] = {
 	ST7735S_RASET, 4,	// 2: Row addr set, 4 args, no delay:
 	0x00, 0x00,		// XSTART = 0
 	0x00, 0x9F
-},
+};
 
-init_cmds3[] = { 
+static const u8 init_cmds3[] = {
 	// Init for st7735s, part 3
 	4,			// 4 commands in list:
 	ST7735S_GMCTRP1, 16,	// 1: Magical unicorn dust, 16 args, no delay:
@@ -153,19 +155,20 @@ static void st7735s_execute_command_list(struct st7735s *lcd, const u8 *addr)
 	numCommands = *addr++;
 	while (numCommands--) {
 		u8 cmd = *addr++;
-		st7735s_write_command(lcd, cmd);
 
+		st7735s_write_command(lcd, cmd);
 		numArgs = *addr++;
 		ms = numArgs & DELAY;
 		numArgs &= ~DELAY;
 		if (numArgs) {
-			st7735s_write_data(lcd, (u8*)addr, numArgs);
+			st7735s_write_data(lcd, (u8 *)addr, numArgs);
 			addr += numArgs;
 		}
 
 		if (ms) {
 			ms = *addr++;
-			if (ms == 255) ms = 500;
+			if (ms == 255)
+				ms = 500;
 			mdelay(ms);
 		}
 	}
@@ -189,6 +192,61 @@ static void st7735s_set_address_window(struct st7735s *lcd, u8 x0, u8 y0,
 	st7735s_write_command(lcd, ST7735S_RAMWR);
 }
 
+static u16 st7735s_conversion_color(u16 color)
+{
+	u16 c = 0;
+
+	c = (color & 0x001F) << 8; // Blue
+	c |= (color & 0xF800) >> 8; // Red
+	c |= (color & 0x0700) >> 8; // Green 1
+	c |= (color & 0x00E0) << 8; // Green 2
+
+	return c;
+}
+
+inline void st7735s_update_screen(struct st7735s *lcd)
+{
+	st7735s_write_data(lcd, (u8 *)lcd->frame_buffer,
+		sizeof(u16) * ST7735S_WIDTH * ST7735S_HEIGHT);
+}
+
+void st7735s_load_image(struct st7735s *lcd, const u8 *image)
+{
+	int pix = 0;
+
+	for (pix = 0; pix < ST7735S_WIDTH * ST7735S_HEIGHT; pix++) {
+		lcd->frame_buffer[pix] =
+				st7735s_conversion_color(*(u16 *)image);
+		image += 2;
+	}
+
+	st7735s_update_screen(lcd);
+}
+
+void st7735s_fill_rectangle(struct st7735s *lcd, u16 x, u16 y, u16 w, u16 h,
+						u16 color)
+{
+	u16 i = 0;
+	u16 j = 0;
+
+	if ((x >= ST7735S_WIDTH) || (y >= ST7735S_HEIGHT))
+		return;
+
+	if ((x + w - 1) > ST7735S_WIDTH)
+		w = ST7735S_WIDTH - x;
+
+	if ((y + h - 1) > ST7735S_HEIGHT)
+		h = ST7735S_HEIGHT - y;
+
+	for (j = 0; j < h; ++j)
+		for (i = 0; i < w; ++i) {
+			lcd->frame_buffer[(x + ST7735S_WIDTH * y) +
+		(i + ST7735S_WIDTH * j)] = st7735s_conversion_color(color);
+		}
+
+	st7735s_update_screen(lcd);
+}
+
 static int st7735s_probe(struct spi_device *spi)
 {
 	struct st7735s *lcd;
@@ -196,8 +254,8 @@ static int st7735s_probe(struct spi_device *spi)
 	struct gpio_desc *gpiod;
 
 	lcd = devm_kzalloc(&spi->dev, sizeof(*lcd), GFP_KERNEL);
-	if (!lcd) {
-		dev_err(&spi->dev, "error mem <devm_kzalloc> \n");
+	if (IS_ERR(lcd)) {
+		dev_err(&spi->dev, "error mem <devm_kzalloc>\n");
 		return -ENOMEM;
 	}
 
@@ -247,8 +305,23 @@ static int st7735s_probe(struct spi_device *spi)
 	st7735s_execute_command_list(lcd, init_cmds1);
 	st7735s_execute_command_list(lcd, init_cmds2);
 	st7735s_execute_command_list(lcd, init_cmds3);
-	st7735s_set_address_window(lcd, 0, 0, ST7735S_WIDTH - 1, ST7735S_HEIGHT - 1);
+	st7735s_set_address_window(lcd, 0, 0, ST7735S_WIDTH - 1,
+						ST7735S_HEIGHT - 1);
 	dev_info(&spi->dev, "device init completed\n");
+
+	memset(lcd->frame_buffer, 0xFFFF, sizeof(lcd->frame_buffer));
+
+	// 128*160
+	// Example x-y-w-h
+	//st7735s_fill_rectangle(lcd, 0, 0, ST7735S_WIDTH,
+	//					ST7735S_HEIGHT, 0x07A5);
+	//st7735s_fill_rectangle(lcd, 0, 0, 30, 30, 0xF0DD);
+	//st7735s_fill_rectangle(lcd, 98, 0, 30, 30, 0xF1A0);
+	//st7735s_fill_rectangle(lcd, 98, 130, 30, 30, 0xEF83);
+	//st7735s_fill_rectangle(lcd, 0, 130, 30, 30, 0x18DE);
+
+	// Test load image
+	st7735s_load_image(lcd, lcd_image);
 
 	dev_set_drvdata(&spi->dev, lcd);
 
