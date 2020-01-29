@@ -21,12 +21,23 @@
 #define ST7735S_MADCTL_MY	0x80
 #define ST7735S_MADCTL_MX	0x40
 
+// WaveShare ST7735S-based 1.8" display, default orientation
+/*
 #define ST7735S_IS_160X128	1
 #define ST7735S_WIDTH		128
 #define ST7735S_HEIGHT		160
 #define ST7735S_XSTART		0
 #define ST7735S_YSTART		0
-#define ST7735S_ROTATION	(ST7735S_MADCTL_MX | ST7735S_MADCTL_MY)
+#define ST7735S_ROTATION	(ST7735S_MADCTL_MX | ST7735S_MADCTL_MY | ST7735S_MADCTL_RGB)
+*/
+
+// 1.44" display, default orientation
+#define ST7735S_IS_128X128	1
+#define ST7735S_WIDTH		128
+#define ST7735S_HEIGHT		128
+#define ST7735S_XSTART		2
+#define ST7735S_YSTART		3
+#define ST7735S_ROTATION	(ST7735S_MADCTL_MX | ST7735S_MADCTL_MY | ST7735S_MADCTL_BGR)
 
 // Commands
 #define ST7735S_SWRESET		0x01 // SoftWare Reset
@@ -65,12 +76,12 @@ static const u8 init_cmds1[] = {
 	ST7735S_SLPOUT, DELAY,	// 2: Out of sleep mode, 0 args, w/delay
 	255,			// 255 ms delay
 	ST7735S_FRMCTR1, 3,	// 3: Frame rate ctrl - normal mode, 3 args:
-	0x02, 0x2D, 0x2E,	// Rate = fosc/(0x02+40) * (LINE+2D+2E)
-	ST7735S_FRMCTR2, 3,	// 4: Frame rate control - idle mode, 3 args:
-	0x02, 0x2D, 0x2E,	// Rate = fosc/(0x02+40) * (LINE+2D+2E)
-	ST7735S_FRMCTR3, 6,	// 5: Frame rate ctrl - partial mode, 6 args:
-	0x02, 0x2D, 0x2E,	// Dot inversion mode
-	0x02, 0x2D, 0x2E,	// Line inversion mode
+	0x01, 0x2C, 0x2D,	// Rate = fosc/(1x2+40) * (LINE+2C+2D)
+	ST7735S_FRMCTR2, 3, 	// 4: Frame rate control - idle mode, 3 args:
+	0x01, 0x2C, 0x2D,	// Rate = fosc/(1x2+40) * (LINE+2C+2D)
+	ST7735S_FRMCTR3, 6, 	// 5: Frame rate ctrl - partial mode, 6 args:
+	0x01, 0x2C, 0x2D,	// Dot inversion mode
+	0x01, 0x2C, 0x2D,	// Line inversion mode
 	ST7735S_INVCTR, 1,	// 6: Display inversion ctrl, 1 arg, no delay:
 	0x07,			// No inversion
 	ST7735S_PWCTR1, 3,	// 7: Power control, 3 args, no delay:
@@ -96,6 +107,7 @@ static const u8 init_cmds1[] = {
 	0x05
 }; // 16-bit color
 
+#ifdef ST7735S_IS_128X128
 static const u8 init_cmds2[] = {
 	// Init for st7735s, part 2
 	2,			// 2 commands in list:
@@ -104,8 +116,20 @@ static const u8 init_cmds2[] = {
 	0x00, 0x7F,		// XEND = 127
 	ST7735S_RASET, 4,	// 2: Row addr set, 4 args, no delay:
 	0x00, 0x00,		// XSTART = 0
-	0x00, 0x9F
+	0x00, 0x7F		// XEND = 127
 };
+#elif ST7735S_IS_160X128
+static const u8 init_cmds2[] = {
+	// Init for st7735s, part 2
+	2,			// 2 commands in list:
+	ST7735S_CASET, 4,	// 1: Column addr set, 4 args, no delay:
+	0x00, 0x00,		// XSTART = 0
+	0x00, 0x7F,		// XEND = 127
+	ST7735S_RASET, 4,	// 2: Row addr set, 4 args, no delay:
+	0x00, 0x00,		// XSTART = 0
+	0x00, 0x9F		// XEND = 159
+};
+#endif
 
 static const u8 init_cmds3[] = {
 	// Init for st7735s, part 3
@@ -204,18 +228,6 @@ static void st7735s_set_address_window(struct st7735s *lcd, u8 x0, u8 y0,
 	st7735s_write_command(lcd, ST7735S_RAMWR);
 }
 
-static u16 st7735s_conversion_color(u16 color)
-{
-	u16 c = 0;
-
-	c = (color & 0x001F) << 8; // Blue
-	c |= (color & 0xF800) >> 8; // Red
-	c |= (color & 0x0700) >> 8; // Green 1
-	c |= (color & 0x00E0) << 8; // Green 2
-
-	return c;
-}
-
 inline void st7735s_update_screen(struct st7735s *lcd)
 {
 	st7735s_write_data(lcd, (u8 *)lcd->frame_buffer,
@@ -224,14 +236,7 @@ inline void st7735s_update_screen(struct st7735s *lcd)
 
 void st7735s_load_image(struct st7735s *lcd, const u8 *image)
 {
-	int pix = 0;
-
-	for (pix = 0; pix < ST7735S_WIDTH * ST7735S_HEIGHT; pix++) {
-		lcd->frame_buffer[pix] =
-				st7735s_conversion_color(*(u16 *)image);
-		image += 2;
-	}
-
+	memcpy(lcd->frame_buffer, image, ST7735S_WIDTH * ST7735S_HEIGHT * 2);
 	st7735s_update_screen(lcd);
 }
 
@@ -253,7 +258,7 @@ void st7735s_fill_rectangle(struct st7735s *lcd, u16 x, u16 y, u16 w, u16 h,
 	for (j = 0; j < h; ++j) {
 		for (i = 0; i < w; ++i) {
 			lcd->frame_buffer[(x + ST7735S_WIDTH * y) +
-		(i + ST7735S_WIDTH * j)] = st7735s_conversion_color(color);
+		(i + ST7735S_WIDTH * j)] = (color >> 8) | (color << 8);
 		}
 	}
 
@@ -363,7 +368,7 @@ static ssize_t st7735s_cdev_write(struct file *filp, const char __user *buf,
 
 	for (pix = 0; pix < ret; pix++) {
 		p = lcd->frame_buffer[pix];
-		lcd->frame_buffer[pix] = st7735s_conversion_color(p);
+		lcd->frame_buffer[pix] = (p >> 8) | (p << 8);
 	}
 
 	st7735s_update_screen(lcd);
@@ -443,16 +448,15 @@ static int st7735s_probe(struct spi_device *spi)
 
 	memset(lcd->frame_buffer, 0xFFFF, sizeof(lcd->frame_buffer));
 
-	// 128*160
 	// Example x-y-w-h
 	//st7735s_fill_rectangle(lcd, 0, 0, ST7735S_WIDTH,
-	//					ST7735S_HEIGHT, 0x07A5);
+	//					ST7735S_HEIGHT, 0x001F);
 	//st7735s_fill_rectangle(lcd, 0, 0, 30, 30, 0xF0DD);
 	//st7735s_fill_rectangle(lcd, 98, 0, 30, 30, 0xF1A0);
-	//st7735s_fill_rectangle(lcd, 98, 130, 30, 30, 0xEF83);
-	//st7735s_fill_rectangle(lcd, 0, 130, 30, 30, 0x18DE);
+	//st7735s_fill_rectangle(lcd, 98, 98, 30, 30, 0xEF83);
+	//st7735s_fill_rectangle(lcd, 0, 98, 30, 30, 0x18DE);
 
-	// Test load image
+	// Test load image 128x128
 	st7735s_load_image(lcd, lcd_image);
 
 	lcd->count = 1;

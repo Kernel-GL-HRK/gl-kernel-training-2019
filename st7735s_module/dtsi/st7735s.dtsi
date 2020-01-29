@@ -11,7 +11,7 @@
 		target = <&pio>;
 		__overlay__ {
 			st7735s_pins: pin_out {
-			pins = "PA0","PA1";
+			pins = "PA1","PA6";
 			function = "gpio_out";
 			};
 		};
@@ -30,7 +30,7 @@
 				spi-max-frequency = <0xf4240>;
 				pinctrl-names = "default";
 				pinctrl-0 = <&st7735s_pins>;
-				a0-gpios = <&pio 0 0 0>;
+				a0-gpios = <&pio 0 6 0>;
 				reset-gpios = <&pio 0 1 0>;
 				status = "okay";
 			};
